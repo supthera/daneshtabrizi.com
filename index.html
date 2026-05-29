@@ -5,31 +5,31 @@
 <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
 
 <!-- ============ SEO / SOCIAL ============ -->
-<title>Danesh Tabrizi — The Network</title>
-<meta name="description" content="A privately owned broadcast network: the domains, online businesses and YouTube channels built and operated by Danesh Tabrizi. One frequency for everything." />
+<title>Danesh Tabrizi — Operative File</title>
+<meta name="description" content="Classified registry of domains, ventures, and signal feeds operated by Danesh Tabrizi. One operative. One network. All assets accounted for." />
 <meta name="author" content="Danesh Tabrizi" />
 <meta name="theme-color" content="#0c0b0b" />
 <link rel="canonical" href="https://daneshtabrizi.com/" />
 <meta property="og:type" content="website" />
-<meta property="og:title" content="Danesh Tabrizi — The Network" />
-<meta property="og:description" content="Every domain, business and channel I've built — broadcasting on one frequency." />
+<meta property="og:title" content="Danesh Tabrizi — Operative File" />
+<meta property="og:description" content="Every domain, venture, and comms channel — logged in one classified registry." />
 <meta property="og:url" content="https://daneshtabrizi.com/" />
 <meta property="og:site_name" content="daneshtabrizi.com" />
 <meta property="og:image" content="https://daneshtabrizi.com/og.jpg" />
 <meta property="og:image:width" content="1200" />
 <meta property="og:image:height" content="630" />
 <meta name="twitter:card" content="summary_large_image" />
-<meta name="twitter:title" content="Danesh Tabrizi — The Network" />
-<meta name="twitter:description" content="Every domain, business and channel I've built — on one frequency." />
+<meta name="twitter:title" content="Danesh Tabrizi — Operative File" />
+<meta name="twitter:description" content="Every domain, venture, and comms channel — one operative file." />
 <meta name="twitter:image" content="https://daneshtabrizi.com/og.jpg" />
 
-<!-- Fonts: Big Shoulders Display (display) + DM Mono (broadcast UI) -->
+<!-- Fonts: Big Shoulders Display (display) + DM Mono (intel terminal UI) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
 <link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
 
 <script type="application/ld+json">
-{ "@context":"https://schema.org","@type":"Person","name":"Danesh Tabrizi","url":"https://daneshtabrizi.com","jobTitle":"Founder / Operator","sameAs":["https://YOUR_LINK_HERE","https://YOUR_LINK_HERE"] }
+{ "@context":"https://schema.org","@type":"Person","name":"Danesh Tabrizi","url":"https://daneshtabrizi.com","jobTitle":"Principal Operative","sameAs":["https://YOUR_LINK_HERE","https://YOUR_LINK_HERE"] }
 </script>
 
 <style>
@@ -44,7 +44,7 @@
   --faint: #4a4640;
   --amber: #ffae3b;
   --rec:   #ff4338;
-  --cyan:  #2fd2e6;   /* colored-static channels */
+  --cyan:  #2fd2e6;   /* intercept glitch channels */
   --mag:   #ff4f9d;
   --line:  rgba(236,230,218,0.12);
   --maxw:  1360px;
@@ -72,26 +72,56 @@ h1,h2,h3{font-family:"Big Shoulders Display",sans-serif;font-weight:800;line-hei
 .static-global{ position:fixed; inset:0; z-index:9050; pointer-events:none;
   background-image:var(--noise); background-size:300px; opacity:.04; mix-blend-mode:screen; }
 .scanlines{ position:fixed; inset:0; z-index:9100; pointer-events:none;
-  background:repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,0.2) 3px, transparent 4px);
-  mix-blend-mode:multiply; opacity:.5; }
+  background:repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,0.12) 4px, transparent 5px);
+  mix-blend-mode:multiply; opacity:.35; }
 .crt-vignette{ position:fixed; inset:0; z-index:9080; pointer-events:none;
   background:radial-gradient(125% 115% at 50% 50%, transparent 62%, rgba(0,0,0,0.5) 100%);
   box-shadow:inset 0 0 150px rgba(0,0,0,0.65); }
 
-/* colored-static glitch — the hover effect, reused everywhere */
-@keyframes noiseShift{ 0%{background-position:0 0} 100%{background-position:88px -66px} }
-.fx{ position:relative; }
+/* intercept glitch — smooth chromatic burst on hover */
+.fx{
+  position:relative; display:inline-block;
+  transform:translateZ(0);
+}
 .fx::before, .fx::after{
   content:attr(data-text); position:absolute; left:0; top:0; width:100%; height:100%;
-  -webkit-background-clip:text; background-clip:text;
-  -webkit-text-fill-color:transparent; color:transparent;
-  background-size:150px 150px; opacity:0; pointer-events:none;
-  transition:opacity .18s var(--ease), transform .18s var(--ease);
+  opacity:0; pointer-events:none; will-change:transform,opacity;
 }
-.fx::before{ background-image:var(--noise); background-color:var(--cyan); background-blend-mode:screen; }
-.fx::after { background-image:var(--noise); background-color:var(--mag);  background-blend-mode:screen; }
-.fx-on::before{ opacity:.92; transform:translateX(-3px); animation:noiseShift .26s steps(3) infinite; }
-.fx-on::after { opacity:.92; transform:translateX(3px);  animation:noiseShift .26s steps(3) infinite reverse; }
+.fx::before{ color:var(--cyan); mix-blend-mode:screen; }
+.fx::after { color:var(--mag);  mix-blend-mode:screen; }
+@keyframes fxSplit{
+  0%,100%{ text-shadow:none; transform:translate3d(0,0,0); }
+  12%{ text-shadow:-4px 0 rgba(47,210,230,.9), 4px 0 rgba(255,79,157,.85); transform:translate3d(-1px,0,0); }
+  28%{ text-shadow:5px 0 rgba(47,210,230,.75), -5px 0 rgba(255,79,157,.7); transform:translate3d(1px,0,0); }
+  44%{ text-shadow:-3px 0 rgba(47,210,230,.55), 3px 0 rgba(255,79,157,.5); transform:translate3d(-1px,0,0); }
+  60%{ text-shadow:2px 0 rgba(47,210,230,.28), -2px 0 rgba(255,79,157,.24); }
+  76%{ text-shadow:-1px 0 rgba(47,210,230,.1), 1px 0 rgba(255,79,157,.08); }
+}
+@keyframes fxGhostL{
+  0%,100%{ opacity:0; transform:translate3d(0,0,0); }
+  10%{ opacity:.8; transform:translate3d(-7px,0,0); }
+  26%{ opacity:.6; transform:translate3d(5px,-1px,0); }
+  42%{ opacity:.72; transform:translate3d(-5px,0,0); }
+  58%{ opacity:.38; transform:translate3d(3px,1px,0); }
+  74%{ opacity:.14; transform:translate3d(-2px,0,0); }
+}
+@keyframes fxGhostR{
+  0%,100%{ opacity:0; transform:translate3d(0,0,0); }
+  10%{ opacity:.8; transform:translate3d(7px,0,0); }
+  26%{ opacity:.6; transform:translate3d(-5px,1px,0); }
+  42%{ opacity:.72; transform:translate3d(5px,0,0); }
+  58%{ opacity:.38; transform:translate3d(-3px,-1px,0); }
+  74%{ opacity:.14; transform:translate3d(2px,0,0); }
+}
+.fx.fx-burst{
+  animation:fxSplit .82s cubic-bezier(.22,.85,.28,1) forwards;
+}
+.fx.fx-burst::before{
+  animation:fxGhostL .82s cubic-bezier(.22,.85,.28,1) forwards;
+}
+.fx.fx-burst::after{
+  animation:fxGhostR .82s cubic-bezier(.22,.85,.28,1) forwards;
+}
 
 /* viewfinder cursor */
 .reticle{ position:fixed; top:0; left:0; z-index:9500; width:24px; height:24px; pointer-events:none;
@@ -113,8 +143,8 @@ section{position:relative}
 .sec-head .meta{ text-align:right }
 .bars{ display:flex; height:6px; width:100% }
 .bars i{ flex:1 }
-.bars .b1{background:#c9c4b8}.bars .b2{background:#cabf45}.bars .b3{background:#5fb0c2}
-.bars .b4{background:#56a067}.bars .b5{background:#a85a8c}.bars .b6{background:#c0504d}.bars .b7{background:#4a5ab0}
+.bars .b1{background:#4a4640}.bars .b2{background:#6b7c5e}.bars .b3{background:#5a6a72}
+.bars .b4{background:#56a067}.bars .b5{background:#8d877b}.bars .b6{background:#4a5ab0}.bars .b7{background:#3d3a36}
 
 /* ============================================================
    TOP BAR
@@ -127,7 +157,8 @@ section{position:relative}
 .topbar .brand b{color:var(--amber)}
 .topbar .right{ display:flex; align-items:center; gap:18px; color:var(--dim) }
 .onair{ display:inline-flex; align-items:center; gap:8px; color:var(--ink) }
-.onair .dot{ width:9px; height:9px; border-radius:50%; background:var(--rec); box-shadow:0 0 8px var(--rec) }
+.onair .dot{ width:9px; height:9px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067; animation:opsPulse 2.4s ease-in-out infinite }
+@keyframes opsPulse{ 0%,100%{opacity:1} 50%{opacity:.45} }
 .tc{ font-variant-numeric:tabular-nums }
 @media (max-width:620px){ .topbar .tc-label,.topbar .sep{display:none} }
 
@@ -135,7 +166,7 @@ section{position:relative}
    HERO
 ============================================================ */
 .hero{ min-height:100svh; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding-top:60px; position:relative }
-#static-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.16; image-rendering:pixelated }
+#static-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.08; image-rendering:pixelated }
 .hero-scrim{ position:absolute; inset:0; z-index:1; pointer-events:none;
   background:radial-gradient(110% 90% at 50% 45%, rgba(12,11,11,0.25), rgba(12,11,11,0.92) 85%) }
 .hero .wrap{ position:relative; z-index:2 }
@@ -145,7 +176,7 @@ section{position:relative}
 .hero h1 .l{ display:block; overflow:hidden }
 .hero h1 .l span{ display:inline-block; transform:translateY(110%) }
 .hero h1 .out{ -webkit-text-stroke:1.5px var(--ink); color:transparent }
-.hero-sub{ margin-top:clamp(20px,4vh,40px); display:flex; flex-wrap:wrap; gap:26px; align-items:center; justify-content:space-between }
+.hero-sub{ margin-top:clamp(20px,4vh,40px); display:flex; flex-wrap:wrap; gap:26px; align-items:center; justify-content:space-between; position:relative; z-index:3 }
 .typed{ font-size:clamp(0.85rem,2.2vw,1.15rem); letter-spacing:0.06em; min-height:1.5em }
 .typed .c{ display:inline-block; width:9px; height:1.05em; background:var(--amber); vertical-align:-0.15em; margin-left:2px }
 .cta{ display:inline-flex; align-items:center; gap:12px; padding:15px 24px; border:1px solid var(--ink);
@@ -158,20 +189,20 @@ section{position:relative}
 /* --- HERO SUBJECT FILE (espionage dossier / POI target lock) --- */
 .dossier{ width:min(342px,82vw); border:1px solid var(--line); background:rgba(14,13,12,0.74);
   backdrop-filter:blur(7px); border-radius:3px; padding:13px; font-size:0.72rem;
-  position:absolute; top:50%; transform:translateY(-50%); z-index:2; }
+  position:absolute; z-index:2; top:0; bottom:0; height:fit-content; margin-top:auto; margin-bottom:auto; }
 @media (min-width:1024px){
-  .dossier{ right:clamp(18px,4vw,56px); left:auto; }
+  .dossier{ right:clamp(18px,4vw,56px); left:auto; margin-bottom:6vh; }
 }
 @media (min-width:1472px){
   .dossier{ right:calc((100vw - var(--maxw)) / 2 + clamp(18px, 4vw, 56px)); }
 }
 @media (max-width:1023px){
-  .dossier{ left:clamp(18px,4vw,56px); right:auto; }
+  .dossier{ left:auto; right:clamp(18px,4vw,56px); width:min(300px,58vw); margin-bottom:16vh; }
 }
 .dz-top{ display:flex; justify-content:space-between; align-items:center; letter-spacing:0.14em; text-transform:uppercase;
   color:var(--dim); border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:11px }
 .dz-track{ display:inline-flex; align-items:center; gap:6px; color:var(--ink) }
-.dz-track i{ width:7px; height:7px; border-radius:50%; background:var(--rec); box-shadow:0 0 8px var(--rec) }
+.dz-track i{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067; animation:opsPulse 2.4s ease-in-out infinite }
 .dz-photo{ position:relative; aspect-ratio:1/1; width:100%; overflow:hidden; border:1px solid var(--line); background:#0a0908; margin-bottom:12px }
 .dz-ph,.dz-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
 .dz-ph{ display:grid; place-items:center; font-family:"Big Shoulders Display"; font-weight:900; font-size:5rem;
@@ -198,7 +229,7 @@ section{position:relative}
   background:repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 3px, var(--ink) 3px 4px, transparent 4px 7px) }
 
 /* ============================================================
-   STATIONS (domains / businesses)
+   ASSETS (domains / businesses)
 ============================================================ */
 .stations{ padding:clamp(80px,12vh,150px) 0 }
 .band{ display:inline-flex; gap:4px; border:1px solid var(--line); border-radius:2px; padding:4px; margin-bottom:34px }
@@ -209,7 +240,7 @@ section{position:relative}
 .station{ position:relative; display:grid; align-items:center; gap:20px;
   grid-template-columns:78px 1fr 190px 120px 120px; padding:26px 14px;
   border-bottom:1px solid var(--line); overflow:hidden; transition:padding-left .3s var(--ease) }
-.station .ch{ font-size:0.72rem; color:var(--amber); letter-spacing:0.1em }
+.station .ch{ font-size:0.72rem; color:var(--amber); letter-spacing:0.1em; font-variant-numeric:tabular-nums }
 .station .domain{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:lowercase;
   font-size:clamp(1.5rem,3.4vw,2.7rem); line-height:1; white-space:nowrap }
 .station .cat{ font-size:0.68rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--dim) }
@@ -228,22 +259,24 @@ section{position:relative}
 }
 
 /* ============================================================
-   CHANNELS (YouTube) — CRT sets
+   SIGNAL FEEDS (YouTube) — surveillance terminals
 ============================================================ */
 .channels{ padding:clamp(70px,10vh,130px) 0 }
 .tvgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:clamp(18px,2vw,30px) }
 .tv{ display:block }
-.screen{ position:relative; aspect-ratio:4/3; border-radius:14px/18px; overflow:hidden;
-  background:#070707; border:1px solid var(--line);
-  box-shadow:inset 0 0 60px rgba(0,0,0,0.9), inset 0 0 14px rgba(0,0,0,0.8) }
+.screen{ position:relative; aspect-ratio:4/3; border-radius:2px; overflow:hidden;
+  background:#060807; border:1px solid var(--line);
+  box-shadow:inset 0 0 40px rgba(0,0,0,0.85), 0 0 0 1px rgba(47,210,230,0.06) }
 .screen::before{ content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
-  background:repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,0.25) 3px); opacity:.5 }
-.screen .snow{ position:absolute; inset:0; background-image:var(--noise); background-size:200px; opacity:.22; mix-blend-mode:screen; transition:opacity .3s }
-.tv:hover .screen .snow{ opacity:.06 }
-.screen .glow{ position:absolute; inset:0; background:radial-gradient(120% 100% at 50% 120%, rgba(255,174,59,0.14), transparent 60%) }
-.screen .bug{ position:absolute; top:12px; right:12px; z-index:4; display:flex; align-items:center; gap:7px; font-size:0.62rem; letter-spacing:0.12em }
-.screen .bug .d{ width:7px; height:7px; border-radius:50%; background:var(--rec); box-shadow:0 0 8px var(--rec) }
-.screen .num{ position:absolute; top:12px; left:14px; z-index:4; font-family:"Big Shoulders Display"; font-weight:800; font-size:1.4rem; color:var(--amber) }
+  background:repeating-linear-gradient(to bottom, transparent 0 3px, rgba(0,0,0,0.18) 4px); opacity:.35 }
+.screen::after{ content:""; position:absolute; inset:0; z-index:2; pointer-events:none;
+  background:linear-gradient(135deg, rgba(47,210,230,0.04) 0%, transparent 45%, rgba(255,174,59,0.03) 100%) }
+.screen .snow{ position:absolute; inset:0; background-image:var(--noise); background-size:200px; opacity:.12; mix-blend-mode:screen; transition:opacity .3s }
+.tv:hover .screen .snow{ opacity:.04 }
+.screen .glow{ position:absolute; inset:0; background:radial-gradient(120% 100% at 50% 0%, rgba(47,210,230,0.08), transparent 55%) }
+.screen .bug{ position:absolute; top:12px; right:12px; z-index:4; display:flex; align-items:center; gap:7px; font-size:0.62rem; letter-spacing:0.12em; color:var(--cyan) }
+.screen .bug .d{ width:7px; height:7px; border-radius:50%; background:var(--cyan); box-shadow:0 0 8px var(--cyan); animation:opsPulse 2.4s ease-in-out infinite }
+.screen .num{ position:absolute; top:12px; left:14px; z-index:4; font-family:"DM Mono",monospace; font-weight:500; font-size:0.68rem; letter-spacing:0.14em; color:var(--dim) }
 .screen .title{ position:absolute; left:14px; bottom:14px; right:14px; z-index:4;
   font-family:"Big Shoulders Display"; font-weight:800; text-transform:uppercase; line-height:0.92;
   font-size:clamp(1.4rem,2.6vw,2rem); transition:transform .3s var(--ease) }
@@ -252,10 +285,10 @@ section{position:relative}
 .tv-meta .nm{ font-size:0.92rem }
 .tv-meta .hd{ font-size:0.72rem; color:var(--dim) }
 .tv-meta .st{ font-size:0.68rem; color:var(--dim); letter-spacing:0.06em; width:100% }
-.tv-meta .watch{ font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--amber) }
+.tv-meta .watch{ font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--cyan) }
 
 /* ============================================================
-   STATION ID (about)
+   OPERATIONAL BRIEF (about)
 ============================================================ */
 .about{ padding:clamp(70px,11vh,150px) 0; border-top:1px solid var(--line) }
 .about .lead{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:uppercase;
@@ -288,7 +321,8 @@ section{position:relative}
 @media (prefers-reduced-motion:reduce){
   *{animation:none !important; transition:none !important}
   .up{opacity:1; transform:none}
-  .fx-on::before,.fx-on::after{opacity:.6}
+  .fx.fx-burst{ animation:none; text-shadow:none; transform:none; }
+  .fx.fx-burst::before,.fx.fx-burst::after{ animation:none; opacity:0; transform:none; }
 }
 </style>
 </head>
@@ -301,12 +335,12 @@ section{position:relative}
 
 <!-- TOP BAR -->
 <header class="topbar">
-  <a class="brand" href="#top">DT<b>//</b>NETWORK</a>
+  <a class="brand" href="#top">DT<b>//</b>BUREAU</a>
   <div class="right">
-    <span class="tc-label">TC</span>
+    <span class="tc-label">UTC</span>
     <span class="tc" id="tc">00:00:00</span>
     <span class="sep">·</span>
-    <span class="onair"><span class="dot"></span>ON AIR</span>
+    <span class="onair"><span class="dot"></span>OPERATIONAL</span>
   </div>
 </header>
 
@@ -318,7 +352,7 @@ section{position:relative}
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="wrap">
     <div class="hero-kicker mono-label">
-      <span class="tag">CH 00 — MASTER FEED</span>
+      <span class="tag">CASE FILE // PRIMARY</span>
       <span>EST. MMXXV</span>
     </div>
     <h1 aria-label="Danesh Tabrizi">
@@ -327,7 +361,7 @@ section{position:relative}
     </h1>
     <div class="hero-sub">
       <p class="typed" aria-live="polite"></p>
-      <a class="cta" href="#stations">Open the Guide →</a>
+      <a class="cta" href="#stations">Open Asset Registry →</a>
     </div>
   </div>
 
@@ -344,59 +378,59 @@ section{position:relative}
     <div class="dz-rows">
       <div class="dz-row"><span class="k">Subject</span><span class="v">Danesh Tabrizi</span></div>
       <div class="dz-row"><span class="k">DOB</span><span class="v">13 Feb 1994 · <span id="dz-age">—</span> yrs</span></div>
-      <div class="dz-row"><span class="k">Class</span><span class="v">Operator / Network Admin</span></div>
+      <div class="dz-row"><span class="k">Class</span><span class="v">Principal Operative</span></div>
       <div class="dz-row"><span class="k">Status</span><span class="v amber">Active</span></div>
       <div class="dz-row"><span class="k">Last Seen</span><span class="v"><span class="redact">CLASSIFIED</span></span></div>
       <div class="dz-row"><span class="k">Clearance</span><span class="v">LVL ███</span></div>
     </div>
     <div class="dz-foot"><span class="dz-id">ID//DT-0213-1994</span><span class="dz-bars" aria-hidden="true"></span></div>
   </aside>
-  <div class="scrollcue" aria-hidden="true"><span class="ln"></span><span>Tune In</span></div>
+  <div class="scrollcue" aria-hidden="true"><span class="ln"></span><span>Proceed</span></div>
 </section>
 
-<!-- STATIONS -->
-<section class="stations" id="stations" aria-label="Websites and businesses">
+<!-- ASSETS -->
+<section class="stations" id="stations" aria-label="Domains and ventures">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up">My<br>Domains</h2>
+      <h2 class="up">My<br>Assets</h2>
       <div class="meta up">
-        <p class="mono-label">Owned &amp; Operated</p>
-        <p class="mono-label" style="margin-top:6px;">Domains · Businesses</p>
+        <p class="mono-label">Confirmed Holdings</p>
+        <p class="mono-label" style="margin-top:6px;">Assets · Fronts · Ventures</p>
       </div>
     </div>
-    <div class="band up" role="tablist" aria-label="Filter stations">
+    <div class="band up" role="tablist" aria-label="Filter assets">
       <button class="on" data-f="all" role="tab" aria-selected="true">All</button>
-      <button data-f="business" role="tab">Businesses</button>
-      <button data-f="design" role="tab">Designs</button>
+      <button data-f="business" role="tab">Commercial</button>
+      <button data-f="design" role="tab">Cover Ops</button>
     </div>
     <div class="guide up" id="guide"></div>
   </div>
 </section>
 
-<!-- CHANNELS -->
-<section class="channels" id="channels" aria-label="YouTube channels">
+<!-- SIGNAL FEEDS -->
+<section class="channels" id="channels" aria-label="YouTube and comms feeds">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up">The<br>Channels</h2>
+      <h2 class="up">Signal<br>Feeds</h2>
       <div class="meta up">
-        <p class="mono-label">YouTube</p>
-        <p class="mono-label" style="margin-top:6px;">Now Broadcasting</p>
+        <p class="mono-label">Comms Intel</p>
+        <p class="mono-label" style="margin-top:6px;">Intercepted · Active</p>
       </div>
     </div>
     <div class="tvgrid up" id="tvgrid"></div>
   </div>
 </section>
 
-<!-- STATION ID -->
+<!-- OPERATIONAL BRIEF -->
 <section class="about" aria-label="About">
   <div class="wrap">
-    <p class="mono-label up" style="margin-bottom:24px;">— Station Identification</p>
-    <h3 class="lead up">One <span class="amber">operator</span>. One frequency. Every property I've built, broadcasting in one place.</h3>
-    <p class="body up">No third party. No middleman. This is the master feed for everything under my name — the sites I design, the businesses I run, and the channels I broadcast. Change the channel below.</p>
+    <p class="mono-label up" style="margin-bottom:24px;">— Operational Brief</p>
+    <h3 class="lead up">One <span class="amber">operative</span>. One network. Every asset I've built — logged and accounted for.</h3>
+    <p class="body up">No third party. No handler. This is the primary file for everything under my name — the domains I hold, the ventures I run, and the comms channels I maintain. Review the registry below.</p>
     <div class="stats">
-      <div class="stat-b up"><div class="n" data-count="0" id="cnt-stations">0</div><div class="l mono-label">Stations</div></div>
-      <div class="stat-b up"><div class="n" data-count="0" id="cnt-channels">0</div><div class="l mono-label">Channels</div></div>
-      <div class="stat-b up"><div class="n" data-count="100">0</div><div class="l mono-label">% Owned</div></div>
+      <div class="stat-b up"><div class="n" data-count="0" id="cnt-stations">0</div><div class="l mono-label">Assets</div></div>
+      <div class="stat-b up"><div class="n" data-count="0" id="cnt-channels">0</div><div class="l mono-label">Feeds</div></div>
+      <div class="stat-b up"><div class="n" data-count="100">0</div><div class="l mono-label">% Controlled</div></div>
     </div>
   </div>
 </section>
@@ -405,7 +439,7 @@ section{position:relative}
 <footer class="footer" id="contact" aria-label="Contact">
   <div class="wrap">
     <div class="bars" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><i class="b5"></i><i class="b6"></i><i class="b7"></i></div>
-    <a class="contact" href="mailto:hello@daneshtabrizi.com">Get In<br><span class="o">Touch</span></a>
+    <a class="contact" href="mailto:hello@daneshtabrizi.com">Establish<br><span class="o">Contact</span></a>
     <div class="foot-row">
       <div class="socials" aria-label="Social">
         <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24" fill="none"><path class="m" d="M4 4 L20 20 M20 4 L4 20" stroke="#ece6da" stroke-width="1.6"/></svg></a>
@@ -413,7 +447,7 @@ section{position:relative}
         <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none"><rect class="m" x="3" y="6" width="18" height="12" rx="3" stroke="#ece6da" stroke-width="1.6"/><path d="M10 9.5 L15 12 L10 14.5 Z" fill="#ece6da"/></svg></a>
         <a href="mailto:hello@daneshtabrizi.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none"><path class="m" d="M4 6 h16 v12 H4 Z M4 7 l8 6 8 -6" stroke="#ece6da" stroke-width="1.6" stroke-linejoin="round"/></svg></a>
       </div>
-      <div class="colophon">© <span id="year"></span> DANESH TABRIZI — END OF TRANSMISSION · <a href="#top">RETURN TO FEED ↑</a></div>
+      <div class="colophon">© <span id="year"></span> DANESH TABRIZI — DOCUMENT SEALED · <a href="#top">RETURN TO BRIEF ↑</a></div>
     </div>
   </div>
 </footer>
@@ -426,27 +460,36 @@ section{position:relative}
 <script>
 /* ============================================================
    EDIT YOUR CONTENT HERE
-   STATIONS = your websites / online businesses (type: business | design)
-   CHANNELS = your YouTube channels
+   ASSETS = your websites / online businesses (type: business | design)
+   FEEDS = your YouTube / comms channels
 ============================================================ */
-const STATIONS = [
-  { domain:"yourstore.com",  cat:"E-Commerce",    type:"business", url:"https://YOUR_LINK_HERE" },
-  { domain:"yoursaas.io",    cat:"SaaS Product",  type:"business", url:"https://YOUR_LINK_HERE" },
-  { domain:"yourstudio.com", cat:"Design Studio", type:"business", url:"https://YOUR_LINK_HERE" },
-  { domain:"yourname.dev",   cat:"Portfolio",     type:"design",   url:"https://YOUR_LINK_HERE" },
-  { domain:"yourmedia.co",   cat:"Media / Blog",  type:"business", url:"https://YOUR_LINK_HERE" },
-  { domain:"yourtool.app",   cat:"Micro-Tool",    type:"design",   url:"https://YOUR_LINK_HERE" },
+const ASSETS = [
+  { domain:"medicareagencyfinder.com", cat:"Healthcare",      type:"business", url:"https://medicareagencyfinder.com" },
+  { domain:"ordinova.com",             cat:"Ventures",        type:"business", url:"https://ordinova.com" },
+  { domain:"opusgrex.com",             cat:"Operations",      type:"business", url:"https://opusgrex.com" },
+  { domain:"supthera.com",             cat:"Therapeutics",    type:"business", url:"https://supthera.com" },
+  { domain:"coolstaffingschool.com",   cat:"Staffing",        type:"business", url:"https://coolstaffingschool.com" },
+  { domain:"bedborrow.com",            cat:"Marketplace",     type:"business", url:"https://bedborrow.com" },
+  { domain:"dimitrineutron.com",       cat:"Media",           type:"business", url:"https://dimitrineutron.com" },
+  { domain:"dantefuego.com",           cat:"Brand",           type:"business", url:"https://dantefuego.com" },
+  { domain:"tradejester.com",          cat:"Trading",         type:"business", url:"https://tradejester.com" },
+  { domain:"goyimearth.com",           cat:"Earth Sciences",  type:"business", url:"https://goyimearth.com" },
+  { domain:"curiousaquarius.com",      cat:"Culture",         type:"business", url:"https://curiousaquarius.com" },
+  { domain:"tesseracards.com",         cat:"Collectibles",    type:"business", url:"https://tesseracards.com" },
+  { domain:"persianvegan.com",         cat:"Food & Lifestyle",type:"business", url:"https://persianvegan.com" },
+  { domain:"mantarsultani.com",        cat:"Personal Brand",  type:"business", url:"https://mantarsultani.com" },
+  { domain:"lordbae.com",              cat:"Brand",           type:"business", url:"https://lordbae.com" },
 ];
 
-const CHANNELS = [
-  { num:"02", name:"Main Channel",   handle:"@yourmain",   stat:"Long-form · 128K subscribers", url:"https://YOUR_LINK_HERE" },
-  { num:"07", name:"Second Channel", handle:"@yoursecond", stat:"Shorts · 44K subscribers",     url:"https://YOUR_LINK_HERE" },
-  { num:"11", name:"Niche Channel",  handle:"@yourniche",  stat:"Tutorials · 12K subscribers",  url:"https://YOUR_LINK_HERE" },
-  { num:"24", name:"Vlog Channel",   handle:"@yourvlog",   stat:"Vlogs · 6K subscribers",       url:"https://YOUR_LINK_HERE" },
+const FEEDS = [
+  { sig:"SIG-02", name:"Primary Feed",   handle:"@yourmain",   stat:"Long-form · 128K subscribers", url:"https://YOUR_LINK_HERE" },
+  { sig:"SIG-07", name:"Secondary Feed", handle:"@yoursecond", stat:"Shorts · 44K subscribers",     url:"https://YOUR_LINK_HERE" },
+  { sig:"SIG-11", name:"Niche Intel",    handle:"@yourniche",  stat:"Tutorials · 12K subscribers",  url:"https://YOUR_LINK_HERE" },
+  { sig:"SIG-24", name:"Field Log",      handle:"@yourvlog",   stat:"Vlogs · 6K subscribers",       url:"https://YOUR_LINK_HERE" },
 ];
 
 // Hero tagline (typed once, then settles). Edit freely.
-const TAGLINE = "Everything I've built, on one frequency.";
+const TAGLINE = "Every asset I've built. One operative file.";
 
 /* ============================================================ */
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
@@ -474,15 +517,14 @@ if(!touch){
   });
 }
 
-/* timecode — updates once per second (calm) */
+/* UTC clock — updates once per second */
 (function tc(){
   const el=document.getElementById("tc"), p=n=>String(n).padStart(2,"0");
-  function set(){ const d=new Date(); el.textContent=`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+  function set(){ const d=new Date(); el.textContent=`${p(d.getUTCHours())}:${p(d.getUTCMinutes())}:${p(d.getUTCSeconds())}`; }
   set(); setInterval(set,1000);
 })();
 
-/* hero static — live TV snow. Low-res + throttled to ~18fps so it
-   shimmers like analog snow without buzzing. Pauses when off-screen. */
+/* hero interference — low-res static, throttled ~18fps. Pauses off-screen. */
 (function snow(){
   const c=document.getElementById("static-canvas"), ctx=c.getContext("2d");
   let W,H,img,run=true,last=0;
@@ -522,27 +564,34 @@ gsap.from(".dossier",{ opacity:0, duration:0.9, delay:1.0, ease:"power3.out" });
   setTimeout(()=>{ m.textContent="FACE MATCH · 99.7%"; }, 1500);
 })();
 
-/* enable colored-static glitch on hover (interaction only) */
+/* brief intercept glitch on hover — plays once, text stays legible */
 function bindFx(scope, sel){
   scope.querySelectorAll(sel).forEach(el=>{
     const link = el.closest("a");
-    link.addEventListener("mouseenter",()=>el.classList.add("fx-on"));
-    link.addEventListener("mouseleave",()=>el.classList.remove("fx-on"));
+    if(!link) return;
+    link.addEventListener("mouseenter",()=>{
+      if(reduced) return;
+      el.classList.remove("fx-burst");
+      void el.offsetWidth;
+      el.classList.add("fx-burst");
+      clearTimeout(el._fxT);
+      el._fxT = setTimeout(()=>el.classList.remove("fx-burst"),860);
+    });
   });
 }
 
-/* BUILD STATIONS */
+/* BUILD ASSETS */
 (function(){
   const g=document.getElementById("guide");
-  STATIONS.forEach((s,i)=>{
+  ASSETS.forEach((s,i)=>{
     const a=document.createElement("a");
     a.className="station up"; a.href=s.url; a.target="_blank"; a.rel="noopener"; a.dataset.type=s.type;
     a.innerHTML=`
-      <span class="ch">CH ${String(i+1).padStart(2,"0")}</span>
+      <span class="ch">AST-${String(i+1).padStart(2,"0")}</span>
       <span class="domain fx" data-text="${s.domain}">${s.domain}</span>
       <span class="cat">${s.cat}</span>
-      <span class="stat"><span class="d"></span>Live</span>
-      <span class="go">Tune In →</span>`;
+      <span class="stat"><span class="d"></span>Active</span>
+      <span class="go">Open File →</span>`;
     g.appendChild(a);
   });
   if(!touch) bindFx(g, ".domain.fx");
@@ -564,24 +613,24 @@ function bindFx(scope, sel){
   }));
 })();
 
-/* BUILD CHANNELS */
+/* BUILD FEEDS */
 (function(){
   const grid=document.getElementById("tvgrid");
-  CHANNELS.forEach(ch=>{
+  FEEDS.forEach(ch=>{
     const a=document.createElement("a");
     a.className="tv up"; a.href=ch.url; a.target="_blank"; a.rel="noopener";
     a.innerHTML=`
       <div class="screen">
         <div class="snow"></div>
         <div class="glow"></div>
-        <div class="num">${ch.num}</div>
-        <div class="bug"><span class="d"></span>LIVE</div>
+        <div class="num">${ch.sig}</div>
+        <div class="bug"><span class="d"></span>RX</div>
         <div class="title fx" data-text="${ch.name}">${ch.name}</div>
       </div>
       <div class="tv-meta">
         <span class="nm">${ch.name}</span>
         <span class="hd">${ch.handle}</span>
-        <span class="watch">Watch →</span>
+        <span class="watch">Intercept →</span>
         <span class="st">${ch.stat}</span>
       </div>`;
     grid.appendChild(a);
@@ -593,8 +642,8 @@ function bindFx(scope, sel){
 gsap.utils.toArray(".up").forEach(el=>{
   gsap.to(el,{ opacity:1, y:0, duration:0.8, ease:"power3.out", scrollTrigger:{ trigger:el, start:"top 90%", once:true } });
 });
-document.getElementById("cnt-stations").dataset.count = STATIONS.length;
-document.getElementById("cnt-channels").dataset.count = CHANNELS.length;
+document.getElementById("cnt-stations").dataset.count = ASSETS.length;
+document.getElementById("cnt-channels").dataset.count = FEEDS.length;
 document.querySelectorAll("[data-count]").forEach(el=>{
   const end=+el.dataset.count;
   ScrollTrigger.create({ trigger:el, start:"top 92%", once:true, onEnter:()=>{
