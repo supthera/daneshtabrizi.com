@@ -1,0 +1,608 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8" />
+<meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+
+<!-- ============ SEO / SOCIAL ============ -->
+<title>Danesh Tabrizi — The Network</title>
+<meta name="description" content="A privately owned broadcast network: the domains, online businesses and YouTube channels built and operated by Danesh Tabrizi. One frequency for everything." />
+<meta name="author" content="Danesh Tabrizi" />
+<meta name="theme-color" content="#0c0b0b" />
+<link rel="canonical" href="https://daneshtabrizi.com/" />
+<meta property="og:type" content="website" />
+<meta property="og:title" content="Danesh Tabrizi — The Network" />
+<meta property="og:description" content="Every domain, business and channel I've built — broadcasting on one frequency." />
+<meta property="og:url" content="https://daneshtabrizi.com/" />
+<meta property="og:site_name" content="daneshtabrizi.com" />
+<meta property="og:image" content="https://daneshtabrizi.com/og.jpg" />
+<meta property="og:image:width" content="1200" />
+<meta property="og:image:height" content="630" />
+<meta name="twitter:card" content="summary_large_image" />
+<meta name="twitter:title" content="Danesh Tabrizi — The Network" />
+<meta name="twitter:description" content="Every domain, business and channel I've built — on one frequency." />
+<meta name="twitter:image" content="https://daneshtabrizi.com/og.jpg" />
+
+<!-- Fonts: Big Shoulders Display (display) + DM Mono (broadcast UI) -->
+<link rel="preconnect" href="https://fonts.googleapis.com" />
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+
+<script type="application/ld+json">
+{ "@context":"https://schema.org","@type":"Person","name":"Danesh Tabrizi","url":"https://daneshtabrizi.com","jobTitle":"Founder / Operator","sameAs":["https://YOUR_LINK_HERE","https://YOUR_LINK_HERE"] }
+</script>
+
+<style>
+/* ============================================================
+   TOKENS
+============================================================ */
+:root{
+  --bg:    #0c0b0b;
+  --panel: #100f0e;
+  --ink:   #ece6da;
+  --dim:   #8d877b;
+  --faint: #4a4640;
+  --amber: #ffae3b;
+  --rec:   #ff4338;
+  --cyan:  #2fd2e6;   /* colored-static channels */
+  --mag:   #ff4f9d;
+  --line:  rgba(236,230,218,0.12);
+  --maxw:  1360px;
+  --ease:  cubic-bezier(0.2,0.8,0.2,1);
+  --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+}
+
+*{margin:0;padding:0;box-sizing:border-box}
+html{-webkit-text-size-adjust:100%}
+body{ background:var(--bg); color:var(--ink); font-family:"DM Mono",ui-monospace,monospace;
+  line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden; }
+a{color:inherit;text-decoration:none}
+button{font:inherit;color:inherit;background:none;border:none}
+::selection{background:var(--amber);color:#000}
+h1,h2,h3{font-family:"Big Shoulders Display",sans-serif;font-weight:800;line-height:0.9;text-transform:uppercase}
+.mono-label{font-size:0.66rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--dim)}
+.amber{color:var(--amber)}
+
+/* ============================================================
+   STATIC CONTROLS
+   Motion is intentionally minimal: textures are STILL by default,
+   and the colored static only animates on hover (interaction).
+============================================================ */
+/* faint, NON-animated grain for texture */
+.static-global{ position:fixed; inset:0; z-index:9050; pointer-events:none;
+  background-image:var(--noise); background-size:300px; opacity:.04; mix-blend-mode:screen; }
+.scanlines{ position:fixed; inset:0; z-index:9100; pointer-events:none;
+  background:repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,0.2) 3px, transparent 4px);
+  mix-blend-mode:multiply; opacity:.5; }
+.crt-vignette{ position:fixed; inset:0; z-index:9080; pointer-events:none;
+  background:radial-gradient(125% 115% at 50% 50%, transparent 62%, rgba(0,0,0,0.5) 100%);
+  box-shadow:inset 0 0 150px rgba(0,0,0,0.65); }
+
+/* colored-static glitch — the hover effect, reused everywhere */
+@keyframes noiseShift{ 0%{background-position:0 0} 100%{background-position:88px -66px} }
+.fx{ position:relative; }
+.fx::before, .fx::after{
+  content:attr(data-text); position:absolute; left:0; top:0; width:100%; height:100%;
+  -webkit-background-clip:text; background-clip:text;
+  -webkit-text-fill-color:transparent; color:transparent;
+  background-size:150px 150px; opacity:0; pointer-events:none;
+  transition:opacity .18s var(--ease), transform .18s var(--ease);
+}
+.fx::before{ background-image:var(--noise); background-color:var(--cyan); background-blend-mode:screen; }
+.fx::after { background-image:var(--noise); background-color:var(--mag);  background-blend-mode:screen; }
+.fx-on::before{ opacity:.92; transform:translateX(-3px); animation:noiseShift .26s steps(3) infinite; }
+.fx-on::after { opacity:.92; transform:translateX(3px);  animation:noiseShift .26s steps(3) infinite reverse; }
+
+/* viewfinder cursor */
+.reticle{ position:fixed; top:0; left:0; z-index:9500; width:24px; height:24px; pointer-events:none;
+  transform:translate(-50%,-50%); transition:width .25s var(--ease), height .25s var(--ease); }
+.reticle::before,.reticle::after{ content:""; position:absolute; background:var(--amber); opacity:.8; }
+.reticle::before{ left:50%; top:0; width:1px; height:100%; transform:translateX(-50%); }
+.reticle::after{ top:50%; left:0; height:1px; width:100%; transform:translateY(-50%); }
+.reticle.lg{ width:42px; height:42px; }
+@media (pointer:coarse){ .reticle{display:none} }
+
+/* ============================================================
+   LAYOUT
+============================================================ */
+.wrap{ width:100%; max-width:var(--maxw); margin:0 auto; padding:0 clamp(18px,4vw,56px); }
+section{position:relative}
+.sec-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;
+  border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:38px; }
+.sec-head h2{ font-size:clamp(2.2rem,7vw,5.6rem) }
+.sec-head .meta{ text-align:right }
+.bars{ display:flex; height:6px; width:100% }
+.bars i{ flex:1 }
+.bars .b1{background:#c9c4b8}.bars .b2{background:#cabf45}.bars .b3{background:#5fb0c2}
+.bars .b4{background:#56a067}.bars .b5{background:#a85a8c}.bars .b6{background:#c0504d}.bars .b7{background:#4a5ab0}
+
+/* ============================================================
+   TOP BAR
+============================================================ */
+.topbar{ position:fixed; top:0; left:0; width:100%; z-index:8000;
+  display:flex; align-items:center; justify-content:space-between; gap:16px;
+  padding:12px clamp(18px,4vw,56px); font-size:0.7rem; letter-spacing:0.12em;
+  background:linear-gradient(180deg, rgba(12,11,11,0.92), rgba(12,11,11,0)); }
+.topbar .brand{ font-family:"Big Shoulders Display"; font-weight:800; font-size:1.05rem; letter-spacing:0.04em; text-transform:uppercase }
+.topbar .brand b{color:var(--amber)}
+.topbar .right{ display:flex; align-items:center; gap:18px; color:var(--dim) }
+.onair{ display:inline-flex; align-items:center; gap:8px; color:var(--ink) }
+.onair .dot{ width:9px; height:9px; border-radius:50%; background:var(--rec); box-shadow:0 0 8px var(--rec) }
+.tc{ font-variant-numeric:tabular-nums }
+@media (max-width:620px){ .topbar .tc-label,.topbar .sep{display:none} }
+
+/* ============================================================
+   HERO
+============================================================ */
+.hero{ min-height:100svh; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding-top:60px; position:relative }
+#static-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.16; image-rendering:pixelated }
+.hero-scrim{ position:absolute; inset:0; z-index:1; pointer-events:none;
+  background:radial-gradient(110% 90% at 50% 45%, rgba(12,11,11,0.25), rgba(12,11,11,0.92) 85%) }
+.hero .wrap{ position:relative; z-index:2 }
+.hero-kicker{ display:flex; align-items:center; gap:14px; margin-bottom:22px }
+.hero-kicker .tag{ border:1px solid var(--line); padding:5px 11px; border-radius:2px }
+.hero h1{ font-size:clamp(3.4rem,17vw,15rem); font-weight:900; letter-spacing:-0.01em; line-height:0.82 }
+.hero h1 .l{ display:block; overflow:hidden }
+.hero h1 .l span{ display:inline-block; transform:translateY(110%) }
+.hero h1 .out{ -webkit-text-stroke:1.5px var(--ink); color:transparent }
+.hero-sub{ margin-top:clamp(20px,4vh,40px); display:flex; flex-wrap:wrap; gap:26px; align-items:center; justify-content:space-between }
+.typed{ font-size:clamp(0.85rem,2.2vw,1.15rem); letter-spacing:0.06em; min-height:1.5em }
+.typed .c{ display:inline-block; width:9px; height:1.05em; background:var(--amber); vertical-align:-0.15em; margin-left:2px }
+.cta{ display:inline-flex; align-items:center; gap:12px; padding:15px 24px; border:1px solid var(--ink);
+  border-radius:2px; font-size:0.74rem; letter-spacing:0.18em; text-transform:uppercase; transition:.35s var(--ease) }
+.cta:hover{ background:var(--amber); border-color:var(--amber); color:#000 }
+.scrollcue{ position:absolute; left:clamp(18px,4vw,56px); bottom:26px; z-index:2; color:var(--dim);
+  font-size:0.64rem; letter-spacing:0.26em; text-transform:uppercase; display:flex; align-items:center; gap:12px }
+.scrollcue .ln{ width:42px; height:1px; background:var(--amber) }
+
+/* --- HERO SUBJECT FILE (espionage dossier / POI target lock) --- */
+.dossier{ width:min(342px,82vw); border:1px solid var(--line); background:rgba(14,13,12,0.74);
+  backdrop-filter:blur(7px); border-radius:3px; padding:13px; font-size:0.72rem;
+  position:absolute; top:50%; transform:translateY(-50%); z-index:2; }
+@media (min-width:1024px){
+  .dossier{ right:clamp(18px,4vw,56px); left:auto; }
+}
+@media (min-width:1472px){
+  .dossier{ right:calc((100vw - var(--maxw)) / 2 + clamp(18px, 4vw, 56px)); }
+}
+@media (max-width:1023px){
+  .dossier{ left:clamp(18px,4vw,56px); right:auto; }
+}
+.dz-top{ display:flex; justify-content:space-between; align-items:center; letter-spacing:0.14em; text-transform:uppercase;
+  color:var(--dim); border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:11px }
+.dz-track{ display:inline-flex; align-items:center; gap:6px; color:var(--ink) }
+.dz-track i{ width:7px; height:7px; border-radius:50%; background:var(--rec); box-shadow:0 0 8px var(--rec) }
+.dz-photo{ position:relative; aspect-ratio:1/1; width:100%; overflow:hidden; border:1px solid var(--line); background:#0a0908; margin-bottom:12px }
+.dz-ph,.dz-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
+.dz-ph{ display:grid; place-items:center; font-family:"Big Shoulders Display"; font-weight:900; font-size:5rem;
+  color:var(--faint); background:radial-gradient(120% 120% at 30% 20%, #1a1714, #0a0908); filter:grayscale(1) contrast(1.1) }
+.dz-photo .br{ position:absolute; width:18px; height:18px; z-index:3; border:2px solid var(--ink); animation:lockin .5s var(--ease) .95s both }
+.dz-photo .tl{ top:8px; left:8px; border-right:0; border-bottom:0 }
+.dz-photo .tr{ top:8px; right:8px; border-left:0; border-bottom:0 }
+.dz-photo .bl{ bottom:8px; left:8px; border-right:0; border-top:0 }
+.dz-photo .br2{ bottom:8px; right:8px; border-left:0; border-top:0 }
+@keyframes lockin{ from{opacity:0; transform:scale(1.45)} to{opacity:1; transform:scale(1)} }
+.dz-scan{ position:absolute; left:0; top:-20%; width:100%; height:20%; z-index:2;
+  background:linear-gradient(rgba(255,174,59,0), rgba(255,174,59,0.2), rgba(255,174,59,0)); animation:scan 3.4s linear infinite }
+@keyframes scan{ 0%{top:-20%} 100%{top:120%} }
+.dz-match{ position:absolute; left:8px; bottom:8px; z-index:3; font-size:0.6rem; letter-spacing:0.08em; color:var(--amber);
+  background:rgba(0,0,0,0.55); padding:3px 7px; border-radius:1px }
+.dz-rows{ display:grid; gap:7px }
+.dz-row{ display:flex; justify-content:space-between; gap:12px }
+.dz-row .k{ color:var(--dim); letter-spacing:0.1em; text-transform:uppercase }
+.dz-row .v{ color:var(--ink); text-align:right }
+.redact{ background:var(--ink); color:transparent !important; padding:0 8px; border-radius:1px; user-select:none }
+.dz-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid var(--line) }
+.dz-id{ color:var(--dim); letter-spacing:0.08em }
+.dz-bars{ width:92px; height:20px; opacity:.7;
+  background:repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 3px, var(--ink) 3px 4px, transparent 4px 7px) }
+
+/* ============================================================
+   STATIONS (domains / businesses)
+============================================================ */
+.stations{ padding:clamp(80px,12vh,150px) 0 }
+.band{ display:inline-flex; gap:4px; border:1px solid var(--line); border-radius:2px; padding:4px; margin-bottom:34px }
+.band button{ padding:9px 18px; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--dim); border-radius:2px; transition:.3s var(--ease) }
+.band button.on{ background:var(--ink); color:#000 }
+
+.guide{ border-top:1px solid var(--line) }
+.station{ position:relative; display:grid; align-items:center; gap:20px;
+  grid-template-columns:78px 1fr 190px 120px 120px; padding:26px 14px;
+  border-bottom:1px solid var(--line); overflow:hidden; transition:padding-left .3s var(--ease) }
+.station .ch{ font-size:0.72rem; color:var(--amber); letter-spacing:0.1em }
+.station .domain{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:lowercase;
+  font-size:clamp(1.5rem,3.4vw,2.7rem); line-height:1; white-space:nowrap }
+.station .cat{ font-size:0.68rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--dim) }
+.station .stat{ display:flex; align-items:center; gap:8px; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase }
+.station .stat .d{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067 }
+.station .go{ justify-self:end; font-size:0.7rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--dim); transition:color .3s var(--ease); white-space:nowrap }
+.station::after{ content:""; position:absolute; inset:0; z-index:-1; background:var(--amber); opacity:0; transition:opacity .3s }
+.station:hover{ padding-left:26px }
+.station:hover::after{ opacity:.04 }
+.station:hover .go{ color:var(--amber) }
+.station.hide{ display:none }
+@media (max-width:860px){
+  .station{ grid-template-columns:1fr; gap:8px; padding:22px 4px }
+  .station .domain{ white-space:normal }
+  .station .go{ justify-self:start }
+}
+
+/* ============================================================
+   CHANNELS (YouTube) — CRT sets
+============================================================ */
+.channels{ padding:clamp(70px,10vh,130px) 0 }
+.tvgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:clamp(18px,2vw,30px) }
+.tv{ display:block }
+.screen{ position:relative; aspect-ratio:4/3; border-radius:14px/18px; overflow:hidden;
+  background:#070707; border:1px solid var(--line);
+  box-shadow:inset 0 0 60px rgba(0,0,0,0.9), inset 0 0 14px rgba(0,0,0,0.8) }
+.screen::before{ content:""; position:absolute; inset:0; z-index:3; pointer-events:none;
+  background:repeating-linear-gradient(to bottom, transparent 0 2px, rgba(0,0,0,0.25) 3px); opacity:.5 }
+.screen .snow{ position:absolute; inset:0; background-image:var(--noise); background-size:200px; opacity:.22; mix-blend-mode:screen; transition:opacity .3s }
+.tv:hover .screen .snow{ opacity:.06 }
+.screen .glow{ position:absolute; inset:0; background:radial-gradient(120% 100% at 50% 120%, rgba(255,174,59,0.14), transparent 60%) }
+.screen .bug{ position:absolute; top:12px; right:12px; z-index:4; display:flex; align-items:center; gap:7px; font-size:0.62rem; letter-spacing:0.12em }
+.screen .bug .d{ width:7px; height:7px; border-radius:50%; background:var(--rec); box-shadow:0 0 8px var(--rec) }
+.screen .num{ position:absolute; top:12px; left:14px; z-index:4; font-family:"Big Shoulders Display"; font-weight:800; font-size:1.4rem; color:var(--amber) }
+.screen .title{ position:absolute; left:14px; bottom:14px; right:14px; z-index:4;
+  font-family:"Big Shoulders Display"; font-weight:800; text-transform:uppercase; line-height:0.92;
+  font-size:clamp(1.4rem,2.6vw,2rem); transition:transform .3s var(--ease) }
+.tv:hover .screen .title{ transform:translateY(-2px) }
+.tv-meta{ display:flex; align-items:baseline; justify-content:space-between; gap:14px; margin-top:14px; flex-wrap:wrap }
+.tv-meta .nm{ font-size:0.92rem }
+.tv-meta .hd{ font-size:0.72rem; color:var(--dim) }
+.tv-meta .st{ font-size:0.68rem; color:var(--dim); letter-spacing:0.06em; width:100% }
+.tv-meta .watch{ font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--amber) }
+
+/* ============================================================
+   STATION ID (about)
+============================================================ */
+.about{ padding:clamp(70px,11vh,150px) 0; border-top:1px solid var(--line) }
+.about .lead{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:uppercase;
+  font-size:clamp(1.8rem,5vw,4rem); line-height:0.98; max-width:20ch }
+.about p.body{ margin-top:26px; max-width:60ch; color:var(--dim); font-size:0.92rem }
+.stats{ display:flex; flex-wrap:wrap; gap:clamp(26px,5vw,70px); margin-top:48px }
+.stat-b .n{ font-family:"Big Shoulders Display"; font-weight:900; font-size:clamp(2.4rem,6vw,4rem); line-height:1 }
+.stat-b .l{ margin-top:6px }
+
+/* ============================================================
+   FOOTER
+============================================================ */
+.footer{ padding:clamp(60px,9vh,120px) 0 40px }
+.footer .bars{ margin-bottom:40px }
+.contact{ display:block; font-family:"Big Shoulders Display"; font-weight:900; text-transform:uppercase;
+  font-size:clamp(2.6rem,12vw,11rem); line-height:0.84; letter-spacing:-0.01em }
+.contact .o{ -webkit-text-stroke:1.4px var(--ink); color:transparent; transition:.4s var(--ease) }
+.contact:hover .o{ color:var(--amber); -webkit-text-stroke:1.4px var(--amber) }
+.foot-row{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:24px; margin-top:54px }
+.socials{ display:flex; gap:10px }
+.socials a{ width:50px; height:50px; display:grid; place-items:center; border:1px solid var(--line); border-radius:3px; transition:.35s var(--ease) }
+.socials a:hover{ border-color:var(--amber) }
+.socials svg{ width:20px; height:20px }
+.socials svg *{ transition:.4s var(--ease); transform-origin:center }
+.socials a:hover .m{ stroke:var(--amber) }
+.colophon{ font-size:0.7rem; color:var(--faint); letter-spacing:0.06em }
+.colophon a{ color:var(--dim) }
+
+.up{ opacity:0; transform:translateY(28px) }
+@media (prefers-reduced-motion:reduce){
+  *{animation:none !important; transition:none !important}
+  .up{opacity:1; transform:none}
+  .fx-on::before,.fx-on::after{opacity:.6}
+}
+</style>
+</head>
+<body id="top">
+
+<div class="static-global" aria-hidden="true"></div>
+<div class="scanlines" aria-hidden="true"></div>
+<div class="crt-vignette" aria-hidden="true"></div>
+<div class="reticle" aria-hidden="true"></div>
+
+<!-- TOP BAR -->
+<header class="topbar">
+  <a class="brand" href="#top">DT<b>//</b>NETWORK</a>
+  <div class="right">
+    <span class="tc-label">TC</span>
+    <span class="tc" id="tc">00:00:00</span>
+    <span class="sep">·</span>
+    <span class="onair"><span class="dot"></span>ON AIR</span>
+  </div>
+</header>
+
+<main>
+
+<!-- HERO -->
+<section class="hero" aria-label="Intro">
+  <canvas id="static-canvas" aria-hidden="true"></canvas>
+  <div class="hero-scrim" aria-hidden="true"></div>
+  <div class="wrap">
+    <div class="hero-kicker mono-label">
+      <span class="tag">CH 00 — MASTER FEED</span>
+      <span>EST. MMXXV</span>
+    </div>
+    <h1 aria-label="Danesh Tabrizi">
+      <span class="l"><span>Danesh</span></span>
+      <span class="l out"><span>Tabrizi</span></span>
+    </h1>
+    <div class="hero-sub">
+      <p class="typed" aria-live="polite"></p>
+      <a class="cta" href="#stations">Open the Guide →</a>
+    </div>
+  </div>
+
+  <aside class="dossier" aria-label="Subject file: Danesh Tabrizi">
+    <div class="dz-top"><span>Subject File</span><span class="dz-track"><i></i>Tracking</span></div>
+    <div class="dz-photo">
+      <!-- To use a real photo, replace the line below with:
+           <img class="dz-img" src="your-photo.jpg" alt="Danesh Tabrizi"> -->
+      <div class="dz-ph">DT</div>
+      <div class="dz-scan" aria-hidden="true"></div>
+      <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+      <span class="dz-match" id="dz-match">FACE MATCH · 99.7%</span>
+    </div>
+    <div class="dz-rows">
+      <div class="dz-row"><span class="k">Subject</span><span class="v">Danesh Tabrizi</span></div>
+      <div class="dz-row"><span class="k">DOB</span><span class="v">13 Feb 1994 · <span id="dz-age">—</span> yrs</span></div>
+      <div class="dz-row"><span class="k">Class</span><span class="v">Operator / Network Admin</span></div>
+      <div class="dz-row"><span class="k">Status</span><span class="v amber">Active</span></div>
+      <div class="dz-row"><span class="k">Last Seen</span><span class="v"><span class="redact">CLASSIFIED</span></span></div>
+      <div class="dz-row"><span class="k">Clearance</span><span class="v">LVL ███</span></div>
+    </div>
+    <div class="dz-foot"><span class="dz-id">ID//DT-0213-1994</span><span class="dz-bars" aria-hidden="true"></span></div>
+  </aside>
+  <div class="scrollcue" aria-hidden="true"><span class="ln"></span><span>Tune In</span></div>
+</section>
+
+<!-- STATIONS -->
+<section class="stations" id="stations" aria-label="Websites and businesses">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="up">My<br>Domains</h2>
+      <div class="meta up">
+        <p class="mono-label">Owned &amp; Operated</p>
+        <p class="mono-label" style="margin-top:6px;">Domains · Businesses</p>
+      </div>
+    </div>
+    <div class="band up" role="tablist" aria-label="Filter stations">
+      <button class="on" data-f="all" role="tab" aria-selected="true">All</button>
+      <button data-f="business" role="tab">Businesses</button>
+      <button data-f="design" role="tab">Designs</button>
+    </div>
+    <div class="guide up" id="guide"></div>
+  </div>
+</section>
+
+<!-- CHANNELS -->
+<section class="channels" id="channels" aria-label="YouTube channels">
+  <div class="wrap">
+    <div class="sec-head">
+      <h2 class="up">The<br>Channels</h2>
+      <div class="meta up">
+        <p class="mono-label">YouTube</p>
+        <p class="mono-label" style="margin-top:6px;">Now Broadcasting</p>
+      </div>
+    </div>
+    <div class="tvgrid up" id="tvgrid"></div>
+  </div>
+</section>
+
+<!-- STATION ID -->
+<section class="about" aria-label="About">
+  <div class="wrap">
+    <p class="mono-label up" style="margin-bottom:24px;">— Station Identification</p>
+    <h3 class="lead up">One <span class="amber">operator</span>. One frequency. Every property I've built, broadcasting in one place.</h3>
+    <p class="body up">No third party. No middleman. This is the master feed for everything under my name — the sites I design, the businesses I run, and the channels I broadcast. Change the channel below.</p>
+    <div class="stats">
+      <div class="stat-b up"><div class="n" data-count="0" id="cnt-stations">0</div><div class="l mono-label">Stations</div></div>
+      <div class="stat-b up"><div class="n" data-count="0" id="cnt-channels">0</div><div class="l mono-label">Channels</div></div>
+      <div class="stat-b up"><div class="n" data-count="100">0</div><div class="l mono-label">% Owned</div></div>
+    </div>
+  </div>
+</section>
+
+<!-- FOOTER -->
+<footer class="footer" id="contact" aria-label="Contact">
+  <div class="wrap">
+    <div class="bars" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><i class="b5"></i><i class="b6"></i><i class="b7"></i></div>
+    <a class="contact" href="mailto:hello@daneshtabrizi.com">Get In<br><span class="o">Touch</span></a>
+    <div class="foot-row">
+      <div class="socials" aria-label="Social">
+        <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24" fill="none"><path class="m" d="M4 4 L20 20 M20 4 L4 20" stroke="#ece6da" stroke-width="1.6"/></svg></a>
+        <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none"><rect class="m" x="4" y="4" width="16" height="16" rx="5" stroke="#ece6da" stroke-width="1.6"/><circle cx="12" cy="12" r="3.1" stroke="#ece6da" stroke-width="1.6"/></svg></a>
+        <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none"><rect class="m" x="3" y="6" width="18" height="12" rx="3" stroke="#ece6da" stroke-width="1.6"/><path d="M10 9.5 L15 12 L10 14.5 Z" fill="#ece6da"/></svg></a>
+        <a href="mailto:hello@daneshtabrizi.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none"><path class="m" d="M4 6 h16 v12 H4 Z M4 7 l8 6 8 -6" stroke="#ece6da" stroke-width="1.6" stroke-linejoin="round"/></svg></a>
+      </div>
+      <div class="colophon">© <span id="year"></span> DANESH TABRIZI — END OF TRANSMISSION · <a href="#top">RETURN TO FEED ↑</a></div>
+    </div>
+  </div>
+</footer>
+
+</main>
+
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
+<script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
+<script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
+<script>
+/* ============================================================
+   EDIT YOUR CONTENT HERE
+   STATIONS = your websites / online businesses (type: business | design)
+   CHANNELS = your YouTube channels
+============================================================ */
+const STATIONS = [
+  { domain:"yourstore.com",  cat:"E-Commerce",    type:"business", url:"https://YOUR_LINK_HERE" },
+  { domain:"yoursaas.io",    cat:"SaaS Product",  type:"business", url:"https://YOUR_LINK_HERE" },
+  { domain:"yourstudio.com", cat:"Design Studio", type:"business", url:"https://YOUR_LINK_HERE" },
+  { domain:"yourname.dev",   cat:"Portfolio",     type:"design",   url:"https://YOUR_LINK_HERE" },
+  { domain:"yourmedia.co",   cat:"Media / Blog",  type:"business", url:"https://YOUR_LINK_HERE" },
+  { domain:"yourtool.app",   cat:"Micro-Tool",    type:"design",   url:"https://YOUR_LINK_HERE" },
+];
+
+const CHANNELS = [
+  { num:"02", name:"Main Channel",   handle:"@yourmain",   stat:"Long-form · 128K subscribers", url:"https://YOUR_LINK_HERE" },
+  { num:"07", name:"Second Channel", handle:"@yoursecond", stat:"Shorts · 44K subscribers",     url:"https://YOUR_LINK_HERE" },
+  { num:"11", name:"Niche Channel",  handle:"@yourniche",  stat:"Tutorials · 12K subscribers",  url:"https://YOUR_LINK_HERE" },
+  { num:"24", name:"Vlog Channel",   handle:"@yourvlog",   stat:"Vlogs · 6K subscribers",       url:"https://YOUR_LINK_HERE" },
+];
+
+// Hero tagline (typed once, then settles). Edit freely.
+const TAGLINE = "Everything I've built, on one frequency.";
+
+/* ============================================================ */
+const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
+const touch = matchMedia("(pointer: coarse)").matches;
+gsap.registerPlugin(ScrollTrigger);
+
+let lenis;
+if(!reduced){
+  lenis = new Lenis({ duration:1.05, smoothWheel:true });
+  lenis.on("scroll", ScrollTrigger.update);
+  gsap.ticker.add(t=>lenis.raf(t*1000));
+  gsap.ticker.lagSmoothing(0);
+}
+function smooth(id){ const el=document.querySelector(id); if(el){ lenis?lenis.scrollTo(el):el.scrollIntoView({behavior:"smooth"}); } }
+document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); smooth(a.getAttribute("href")); }));
+
+/* viewfinder cursor (moves with pointer only) */
+if(!touch){
+  const r=document.querySelector(".reticle"); let x=innerWidth/2,y=innerHeight/2,cx=x,cy=y;
+  addEventListener("mousemove",e=>{x=e.clientX;y=e.clientY;});
+  (function loop(){ cx+=(x-cx)*0.25; cy+=(y-cy)*0.25; r.style.transform=`translate(${cx}px,${cy}px) translate(-50%,-50%)`; requestAnimationFrame(loop); })();
+  document.querySelectorAll("a,button,.station,.tv").forEach(el=>{
+    el.addEventListener("mouseenter",()=>r.classList.add("lg"));
+    el.addEventListener("mouseleave",()=>r.classList.remove("lg"));
+  });
+}
+
+/* timecode — updates once per second (calm) */
+(function tc(){
+  const el=document.getElementById("tc"), p=n=>String(n).padStart(2,"0");
+  function set(){ const d=new Date(); el.textContent=`${p(d.getHours())}:${p(d.getMinutes())}:${p(d.getSeconds())}`; }
+  set(); setInterval(set,1000);
+})();
+
+/* hero static — live TV snow. Low-res + throttled to ~18fps so it
+   shimmers like analog snow without buzzing. Pauses when off-screen. */
+(function snow(){
+  const c=document.getElementById("static-canvas"), ctx=c.getContext("2d");
+  let W,H,img,run=true,last=0;
+  function size(){ W=c.width=Math.max(120,Math.floor(c.clientWidth/5)); H=c.height=Math.max(80,Math.floor(c.clientHeight/5)); img=ctx.createImageData(W,H); }
+  function paint(){ const d=img.data; for(let i=0;i<d.length;i+=4){ const v=Math.random()*255|0; d[i]=d[i+1]=d[i+2]=v; d[i+3]=255; } ctx.putImageData(img,0,0); }
+  size(); addEventListener("resize",()=>{ size(); paint(); });
+  if(reduced){ paint(); return; }            // single frame if user prefers reduced motion
+  function frame(ts){ if(run && ts-last>55){ last=ts; paint(); } requestAnimationFrame(frame); }
+  requestAnimationFrame(frame);
+  new IntersectionObserver(es=>es.forEach(e=>run=e.isIntersecting)).observe(c);
+})();
+
+/* hero reveal + type-once tagline */
+gsap.to(".hero h1 .l span",{ yPercent:0, duration:1.05, ease:"power4.out", stagger:0.12, delay:0.2 });
+gsap.from(".hero-kicker, .hero-sub",{ opacity:0, y:16, duration:0.9, stagger:0.12, delay:0.8, ease:"power3.out" });
+(function typer(){
+  const el=document.querySelector(".typed");
+  if(reduced){ el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`; return; }
+  let i=0;
+  (function tick(){
+    el.innerHTML=`<span class="amber">▸</span> ${TAGLINE.slice(0,i)}<span class="c"></span>`;
+    if(i++<TAGLINE.length) setTimeout(tick,55);
+    else el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`; // settle, drop caret
+  })();
+})();
+
+/* subject file: reveal, live age, one-time scan→match */
+gsap.from(".dossier",{ opacity:0, duration:0.9, delay:1.0, ease:"power3.out" });
+(function(){
+  const n=new Date(); let a=n.getFullYear()-1994;
+  if(n.getMonth()<1 || (n.getMonth()===1 && n.getDate()<13)) a--;   // before 13 Feb? not yet had birthday
+  const el=document.getElementById("dz-age"); if(el) el.textContent=a;
+})();
+(function(){
+  const m=document.getElementById("dz-match"); if(!m||reduced) return;
+  m.textContent="SCANNING…";
+  setTimeout(()=>{ m.textContent="FACE MATCH · 99.7%"; }, 1500);
+})();
+
+/* enable colored-static glitch on hover (interaction only) */
+function bindFx(scope, sel){
+  scope.querySelectorAll(sel).forEach(el=>{
+    const link = el.closest("a");
+    link.addEventListener("mouseenter",()=>el.classList.add("fx-on"));
+    link.addEventListener("mouseleave",()=>el.classList.remove("fx-on"));
+  });
+}
+
+/* BUILD STATIONS */
+(function(){
+  const g=document.getElementById("guide");
+  STATIONS.forEach((s,i)=>{
+    const a=document.createElement("a");
+    a.className="station up"; a.href=s.url; a.target="_blank"; a.rel="noopener"; a.dataset.type=s.type;
+    a.innerHTML=`
+      <span class="ch">CH ${String(i+1).padStart(2,"0")}</span>
+      <span class="domain fx" data-text="${s.domain}">${s.domain}</span>
+      <span class="cat">${s.cat}</span>
+      <span class="stat"><span class="d"></span>Live</span>
+      <span class="go">Tune In →</span>`;
+    g.appendChild(a);
+  });
+  if(!touch) bindFx(g, ".domain.fx");
+})();
+
+/* filter band */
+(function(){
+  const btns=[...document.querySelectorAll(".band button")];
+  btns.forEach(b=>b.addEventListener("click",()=>{
+    btns.forEach(x=>{x.classList.remove("on");x.setAttribute("aria-selected","false");});
+    b.classList.add("on"); b.setAttribute("aria-selected","true");
+    const f=b.dataset.f;
+    document.querySelectorAll(".station").forEach(s=>{
+      const show=(f==="all"||s.dataset.type===f);
+      s.classList.toggle("hide",!show);
+      if(show) gsap.fromTo(s,{opacity:0,y:12},{opacity:1,y:0,duration:0.45,ease:"power3.out"});
+    });
+    ScrollTrigger.refresh();
+  }));
+})();
+
+/* BUILD CHANNELS */
+(function(){
+  const grid=document.getElementById("tvgrid");
+  CHANNELS.forEach(ch=>{
+    const a=document.createElement("a");
+    a.className="tv up"; a.href=ch.url; a.target="_blank"; a.rel="noopener";
+    a.innerHTML=`
+      <div class="screen">
+        <div class="snow"></div>
+        <div class="glow"></div>
+        <div class="num">${ch.num}</div>
+        <div class="bug"><span class="d"></span>LIVE</div>
+        <div class="title fx" data-text="${ch.name}">${ch.name}</div>
+      </div>
+      <div class="tv-meta">
+        <span class="nm">${ch.name}</span>
+        <span class="hd">${ch.handle}</span>
+        <span class="watch">Watch →</span>
+        <span class="st">${ch.stat}</span>
+      </div>`;
+    grid.appendChild(a);
+  });
+  if(!touch) bindFx(grid, ".title.fx");
+})();
+
+/* scroll reveals (one-time) + counts */
+gsap.utils.toArray(".up").forEach(el=>{
+  gsap.to(el,{ opacity:1, y:0, duration:0.8, ease:"power3.out", scrollTrigger:{ trigger:el, start:"top 90%", once:true } });
+});
+document.getElementById("cnt-stations").dataset.count = STATIONS.length;
+document.getElementById("cnt-channels").dataset.count = CHANNELS.length;
+document.querySelectorAll("[data-count]").forEach(el=>{
+  const end=+el.dataset.count;
+  ScrollTrigger.create({ trigger:el, start:"top 92%", once:true, onEnter:()=>{
+    gsap.to({v:0},{v:end,duration:1.3,ease:"power2.out",onUpdate(){ el.textContent=Math.floor(this.targets()[0].v); }});
+  }});
+});
+document.getElementById("year").textContent=new Date().getFullYear();
+window.addEventListener("load",()=>ScrollTrigger.refresh());
+</script>
+</body>
+</html>
