@@ -26,7 +26,7 @@
 <!-- Fonts: Big Shoulders Display (display) + DM Mono (intel terminal UI) -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800;900&family=DM+Mono:wght@300;400;500&display=swap" rel="stylesheet" />
+<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800;900&family=DM+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+SC:wght@300;400&family=Vazirmatn:wght@300;400&display=swap" rel="stylesheet" />
 
 <script type="application/ld+json">
 { "@context":"https://schema.org","@type":"Person","name":"Danesh Tabrizi","url":"https://daneshtabrizi.com","jobTitle":"Principal Operative","sameAs":["https://YOUR_LINK_HERE","https://YOUR_LINK_HERE"] }
@@ -50,13 +50,15 @@
   --maxw:  1360px;
   --ease:  cubic-bezier(0.2,0.8,0.2,1);
   --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  --cursor-site:url("site-cursor.cur"), auto;
+  --cursor-hero:url("hero-cursor.cur"), auto;
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
 html{-webkit-text-size-adjust:100%}
 body{ background:var(--bg); color:var(--ink); font-family:"DM Mono",ui-monospace,monospace;
   line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden;
-  cursor:url("site-cursor.cur"), auto; }
+  cursor:var(--cursor-site); }
 @media (pointer:coarse){ body{ cursor:auto; } }
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:none}
@@ -180,6 +182,19 @@ section{position:relative}
   .topbar .brand-tw{ font-size:0.58rem; min-width:13ch }
 }
 .topbar .right{ display:flex; align-items:center; gap:18px; color:var(--dim) }
+.topbar, .topbar *{ cursor:var(--cursor-site); }
+body.in-hero-view .topbar,
+body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
+#stations, #stations *,
+#channels, #channels *,
+.about, .about *{ cursor:var(--cursor-site); }
+@media (pointer:coarse){
+  body.in-hero-view .topbar, body.in-hero-view .topbar *,
+  .topbar, .topbar *,
+  #stations, #stations *,
+  #channels, #channels *,
+  .about, .about *{ cursor:auto; }
+}
 .onair{ display:inline-flex; align-items:center; gap:8px; color:var(--ink) }
 .onair .dot{ width:9px; height:9px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067; animation:opsPulse 2.4s ease-in-out infinite }
 @keyframes opsPulse{ 0%,100%{opacity:1} 50%{opacity:.45} }
@@ -190,8 +205,8 @@ section{position:relative}
    HERO
 ============================================================ */
 .hero{ min-height:100svh; display:flex; flex-direction:column; justify-content:center; overflow:hidden; padding-top:60px; position:relative;
-  cursor:url("hero-cursor.cur"), auto; }
-.hero *, .hero *::before, .hero *::after{ cursor:url("hero-cursor.cur"), auto; }
+  cursor:var(--cursor-hero); }
+.hero *, .hero *::before, .hero *::after{ cursor:var(--cursor-hero); }
 @media (pointer:coarse){ .hero, .hero *{ cursor:auto; } }
 #static-canvas{ position:absolute; inset:0; width:100%; height:100%; z-index:0; opacity:.08; image-rendering:pixelated }
 .hero-scrim{ position:absolute; inset:0; z-index:1; pointer-events:none;
@@ -204,11 +219,40 @@ section{position:relative}
 .hero h1 .l span{ display:inline-block; transform:translateY(110%) }
 .hero h1 .out{ -webkit-text-stroke:1.5px var(--ink); color:transparent }
 .hero-quote{
-  margin-top:clamp(10px,1.8vh,16px); margin-bottom:clamp(8px,1.5vh,14px); max-width:44ch;
+  margin-top:clamp(10px,1.8vh,16px); margin-bottom:clamp(6px,1.2vh,10px); max-width:44ch;
   font-size:clamp(0.82rem,1.8vw,1rem); font-style:italic;
   color:var(--dim); letter-spacing:0.02em; line-height:1.55;
 }
 .hero-quote-nobreak{ white-space:nowrap }
+.hero-quote-intl{
+  display:flex; align-items:flex-start; flex-wrap:wrap; gap:clamp(10px,2vw,16px);
+  width:fit-content; max-width:100%;
+  margin-top:clamp(6px,1.2vh,10px); margin-bottom:clamp(8px,1.5vh,14px);
+}
+.hero-quote-sep{ color:var(--faint); font-size:clamp(0.88rem,1.9vw,1.05rem); line-height:1; user-select:none; margin-top:0.45em; }
+.hero-quote-fa-col{
+  display:flex; flex-direction:column; gap:clamp(4px,0.8vh,6px); width:fit-content;
+}
+.hero-quote-ru{
+  width:fit-content; max-width:100%; margin:0;
+  font-family:"Noto Sans",sans-serif; font-size:clamp(0.82rem,1.8vw,0.98rem); font-weight:300;
+  color:var(--dim); line-height:1.5;
+}
+.hero-quote-zh{
+  width:fit-content; max-width:100%; margin:0;
+  font-family:"Noto Sans SC",sans-serif; font-size:clamp(0.88rem,1.9vw,1.05rem); font-weight:300;
+  color:var(--dim); line-height:1.6;
+}
+.hero-quote-sa{
+  width:fit-content; max-width:100%; margin:0;
+  font-family:"Noto Sans Devanagari",sans-serif; font-size:clamp(0.88rem,1.9vw,1.05rem); font-weight:400;
+  color:var(--dim); line-height:1.6;
+}
+.hero-quote-fa{
+  width:fit-content; max-width:100%; margin:0;
+  font-family:"Vazirmatn","Tahoma",sans-serif; font-size:clamp(0.88rem,1.9vw,1.05rem); font-weight:300;
+  color:var(--dim); line-height:1.6; direction:rtl; text-align:left;
+}
 .hero-sub{ margin-top:clamp(20px,4vh,40px); display:flex; flex-wrap:wrap; gap:26px; align-items:center; justify-content:space-between; position:relative; z-index:3 }
 .typed{ font-size:clamp(0.85rem,2.2vw,1.15rem); letter-spacing:0.06em; min-height:1.5em }
 .typed .c{ display:inline-block; width:9px; height:1.05em; background:var(--amber); vertical-align:-0.15em; margin-left:2px }
@@ -269,13 +313,13 @@ section{position:relative}
 .band button.on{ background:var(--ink); color:#000 }
 
 .guide{ border-top:1px solid var(--line) }
-.station{ position:relative; display:grid; align-items:center; gap:20px;
+.station{ position:relative; display:grid; align-items:center; gap:20px 32px;
   grid-template-columns:78px 1fr 190px 120px 120px; padding:26px 14px;
   border-bottom:1px solid var(--line); overflow:hidden; transition:padding-left .3s var(--ease) }
 .station .ch{ font-size:0.72rem; color:var(--amber); letter-spacing:0.1em; font-variant-numeric:tabular-nums }
 .station .domain{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:lowercase;
   font-size:clamp(1.25rem,2.8vw,2.2rem); line-height:1; white-space:nowrap }
-.station .cat{ font-size:0.68rem; letter-spacing:0.06em; color:var(--dim) }
+.station .cat{ font-size:0.78rem; letter-spacing:0.06em; color:var(--dim); margin-left:-10px; padding-right:12px; }
 .station .stat{ display:flex; align-items:center; gap:8px; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase }
 .station .stat .d{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067 }
 .station .stat.offline .d{ background:var(--rec); box-shadow:0 0 8px var(--rec) }
@@ -286,7 +330,6 @@ section{position:relative}
 .station:hover::after{ opacity:.04 }
 .station:hover .go{ color:var(--amber) }
 .station.hide{ display:none }
-.station.offline{ cursor:not-allowed }
 @media (max-width:860px){
   .station{ grid-template-columns:1fr; gap:8px; padding:22px 4px }
   .station .domain{ white-space:normal }
@@ -459,9 +502,19 @@ section{position:relative}
   <div class="wrap">
     <div class="hero-kicker mono-label">
       <span class="tag">CASE FILE // PRIMARY</span>
-      <span>EST. MMXXV</span>
+      <span>MCMXCIV</span>
     </div>
     <p class="hero-quote">A jack of all trades is a master of none, <span class="hero-quote-nobreak">but oftentimes better than a master of one.</span></p>
+    <div class="hero-quote-intl">
+      <div class="hero-quote-fa-col">
+        <p class="hero-quote-fa" lang="fa" dir="rtl">شک کلید دانش است</p>
+        <p class="hero-quote-ru" lang="ru">Нет худа без добра</p>
+      </div>
+      <span class="hero-quote-sep" aria-hidden="true">·</span>
+      <p class="hero-quote-zh" lang="zh">和而不同</p>
+      <span class="hero-quote-sep" aria-hidden="true">·</span>
+      <p class="hero-quote-sa" lang="sa">सत्यमेव जयते नानृतं</p>
+    </div>
     <h1 aria-label="Danesh Tabrizi">
       <span class="l"><span>Danesh</span></span>
       <span class="l out"><span>Tabrizi</span></span>
@@ -647,6 +700,20 @@ if(!reduced){
 function smooth(id){ const el=document.querySelector(id); if(el){ lenis?lenis.scrollTo(el):el.scrollIntoView({behavior:"smooth"}); } }
 document.querySelectorAll('a[href^="#"]:not(.offline)').forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); smooth(a.getAttribute("href")); }));
 
+/* cursor zones — hero cursor on topbar while hero is in view */
+(function(){
+  if(touch) return;
+  const hero=document.querySelector(".hero");
+  if(!hero) return;
+  function syncHeroView(){
+    document.body.classList.toggle("in-hero-view", hero.getBoundingClientRect().bottom > 52);
+  }
+  syncHeroView();
+  addEventListener("scroll", syncHeroView, {passive:true});
+  addEventListener("resize", syncHeroView, {passive:true});
+  if(lenis) lenis.on("scroll", syncHeroView);
+})();
+
 /* viewfinder cursor (moves with pointer only) */
 if(!touch){
   const r=document.querySelector(".reticle"); let x=innerWidth/2,y=innerHeight/2,cx=x,cy=y;
@@ -685,7 +752,7 @@ if(!touch){
 
 /* hero reveal + type-once tagline */
 gsap.to(".hero h1 .l span",{ yPercent:0, duration:1.05, ease:"power4.out", stagger:0.12, delay:0.2 });
-gsap.from(".hero-kicker, .hero-quote, .hero-sub",{ opacity:0, y:16, duration:0.9, stagger:0.12, delay:0.8, ease:"power3.out" });
+gsap.from(".hero-kicker, .hero-quote, .hero-quote-intl, .hero-sub",{ opacity:0, y:16, duration:0.9, stagger:0.12, delay:0.8, ease:"power3.out" });
 (function typer(){
   const el=document.querySelector(".typed");
   if(reduced){ el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`; return; }
@@ -859,16 +926,24 @@ function bindFx(scope, sel){
 /* BUILD ASSETS */
 (function(){
   const g=document.getElementById("guide");
+  const assetClickSfx=new Audio("melee.mp3");
+  assetClickSfx.preload="auto";
+  function playAssetClick(){
+    assetClickSfx.currentTime=0;
+    assetClickSfx.play().catch(()=>{});
+  }
   ASSETS.forEach((s,i)=>{
     const a=document.createElement("a");
     const live = s.status !== "offline";
     a.className="station up"; a.dataset.type=s.type;
     if(live){
       a.href=s.url; a.target="_blank"; a.rel="noopener";
+      a.addEventListener("click",playAssetClick);
     }else{
       a.href="#"; a.classList.add("offline");
       a.addEventListener("click",e=>{
         e.preventDefault();
+        playAssetClick();
         openOfflineModal(s.domain);
       });
     }
