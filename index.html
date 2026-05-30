@@ -141,6 +141,7 @@ section{position:relative}
   border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:38px; }
 .sec-head h2{ font-size:clamp(2.2rem,7vw,5.6rem) }
 #stations .sec-head h2{ font-size:clamp(1.75rem,4.5vw,3.4rem); white-space:nowrap }
+#channels .sec-head h2{ font-size:clamp(1.75rem,4.5vw,3.4rem); white-space:nowrap }
 .sec-head .meta{ text-align:right }
 .bars{ display:flex; height:6px; width:100% }
 .bars i{ flex:1 }
@@ -161,7 +162,7 @@ section{position:relative}
 .topbar .brand-name{ white-space:nowrap }
 .topbar .brand-tw{
   font-family:"DM Mono",monospace; font-weight:400; font-size:0.62rem;
-  letter-spacing:0.14em; text-transform:uppercase; color:var(--amber); min-width:8.5ch;
+  letter-spacing:0.14em; text-transform:uppercase; color:var(--amber); min-width:15ch;
 }
 .topbar .brand-caret{
   display:inline-block; width:7px; height:0.9em; margin-left:2px; background:var(--amber);
@@ -169,7 +170,7 @@ section{position:relative}
 }
 @media (max-width:480px){
   .topbar .brand{ font-size:0.92rem }
-  .topbar .brand-tw{ font-size:0.58rem; min-width:7.5ch }
+  .topbar .brand-tw{ font-size:0.58rem; min-width:13ch }
 }
 .topbar .right{ display:flex; align-items:center; gap:18px; color:var(--dim) }
 .onair{ display:inline-flex; align-items:center; gap:8px; color:var(--ink) }
@@ -192,6 +193,12 @@ section{position:relative}
 .hero h1 .l{ display:block; overflow:hidden }
 .hero h1 .l span{ display:inline-block; transform:translateY(110%) }
 .hero h1 .out{ -webkit-text-stroke:1.5px var(--ink); color:transparent }
+.hero-quote{
+  margin-top:clamp(10px,1.8vh,16px); margin-bottom:clamp(8px,1.5vh,14px); max-width:44ch;
+  font-size:clamp(0.82rem,1.8vw,1rem); font-style:italic;
+  color:var(--dim); letter-spacing:0.02em; line-height:1.55;
+}
+.hero-quote-nobreak{ white-space:nowrap }
 .hero-sub{ margin-top:clamp(20px,4vh,40px); display:flex; flex-wrap:wrap; gap:26px; align-items:center; justify-content:space-between; position:relative; z-index:3 }
 .typed{ font-size:clamp(0.85rem,2.2vw,1.15rem); letter-spacing:0.06em; min-height:1.5em }
 .typed .c{ display:inline-block; width:9px; height:1.05em; background:var(--amber); vertical-align:-0.15em; margin-left:2px }
@@ -257,7 +264,7 @@ section{position:relative}
   border-bottom:1px solid var(--line); overflow:hidden; transition:padding-left .3s var(--ease) }
 .station .ch{ font-size:0.72rem; color:var(--amber); letter-spacing:0.1em; font-variant-numeric:tabular-nums }
 .station .domain{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:lowercase;
-  font-size:clamp(1.5rem,3.4vw,2.7rem); line-height:1; white-space:nowrap }
+  font-size:clamp(1.25rem,2.8vw,2.2rem); line-height:1; white-space:nowrap }
 .station .cat{ font-size:0.68rem; letter-spacing:0.06em; color:var(--dim) }
 .station .stat{ display:flex; align-items:center; gap:8px; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase }
 .station .stat .d{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067 }
@@ -442,6 +449,7 @@ section{position:relative}
       <span class="tag">CASE FILE // PRIMARY</span>
       <span>EST. MMXXV</span>
     </div>
+    <p class="hero-quote">A jack of all trades is a master of none, <span class="hero-quote-nobreak">but oftentimes better than a master of one.</span></p>
     <h1 aria-label="Danesh Tabrizi">
       <span class="l"><span>Danesh</span></span>
       <span class="l out"><span>Tabrizi</span></span>
@@ -495,7 +503,7 @@ section{position:relative}
 <section class="channels" id="channels" aria-label="YouTube and comms feeds">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up">Signal<br>Feeds</h2>
+      <h2 class="up">Youtube Channels</h2>
       <div class="meta up">
         <p class="mono-label">Comms Intel</p>
         <p class="mono-label" style="margin-top:6px;">Intercepted · Active</p>
@@ -598,7 +606,7 @@ gsap.registerPlugin(ScrollTrigger);
 (function brandTypewriter(){
   const el=document.getElementById("brand-type");
   if(!el) return;
-  const words=["Developer","Designer","Freelancer"];
+  const words=["Developer","Designer","Entrepreneur","Content Creator","Photographer"];
   if(reduced){ el.textContent=words[0]; return; }
   let wi=0, ci=0, del=false, pause=false;
   (function tick(){
@@ -660,7 +668,7 @@ if(!touch){
 
 /* hero reveal + type-once tagline */
 gsap.to(".hero h1 .l span",{ yPercent:0, duration:1.05, ease:"power4.out", stagger:0.12, delay:0.2 });
-gsap.from(".hero-kicker, .hero-sub",{ opacity:0, y:16, duration:0.9, stagger:0.12, delay:0.8, ease:"power3.out" });
+gsap.from(".hero-kicker, .hero-quote, .hero-sub",{ opacity:0, y:16, duration:0.9, stagger:0.12, delay:0.8, ease:"power3.out" });
 (function typer(){
   const el=document.querySelector(".typed");
   if(reduced){ el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`; return; }
