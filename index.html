@@ -206,8 +206,7 @@ section{position:relative}
 .dz-track i{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067; animation:opsPulse 2.4s ease-in-out infinite }
 .dz-photo{ position:relative; aspect-ratio:1/1; width:100%; overflow:hidden; border:1px solid var(--line); background:#0a0908; margin-bottom:12px }
 .dz-ph,.dz-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
-.dz-ph{ display:grid; place-items:center; font-family:"Big Shoulders Display"; font-weight:900; font-size:5rem;
-  color:var(--faint); background:radial-gradient(120% 120% at 30% 20%, #1a1714, #0a0908); filter:grayscale(1) contrast(1.1) }
+.dz-img{ object-position:58% 32%; filter:grayscale(1) contrast(1.08) }
 .dz-photo .br{ position:absolute; width:18px; height:18px; z-index:3; border:2px solid var(--ink); animation:lockin .5s var(--ease) .95s both }
 .dz-photo .tl{ top:8px; left:8px; border-right:0; border-bottom:0 }
 .dz-photo .tr{ top:8px; right:8px; border-left:0; border-bottom:0 }
@@ -292,7 +291,14 @@ section{position:relative}
 .term-body{
   padding:18px 14px 14px; font-size:0.78rem; line-height:1.65; color:var(--dim);
 }
-.term-body .ln{ display:block; margin-bottom:6px }
+.term-body .ln{ display:block; margin-bottom:6px; min-height:1.65em }
+.term-body .type-caret{
+  display:inline-block; width:8px; height:0.95em; margin-left:2px;
+  background:var(--cyan); vertical-align:-0.08em;
+  box-shadow:0 0 6px rgba(47,210,230,.45);
+  animation:termBlink 1.05s step-end infinite;
+}
+.term-body .ln.done .type-caret{ display:none }
 .term-body .ln.cmd{ color:var(--cyan) }
 .term-body .ln.warn{ color:var(--amber); margin-top:14px; font-size:0.82rem; letter-spacing:0.04em }
 .term-body .ln.dim{ color:var(--faint); font-size:0.68rem; letter-spacing:0.08em; margin-top:12px }
@@ -386,6 +392,7 @@ section{position:relative}
   .fx.fx-burst{ animation:none; text-shadow:none; transform:none; }
   .fx.fx-burst::before,.fx.fx-burst::after{ animation:none; opacity:0; transform:none; }
   .term-cursor .blink{ animation:none; opacity:.65; }
+  .term-body .type-caret{ animation:none; opacity:.65; }
 }
 </style>
 </head>
@@ -430,10 +437,8 @@ section{position:relative}
 
   <aside class="dossier" aria-label="Subject file: Danesh Tabrizi">
     <div class="dz-top"><span>Subject File</span><span class="dz-track"><i></i>Tracking</span></div>
-    <div class="dz-photo">
-      <!-- To use a real photo, replace the line below with:
-           <img class="dz-img" src="your-photo.jpg" alt="Danesh Tabrizi"> -->
-      <div class="dz-ph">DT</div>
+      <div class="dz-photo">
+        <img class="dz-img" src="profile.jpg" alt="Danesh Tabrizi" width="1024" height="576">
       <div class="dz-scan" aria-hidden="true"></div>
       <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
       <span class="dz-match" id="dz-match">FACE MATCH · 99.7%</span>
@@ -522,14 +527,7 @@ section{position:relative}
       <span id="term-title">Bureau Terminal // v2.4</span>
       <span class="sig"><i aria-hidden="true"></i>Intercept</span>
     </div>
-    <div class="term-body">
-      <span class="ln cmd">&gt; INITIATE UPLINK…</span>
-      <span class="ln cmd">&gt; TARGET:: <span class="tgt" id="term-target">—</span></span>
-      <span class="ln cmd">&gt; STATUS:: OFFLINE</span>
-      <span class="ln cmd">&gt; ROUTE:: BLOCKED</span>
-      <span class="ln warn">Website is under construction.</span>
-      <span class="ln dim">// ASSET TEMPORARILY DECOMMISSIONED —<br>NO EXTERNAL HANDOFF AUTHORIZED</span>
-    </div>
+    <div class="term-body" id="term-body" aria-live="polite" aria-busy="false"></div>
     <div class="term-foot">
       <button type="button" class="term-dismiss" id="term-dismiss">Acknowledge</button>
     </div>
@@ -547,21 +545,21 @@ section{position:relative}
    FEEDS = your YouTube / comms channels
 ============================================================ */
 const ASSETS = [
-  { domain:"medicareagencyfinder.com", cat:"Healthcare SaaS", type:"business", url:"https://medicareagencyfinder.com" },
   { domain:"ordinova.com",             cat:"Healthcare SaaS", type:"business", url:"https://ordinova.com" },
   { domain:"opusgrex.com",             cat:"Healthcare SaaS", type:"business", status:"offline", url:"https://opusgrex.com" },
-  { domain:"supthera.com",             cat:"Commercial Business", type:"business", url:"https://supthera.com" },
+  { domain:"medicareagencyfinder.com", cat:"Healthcare SaaS", type:"business", url:"https://medicareagencyfinder.com" },
   { domain:"coolstaffingschool.com",   cat:"Online Course",   type:"business", status:"offline", url:"https://coolstaffingschool.com" },
+  { domain:"supthera.com",             cat:"Commercial Business", type:"business", url:"https://supthera.com" },
   { domain:"bedborrow.com",            cat:"Commercial Business", type:"business", status:"offline", url:"https://bedborrow.com" },
+  { domain:"lordbae.com",              cat:"Commercial Business", type:"business", status:"offline", url:"https://lordbae.com" },
+  { domain:"mantarsultani.com",        cat:"Commercial Business", type:"business", url:"https://mantarsultani.com" },
+  { domain:"curiousaquarius.com",      cat:"Online Blog",     type:"business", status:"offline", url:"https://curiousaquarius.com" },
   { domain:"dimitrineutron.com",       cat:"Online Blog",     type:"business", status:"offline", url:"https://dimitrineutron.com" },
+  { domain:"persianvegan.com",         cat:"Online Blog",     type:"business", status:"offline", url:"https://persianvegan.com" },
+  { domain:"tesseracards.com",         cat:"E-commerce Brand", type:"business", status:"offline", url:"https://tesseracards.com" },
   { domain:"dantefuego.com",           cat:"E-commerce Brand", type:"business", url:"https://dantefuego.com" },
   { domain:"tradejester.com",          cat:"Trading",         type:"business", status:"offline", url:"https://tradejester.com" },
   { domain:"goyimearth.com",           cat:"Digital Library", type:"business", url:"https://goyimearth.com" },
-  { domain:"curiousaquarius.com",      cat:"Online Blog",     type:"business", status:"offline", url:"https://curiousaquarius.com" },
-  { domain:"tesseracards.com",         cat:"E-commerce Brand", type:"business", status:"offline", url:"https://tesseracards.com" },
-  { domain:"persianvegan.com",         cat:"Online Blog",     type:"business", status:"offline", url:"https://persianvegan.com" },
-  { domain:"mantarsultani.com",        cat:"Commercial Business", type:"business", url:"https://mantarsultani.com" },
-  { domain:"lordbae.com",              cat:"Commercial Business", type:"business", status:"offline", url:"https://lordbae.com" },
 ];
 
 const FEEDS = [
@@ -666,23 +664,121 @@ function bindFx(scope, sel){
 /* offline asset terminal modal */
 (function(){
   const overlay=document.getElementById("term-overlay");
-  const target=document.getElementById("term-target");
+  const body=document.getElementById("term-body");
   const dismiss=document.getElementById("term-dismiss");
+  const termCursor=document.querySelector(".term-cursor");
   let lastFocus=null;
+  let typeGen=0;
+
+  function fullBodyHTML(domain){
+    return `
+      <span class="ln cmd done">&gt; INITIATE UPLINK…</span>
+      <span class="ln cmd done">&gt; TARGET:: <span class="tgt">${domain}</span></span>
+      <span class="ln cmd done">&gt; STATUS:: OFFLINE</span>
+      <span class="ln cmd done">&gt; ROUTE:: BLOCKED</span>
+      <span class="ln warn done">Website is under construction.</span>
+      <span class="ln dim done">// ASSET TEMPORARILY DECOMMISSIONED —<br>NO EXTERNAL HANDOFF AUTHORIZED</span>`;
+  }
+
+  function renderInstant(domain){
+    body.innerHTML=fullBodyHTML(domain);
+    body.style.minHeight="";
+    body.setAttribute("aria-busy","false");
+    termCursor.style.visibility="";
+  }
+
+  function reserveBodyHeight(domain){
+    body.innerHTML=fullBodyHTML(domain);
+    body.style.minHeight=body.scrollHeight+"px";
+    body.replaceChildren();
+  }
+
+  function sleep(ms, gen){
+    return new Promise(resolve=>{
+      setTimeout(()=>resolve(gen===typeGen), ms);
+    });
+  }
+
+  async function typeModal(domain){
+    const gen=++typeGen;
+    body.setAttribute("aria-busy","true");
+    termCursor.style.visibility="hidden";
+    reserveBodyHeight(domain);
+
+    const lines=[
+      { c:"cmd", parts:["> INITIATE UPLINK…"] },
+      { c:"cmd", parts:["> TARGET:: ", domain], hi:1 },
+      { c:"cmd", parts:["> STATUS:: OFFLINE"] },
+      { c:"cmd", parts:["> ROUTE:: BLOCKED"] },
+      { c:"warn", parts:["Website is under construction."] },
+      { c:"dim", parts:["// ASSET TEMPORARILY DECOMMISSIONED —", "NO EXTERNAL HANDOFF AUTHORIZED"], br:true },
+    ];
+
+    const rows=lines.map(line=>{
+      const row=document.createElement("span");
+      row.className=`ln ${line.c}`;
+      const textEl=document.createElement("span");
+      textEl.className="type-text";
+      row.appendChild(textEl);
+      body.appendChild(row);
+      return { row, textEl, line };
+    });
+
+    for(const { row, textEl, line } of rows){
+      if(gen!==typeGen) return;
+      const caret=document.createElement("i");
+      caret.className="type-caret";
+      caret.setAttribute("aria-hidden","true");
+      row.appendChild(caret);
+
+      for(let p=0; p<line.parts.length; p++){
+        if(gen!==typeGen) return;
+        if(line.br && p>0) textEl.appendChild(document.createElement("br"));
+        const part=line.parts[p];
+        const isHi=line.hi===p;
+        for(let i=0; i<part.length; i++){
+          if(gen!==typeGen) return;
+          if(isHi && i===0){
+            const hi=document.createElement("span");
+            hi.className="tgt";
+            hi.textContent=part[i];
+            textEl.appendChild(hi);
+          }else if(isHi){
+            textEl.querySelector(".tgt").textContent+=part[i];
+          }else{
+            textEl.appendChild(document.createTextNode(part[i]));
+          }
+          if(!(await sleep(14, gen))) return;
+        }
+      }
+      row.classList.add("done");
+      caret.remove();
+      if(!(await sleep(28, gen))) return;
+    }
+
+    if(gen!==typeGen) return;
+    body.setAttribute("aria-busy","false");
+    termCursor.style.visibility="";
+  }
 
   function openOfflineModal(domain){
     lastFocus=document.activeElement;
-    target.textContent=domain;
     overlay.hidden=false;
     overlay.setAttribute("aria-hidden","false");
     requestAnimationFrame(()=>overlay.classList.add("open"));
     document.body.style.overflow="hidden";
     dismiss.focus();
+    if(reduced) renderInstant(domain);
+    else typeModal(domain);
   }
   function closeOfflineModal(){
+    typeGen++;
     overlay.classList.remove("open");
     overlay.setAttribute("aria-hidden","true");
     document.body.style.overflow="";
+    body.setAttribute("aria-busy","false");
+    body.style.minHeight="";
+    termCursor.style.visibility="";
     setTimeout(()=>{ if(!overlay.classList.contains("open")) overlay.hidden=true; },360);
     if(lastFocus && lastFocus.focus) lastFocus.focus();
   }
