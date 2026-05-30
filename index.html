@@ -154,8 +154,23 @@ section{position:relative}
   display:flex; align-items:center; justify-content:space-between; gap:16px;
   padding:12px clamp(18px,4vw,56px); font-size:0.7rem; letter-spacing:0.12em;
   background:linear-gradient(180deg, rgba(12,11,11,0.92), rgba(12,11,11,0)); }
-.topbar .brand{ font-family:"Big Shoulders Display"; font-weight:800; font-size:1.05rem; letter-spacing:0.04em; text-transform:uppercase }
-.topbar .brand b{color:var(--amber)}
+.topbar .brand{
+  display:flex; align-items:baseline; gap:clamp(8px,1.5vw,12px); flex-wrap:wrap;
+  font-family:"Big Shoulders Display"; font-weight:800; font-size:1.05rem; letter-spacing:0.04em; text-transform:uppercase;
+}
+.topbar .brand-name{ white-space:nowrap }
+.topbar .brand-tw{
+  font-family:"DM Mono",monospace; font-weight:400; font-size:0.62rem;
+  letter-spacing:0.14em; text-transform:uppercase; color:var(--amber); min-width:8.5ch;
+}
+.topbar .brand-caret{
+  display:inline-block; width:7px; height:0.9em; margin-left:2px; background:var(--amber);
+  vertical-align:-0.08em; animation:termBlink 1.05s step-end infinite;
+}
+@media (max-width:480px){
+  .topbar .brand{ font-size:0.92rem }
+  .topbar .brand-tw{ font-size:0.58rem; min-width:7.5ch }
+}
 .topbar .right{ display:flex; align-items:center; gap:18px; color:var(--dim) }
 .onair{ display:inline-flex; align-items:center; gap:8px; color:var(--ink) }
 .onair .dot{ width:9px; height:9px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067; animation:opsPulse 2.4s ease-in-out infinite }
@@ -393,6 +408,7 @@ section{position:relative}
   .fx.fx-burst::before,.fx.fx-burst::after{ animation:none; opacity:0; transform:none; }
   .term-cursor .blink{ animation:none; opacity:.65; }
   .term-body .type-caret{ animation:none; opacity:.65; }
+  .topbar .brand-caret{ animation:none; opacity:.65; }
 }
 </style>
 </head>
@@ -405,7 +421,10 @@ section{position:relative}
 
 <!-- TOP BAR -->
 <header class="topbar">
-  <a class="brand" href="#top">DT<b>//</b>BUREAU</a>
+  <a class="brand" href="#top">
+    <span class="brand-name">Danesh Tabrizi</span>
+    <span class="brand-tw" aria-live="polite"><span id="brand-type"></span><i class="brand-caret" aria-hidden="true"></i></span>
+  </a>
   <div class="right">
     <span class="tc-label">UTC</span>
     <span class="tc" id="tc">00:00:00</span>
@@ -576,6 +595,29 @@ const TAGLINE = "Every asset I've built. One operative file.";
 const reduced = matchMedia("(prefers-reduced-motion: reduce)").matches;
 const touch = matchMedia("(pointer: coarse)").matches;
 gsap.registerPlugin(ScrollTrigger);
+
+/* brand typewriter — cycles role labels */
+(function brandTypewriter(){
+  const el=document.getElementById("brand-type");
+  if(!el) return;
+  const words=["Developer","Designer","Freelancer"];
+  if(reduced){ el.textContent=words[0]; return; }
+  let wi=0, ci=0, del=false, pause=false;
+  (function tick(){
+    const word=words[wi];
+    if(pause){ pause=false; setTimeout(tick, 55); return; }
+    if(!del){
+      ci++;
+      el.textContent=word.slice(0, ci);
+      if(ci>=word.length){ del=true; setTimeout(tick, 2000); return; }
+    }else{
+      ci--;
+      el.textContent=word.slice(0, ci);
+      if(ci<=0){ del=false; wi=(wi+1)%words.length; pause=true; }
+    }
+    setTimeout(tick, del ? 34 : 52);
+  })();
+})();
 
 let lenis;
 if(!reduced){
