@@ -274,6 +274,7 @@ section{position:relative}
 }
 .term-overlay.open{ opacity:1; visibility:visible; pointer-events:auto; }
 .term-modal{
+  position:relative;
   width:min(420px,92vw); border:1px solid var(--line);
   background:rgba(10,9,8,.96); border-radius:2px;
   box-shadow:0 0 0 1px rgba(47,210,230,.08), 0 24px 80px rgba(0,0,0,.65);
@@ -305,6 +306,19 @@ section{position:relative}
   transition:.3s var(--ease); cursor:pointer;
 }
 .term-dismiss:hover{ border-color:var(--amber); color:var(--amber) }
+.term-cursor{
+  position:absolute; left:14px; bottom:16px;
+  display:inline-flex; align-items:center; gap:5px;
+  font-size:0.72rem; color:var(--cyan); letter-spacing:0;
+  pointer-events:none; user-select:none;
+}
+.term-cursor .prompt{ opacity:.85 }
+.term-cursor .blink{
+  width:9px; height:1.05em; background:var(--cyan);
+  box-shadow:0 0 6px rgba(47,210,230,.45);
+  animation:termBlink 1.05s step-end infinite;
+}
+@keyframes termBlink{ 0%,49%{opacity:1} 50%,100%{opacity:0} }
 
 /* ============================================================
    SIGNAL FEEDS (YouTube) — surveillance terminals
@@ -371,6 +385,7 @@ section{position:relative}
   .up{opacity:1; transform:none}
   .fx.fx-burst{ animation:none; text-shadow:none; transform:none; }
   .fx.fx-burst::before,.fx.fx-burst::after{ animation:none; opacity:0; transform:none; }
+  .term-cursor .blink{ animation:none; opacity:.65; }
 }
 </style>
 </head>
@@ -518,6 +533,7 @@ section{position:relative}
     <div class="term-foot">
       <button type="button" class="term-dismiss" id="term-dismiss">Acknowledge</button>
     </div>
+    <span class="term-cursor" aria-hidden="true"><span class="prompt">&gt;</span><i class="blink"></i></span>
   </div>
 </div>
 
