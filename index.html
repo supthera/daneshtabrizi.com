@@ -140,6 +140,7 @@ section{position:relative}
 .sec-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;
   border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:38px; }
 .sec-head h2{ font-size:clamp(2.2rem,7vw,5.6rem) }
+#stations .sec-head h2{ font-size:clamp(1.75rem,4.5vw,3.4rem); white-space:nowrap }
 .sec-head .meta{ text-align:right }
 .bars{ display:flex; height:6px; width:100% }
 .bars i{ flex:1 }
@@ -243,20 +244,67 @@ section{position:relative}
 .station .ch{ font-size:0.72rem; color:var(--amber); letter-spacing:0.1em; font-variant-numeric:tabular-nums }
 .station .domain{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:lowercase;
   font-size:clamp(1.5rem,3.4vw,2.7rem); line-height:1; white-space:nowrap }
-.station .cat{ font-size:0.68rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--dim) }
+.station .cat{ font-size:0.68rem; letter-spacing:0.06em; color:var(--dim) }
 .station .stat{ display:flex; align-items:center; gap:8px; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase }
 .station .stat .d{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067 }
+.station .stat.offline .d{ background:var(--rec); box-shadow:0 0 8px var(--rec) }
+.station .stat.offline{ color:var(--dim) }
 .station .go{ justify-self:end; font-size:0.7rem; letter-spacing:0.16em; text-transform:uppercase; color:var(--dim); transition:color .3s var(--ease); white-space:nowrap }
 .station::after{ content:""; position:absolute; inset:0; z-index:-1; background:var(--amber); opacity:0; transition:opacity .3s }
 .station:hover{ padding-left:26px }
 .station:hover::after{ opacity:.04 }
 .station:hover .go{ color:var(--amber) }
 .station.hide{ display:none }
+.station.offline{ cursor:not-allowed }
 @media (max-width:860px){
   .station{ grid-template-columns:1fr; gap:8px; padding:22px 4px }
   .station .domain{ white-space:normal }
   .station .go{ justify-self:start }
 }
+
+/* ============================================================
+   OFFLINE TERMINAL MODAL
+============================================================ */
+.term-overlay{
+  position:fixed; inset:0; z-index:9800;
+  display:grid; place-items:center; padding:24px;
+  background:rgba(6,5,4,.82); backdrop-filter:blur(6px);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .35s var(--ease), visibility .35s;
+}
+.term-overlay.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.term-modal{
+  width:min(420px,92vw); border:1px solid var(--line);
+  background:rgba(10,9,8,.96); border-radius:2px;
+  box-shadow:0 0 0 1px rgba(47,210,230,.08), 0 24px 80px rgba(0,0,0,.65);
+  transform:translateY(12px) scale(.98);
+  transition:transform .35s var(--ease);
+}
+.term-overlay.open .term-modal{ transform:none; }
+.term-head{
+  display:flex; justify-content:space-between; align-items:center; gap:12px;
+  padding:11px 14px; border-bottom:1px solid var(--line);
+  font-size:0.64rem; letter-spacing:0.18em; text-transform:uppercase; color:var(--dim);
+}
+.term-head .sig{ color:var(--rec); display:inline-flex; align-items:center; gap:7px }
+.term-head .sig i{ width:7px; height:7px; border-radius:50%; background:var(--rec); box-shadow:0 0 8px var(--rec); animation:opsPulse 2.4s ease-in-out infinite }
+.term-body{
+  padding:18px 14px 14px; font-size:0.78rem; line-height:1.65; color:var(--dim);
+}
+.term-body .ln{ display:block; margin-bottom:6px }
+.term-body .ln.cmd{ color:var(--cyan) }
+.term-body .ln.warn{ color:var(--amber); margin-top:14px; font-size:0.82rem; letter-spacing:0.04em }
+.term-body .ln.dim{ color:var(--faint); font-size:0.68rem; letter-spacing:0.08em; margin-top:12px }
+.term-body .tgt{ color:var(--ink) }
+.term-foot{
+  display:flex; justify-content:flex-end; padding:0 14px 14px;
+}
+.term-dismiss{
+  padding:10px 18px; border:1px solid var(--line); border-radius:2px;
+  font-size:0.68rem; letter-spacing:0.16em; text-transform:uppercase;
+  transition:.3s var(--ease); cursor:pointer;
+}
+.term-dismiss:hover{ border-color:var(--amber); color:var(--amber) }
 
 /* ============================================================
    SIGNAL FEEDS (YouTube) — surveillance terminals
@@ -392,10 +440,9 @@ section{position:relative}
 <section class="stations" id="stations" aria-label="Domains and ventures">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up">My<br>Assets</h2>
+      <h2 class="up">Asset Registry</h2>
       <div class="meta up">
-        <p class="mono-label">Confirmed Holdings</p>
-        <p class="mono-label" style="margin-top:6px;">Assets · Fronts · Ventures</p>
+        <p class="mono-label">Confirmed Holdings · Ventures</p>
       </div>
     </div>
     <div class="band up" role="tablist" aria-label="Filter assets">
@@ -454,6 +501,26 @@ section{position:relative}
 
 </main>
 
+<div class="term-overlay" id="term-overlay" hidden aria-hidden="true">
+  <div class="term-modal" role="dialog" aria-modal="true" aria-labelledby="term-title">
+    <div class="term-head">
+      <span id="term-title">Bureau Terminal // v2.4</span>
+      <span class="sig"><i aria-hidden="true"></i>Intercept</span>
+    </div>
+    <div class="term-body">
+      <span class="ln cmd">&gt; INITIATE UPLINK…</span>
+      <span class="ln cmd">&gt; TARGET:: <span class="tgt" id="term-target">—</span></span>
+      <span class="ln cmd">&gt; STATUS:: OFFLINE</span>
+      <span class="ln cmd">&gt; ROUTE:: BLOCKED</span>
+      <span class="ln warn">Website is under construction.</span>
+      <span class="ln dim">// ASSET TEMPORARILY DECOMMISSIONED —<br>NO EXTERNAL HANDOFF AUTHORIZED</span>
+    </div>
+    <div class="term-foot">
+      <button type="button" class="term-dismiss" id="term-dismiss">Acknowledge</button>
+    </div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
@@ -464,21 +531,21 @@ section{position:relative}
    FEEDS = your YouTube / comms channels
 ============================================================ */
 const ASSETS = [
-  { domain:"medicareagencyfinder.com", cat:"Healthcare",      type:"business", url:"https://medicareagencyfinder.com" },
-  { domain:"ordinova.com",             cat:"Ventures",        type:"business", url:"https://ordinova.com" },
-  { domain:"opusgrex.com",             cat:"Operations",      type:"business", url:"https://opusgrex.com" },
-  { domain:"supthera.com",             cat:"Therapeutics",    type:"business", url:"https://supthera.com" },
-  { domain:"coolstaffingschool.com",   cat:"Staffing",        type:"business", url:"https://coolstaffingschool.com" },
-  { domain:"bedborrow.com",            cat:"Marketplace",     type:"business", url:"https://bedborrow.com" },
-  { domain:"dimitrineutron.com",       cat:"Media",           type:"business", url:"https://dimitrineutron.com" },
-  { domain:"dantefuego.com",           cat:"Brand",           type:"business", url:"https://dantefuego.com" },
-  { domain:"tradejester.com",          cat:"Trading",         type:"business", url:"https://tradejester.com" },
-  { domain:"goyimearth.com",           cat:"Earth Sciences",  type:"business", url:"https://goyimearth.com" },
-  { domain:"curiousaquarius.com",      cat:"Culture",         type:"business", url:"https://curiousaquarius.com" },
-  { domain:"tesseracards.com",         cat:"Collectibles",    type:"business", url:"https://tesseracards.com" },
-  { domain:"persianvegan.com",         cat:"Food & Lifestyle",type:"business", url:"https://persianvegan.com" },
-  { domain:"mantarsultani.com",        cat:"Personal Brand",  type:"business", url:"https://mantarsultani.com" },
-  { domain:"lordbae.com",              cat:"Brand",           type:"business", url:"https://lordbae.com" },
+  { domain:"medicareagencyfinder.com", cat:"Healthcare SaaS", type:"business", url:"https://medicareagencyfinder.com" },
+  { domain:"ordinova.com",             cat:"Healthcare SaaS", type:"business", url:"https://ordinova.com" },
+  { domain:"opusgrex.com",             cat:"Healthcare SaaS", type:"business", status:"offline", url:"https://opusgrex.com" },
+  { domain:"supthera.com",             cat:"Commercial Business", type:"business", url:"https://supthera.com" },
+  { domain:"coolstaffingschool.com",   cat:"Online Course",   type:"business", status:"offline", url:"https://coolstaffingschool.com" },
+  { domain:"bedborrow.com",            cat:"Commercial Business", type:"business", status:"offline", url:"https://bedborrow.com" },
+  { domain:"dimitrineutron.com",       cat:"Online Blog",     type:"business", status:"offline", url:"https://dimitrineutron.com" },
+  { domain:"dantefuego.com",           cat:"E-commerce Brand", type:"business", url:"https://dantefuego.com" },
+  { domain:"tradejester.com",          cat:"Trading",         type:"business", status:"offline", url:"https://tradejester.com" },
+  { domain:"goyimearth.com",           cat:"Digital Library", type:"business", url:"https://goyimearth.com" },
+  { domain:"curiousaquarius.com",      cat:"Online Blog",     type:"business", status:"offline", url:"https://curiousaquarius.com" },
+  { domain:"tesseracards.com",         cat:"E-commerce Brand", type:"business", status:"offline", url:"https://tesseracards.com" },
+  { domain:"persianvegan.com",         cat:"Online Blog",     type:"business", status:"offline", url:"https://persianvegan.com" },
+  { domain:"mantarsultani.com",        cat:"Commercial Business", type:"business", url:"https://mantarsultani.com" },
+  { domain:"lordbae.com",              cat:"Commercial Business", type:"business", status:"offline", url:"https://lordbae.com" },
 ];
 
 const FEEDS = [
@@ -504,7 +571,7 @@ if(!reduced){
   gsap.ticker.lagSmoothing(0);
 }
 function smooth(id){ const el=document.querySelector(id); if(el){ lenis?lenis.scrollTo(el):el.scrollIntoView({behavior:"smooth"}); } }
-document.querySelectorAll('a[href^="#"]').forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); smooth(a.getAttribute("href")); }));
+document.querySelectorAll('a[href^="#"]:not(.offline)').forEach(a=>a.addEventListener("click",e=>{ e.preventDefault(); smooth(a.getAttribute("href")); }));
 
 /* viewfinder cursor (moves with pointer only) */
 if(!touch){
@@ -580,17 +647,59 @@ function bindFx(scope, sel){
   });
 }
 
+/* offline asset terminal modal */
+(function(){
+  const overlay=document.getElementById("term-overlay");
+  const target=document.getElementById("term-target");
+  const dismiss=document.getElementById("term-dismiss");
+  let lastFocus=null;
+
+  function openOfflineModal(domain){
+    lastFocus=document.activeElement;
+    target.textContent=domain;
+    overlay.hidden=false;
+    overlay.setAttribute("aria-hidden","false");
+    requestAnimationFrame(()=>overlay.classList.add("open"));
+    document.body.style.overflow="hidden";
+    dismiss.focus();
+  }
+  function closeOfflineModal(){
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden","true");
+    document.body.style.overflow="";
+    setTimeout(()=>{ if(!overlay.classList.contains("open")) overlay.hidden=true; },360);
+    if(lastFocus && lastFocus.focus) lastFocus.focus();
+  }
+
+  window.openOfflineModal=openOfflineModal;
+  dismiss.addEventListener("click",closeOfflineModal);
+  overlay.addEventListener("click",e=>{ if(e.target===overlay) closeOfflineModal(); });
+  addEventListener("keydown",e=>{
+    if(e.key==="Escape" && overlay.classList.contains("open")) closeOfflineModal();
+  });
+})();
+
 /* BUILD ASSETS */
 (function(){
   const g=document.getElementById("guide");
   ASSETS.forEach((s,i)=>{
     const a=document.createElement("a");
-    a.className="station up"; a.href=s.url; a.target="_blank"; a.rel="noopener"; a.dataset.type=s.type;
+    const live = s.status !== "offline";
+    a.className="station up"; a.dataset.type=s.type;
+    if(live){
+      a.href=s.url; a.target="_blank"; a.rel="noopener";
+    }else{
+      a.href="#"; a.classList.add("offline");
+      a.addEventListener("click",e=>{
+        e.preventDefault();
+        openOfflineModal(s.domain);
+      });
+    }
     a.innerHTML=`
       <span class="ch">AST-${String(i+1).padStart(2,"0")}</span>
       <span class="domain fx" data-text="${s.domain}">${s.domain}</span>
       <span class="cat">${s.cat}</span>
-      <span class="stat"><span class="d"></span>Active</span>
+      <span class="stat${live ? "" : " offline"}"><span class="d"></span>${live ? "Active" : "Offline"}</span>
       <span class="go">Open File →</span>`;
     g.appendChild(a);
   });
