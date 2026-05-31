@@ -191,14 +191,8 @@ section{position:relative}
   100%{ color:var(--pastel-teal); }
 }
 .pastel-color-cycle{ animation:pastel-color-cycle 8s steps(16) infinite; }
-.sec-head-pastel{ position:relative; display:inline-block; }
-.sec-head-pastel-base{ transition:opacity .5s ease-in-out; }
-.sec-head-pastel:hover .sec-head-pastel-base{ opacity:0; }
-.sec-head-pastel-cycle{
-  position:absolute; inset:0; opacity:0;
-  transition:opacity .5s ease-in-out;
-}
-.sec-head-pastel:hover .sec-head-pastel-cycle{ opacity:1; }
+.sec-head-lead{ display:flex; align-items:flex-end; flex-wrap:wrap; gap:clamp(14px,2.5vw,24px); }
+#stations .sec-head .band{ margin-bottom:0; }
 .sec-head .meta{ text-align:right }
 .bars{ display:flex; height:6px; width:100% }
 .bars i{ flex:1 }
@@ -349,8 +343,8 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
    ASSETS (domains / businesses)
 ============================================================ */
 .stations{ padding:clamp(80px,12vh,150px) 0 }
-.band{ display:inline-flex; gap:4px; border:1px solid var(--line); border-radius:2px; padding:4px; margin-bottom:34px }
-.band button{ padding:9px 18px; font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--dim); border-radius:2px; transition:.3s var(--ease) }
+.band{ display:inline-flex; gap:3px; border:1px solid var(--line); border-radius:2px; padding:2px; margin-bottom:34px }
+.band button{ padding:5px 12px; font-size:0.64rem; letter-spacing:0.12em; text-transform:uppercase; color:var(--dim); border-radius:2px; transition:.3s var(--ease); line-height:1.2 }
 .band button.on{ background:var(--ink); color:#000 }
 
 .guide{ border-top:1px solid var(--line) }
@@ -585,18 +579,17 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="stations" id="stations" aria-label="Domains and ventures">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up sec-head-pastel">
-        <span class="sec-head-pastel-base">Asset Registry</span>
-        <span class="sec-head-pastel-cycle pastel-color-cycle" aria-hidden="true">Asset Registry</span>
-      </h2>
+      <div class="sec-head-lead">
+        <h2 class="up">Asset Registry</h2>
+        <div class="band up" role="tablist" aria-label="Filter assets">
+          <button class="on" data-f="all" role="tab" aria-selected="true">All</button>
+          <button data-f="business" role="tab">Commercial</button>
+          <button data-f="design" role="tab">Cover Ops</button>
+        </div>
+      </div>
       <div class="meta up">
         <p class="mono-label">Confirmed Holdings · Ventures</p>
       </div>
-    </div>
-    <div class="band up" role="tablist" aria-label="Filter assets">
-      <button class="on" data-f="all" role="tab" aria-selected="true">All</button>
-      <button data-f="business" role="tab">Commercial</button>
-      <button data-f="design" role="tab">Cover Ops</button>
     </div>
     <div class="guide up" id="guide"></div>
   </div>
@@ -606,13 +599,9 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="channels" id="channels" aria-label="YouTube and comms feeds">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up sec-head-pastel">
-        <span class="sec-head-pastel-base">Youtube Channels</span>
-        <span class="sec-head-pastel-cycle pastel-color-cycle" aria-hidden="true">Youtube Channels</span>
-      </h2>
+      <h2 class="up pastel-color-cycle">Youtube Channels</h2>
       <div class="meta up">
-        <p class="mono-label">Comms Intel</p>
-        <p class="mono-label" style="margin-top:6px;">Intercepted · Active</p>
+        <p class="mono-label">Documented Feeds · Broadcasting</p>
       </div>
     </div>
     <div class="tvgrid up" id="tvgrid"></div>
