@@ -23,10 +23,12 @@
 <meta name="twitter:description" content="Every domain, venture, and comms channel — one operative file." />
 <meta name="twitter:image" content="https://daneshtabrizi.com/og.jpg" />
 
-<!-- Fonts: Big Shoulders Display (display) + DM Mono (intel terminal UI) -->
+<!-- Fonts: critical sync, intl deferred -->
 <link rel="preconnect" href="https://fonts.googleapis.com" />
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
-<link href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@500;600;700;800;900&family=DM+Mono:wght@300;400;500&family=Noto+Sans:wght@300;400&family=Noto+Sans+Devanagari:wght@400;500&family=Noto+Sans+SC:wght@300;400&family=Vazirmatn:wght@300;400&display=swap" rel="stylesheet" />
+<link rel="preload" as="style" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=block" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=block" />
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Noto+Sans+Devanagari:wght@400&family=Noto+Sans+SC:wght@300&family=Vazirmatn:wght@300&display=swap" />
 
 <script type="application/ld+json">
 { "@context":"https://schema.org","@type":"Person","name":"Danesh Tabrizi","url":"https://daneshtabrizi.com","jobTitle":"Principal Operative","sameAs":["https://YOUR_LINK_HERE","https://YOUR_LINK_HERE"] }
@@ -52,6 +54,22 @@
   --noise:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   --cursor-site:url("site-cursor.cur"), auto;
   --cursor-hero:url("hero-cursor.cur"), auto;
+  --pastel-teal:#B8E4E1;
+  --pastel-mint:#B8EBE9;
+  --pastel-lavender:#CCC8FA;
+  --pastel-violet:#D4CFF8;
+  --pastel-pink:#E8C8E4;
+  --pastel-rose:#F5D4E4;
+  --pastel-sage:#C4E8E1;
+  --pastel-lilac:#DDD8FA;
+  --pastel-aqua:#A8E4E0;
+  --pastel-sky:#C8E4F0;
+  --pastel-plum:#E4D8FA;
+  --pastel-blush:#F5DCE8;
+  --pastel-seafoam:#B8EDE4;
+  --pastel-wisteria:#D4CCF0;
+  --pastel-coral:#F8DCE0;
+  --pastel-periwinkle:#DDDAFA;
 }
 
 *{margin:0;padding:0;box-sizing:border-box}
@@ -59,11 +77,13 @@ html{-webkit-text-size-adjust:100%}
 body{ background:var(--bg); color:var(--ink); font-family:"DM Mono",ui-monospace,monospace;
   line-height:1.5; -webkit-font-smoothing:antialiased; overflow-x:hidden;
   cursor:var(--cursor-site); }
+h1,h2,h3{font-family:"Big Shoulders Display",system-ui,sans-serif;font-weight:800;line-height:0.9;text-transform:uppercase}
+html:not(.fonts-ready) .hero-main,
+html:not(.fonts-ready) .dossier{ visibility:hidden; }
 @media (pointer:coarse){ body{ cursor:auto; } }
 a{color:inherit;text-decoration:none}
 button{font:inherit;color:inherit;background:none;border:none}
 ::selection{background:var(--amber);color:#000}
-h1,h2,h3{font-family:"Big Shoulders Display",sans-serif;font-weight:800;line-height:0.9;text-transform:uppercase}
 .mono-label{font-size:0.66rem;letter-spacing:0.28em;text-transform:uppercase;color:var(--dim)}
 .amber{color:var(--amber)}
 
@@ -149,8 +169,36 @@ section{position:relative}
 .sec-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;
   border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:38px; }
 .sec-head h2{ font-size:clamp(2.2rem,7vw,5.6rem) }
-#stations .sec-head h2{ font-size:clamp(1.75rem,4.5vw,3.4rem); white-space:nowrap }
-#channels .sec-head h2{ font-size:clamp(1.75rem,4.5vw,3.4rem); white-space:nowrap }
+#stations .sec-head h2,
+#channels .sec-head h2{ font-size:clamp(1.55rem,4vw,3rem); white-space:nowrap }
+@keyframes pastel-color-cycle{
+  0%{ color:var(--pastel-teal); }
+  6.25%{ color:var(--pastel-mint); }
+  12.5%{ color:var(--pastel-lavender); }
+  18.75%{ color:var(--pastel-violet); }
+  25%{ color:var(--pastel-pink); }
+  31.25%{ color:var(--pastel-rose); }
+  37.5%{ color:var(--pastel-sage); }
+  43.75%{ color:var(--pastel-lilac); }
+  50%{ color:var(--pastel-aqua); }
+  56.25%{ color:var(--pastel-sky); }
+  62.5%{ color:var(--pastel-plum); }
+  68.75%{ color:var(--pastel-blush); }
+  75%{ color:var(--pastel-seafoam); }
+  81.25%{ color:var(--pastel-wisteria); }
+  87.5%{ color:var(--pastel-coral); }
+  93.75%{ color:var(--pastel-periwinkle); }
+  100%{ color:var(--pastel-teal); }
+}
+.pastel-color-cycle{ animation:pastel-color-cycle 8s steps(16) infinite; }
+.sec-head-pastel{ position:relative; display:inline-block; }
+.sec-head-pastel-base{ transition:opacity .5s ease-in-out; }
+.sec-head-pastel:hover .sec-head-pastel-base{ opacity:0; }
+.sec-head-pastel-cycle{
+  position:absolute; inset:0; opacity:0;
+  transition:opacity .5s ease-in-out;
+}
+.sec-head-pastel:hover .sec-head-pastel-cycle{ opacity:1; }
 .sec-head .meta{ text-align:right }
 .bars{ display:flex; height:6px; width:100% }
 .bars i{ flex:1 }
@@ -212,32 +260,27 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 .hero-scrim{ position:absolute; inset:0; z-index:1; pointer-events:none;
   background:radial-gradient(110% 90% at 50% 45%, rgba(12,11,11,0.25), rgba(12,11,11,0.92) 85%) }
 .hero .wrap{ position:relative; z-index:2 }
-.hero-kicker{ display:flex; align-items:center; gap:14px; margin-bottom:22px }
-.hero-kicker .tag{ border:1px solid var(--line); padding:5px 11px; border-radius:2px }
-.hero h1{ font-size:clamp(3.4rem,17vw,15rem); font-weight:900; letter-spacing:-0.01em; line-height:0.82 }
+.hero-grid{
+  display:grid; align-items:center; gap:clamp(24px,4vw,56px);
+  grid-template-columns:min(300px,34vw) minmax(0,1fr);
+}
+.hero-main{ min-width:0; }
+.hero h1{ font-size:clamp(2.6rem,11vw,11rem); font-weight:900; letter-spacing:-0.01em; line-height:0.82 }
 .hero h1 .l{ display:block; overflow:hidden }
 .hero h1 .l span{ display:inline-block; transform:translateY(110%) }
 .hero h1 .out{ -webkit-text-stroke:1.5px var(--ink); color:transparent }
 .hero-quote{
-  margin-top:clamp(10px,1.8vh,16px); margin-bottom:clamp(6px,1.2vh,10px); max-width:44ch;
+  margin:0 auto clamp(6px,1.2vh,10px); max-width:44ch;
   font-size:clamp(0.82rem,1.8vw,1rem); font-style:italic;
-  color:var(--dim); letter-spacing:0.02em; line-height:1.55;
+  color:var(--dim); letter-spacing:0.02em; line-height:1.55; text-align:center;
 }
 .hero-quote-nobreak{ white-space:nowrap }
 .hero-quote-intl{
-  display:flex; align-items:flex-start; flex-wrap:wrap; gap:clamp(10px,2vw,16px);
+  display:flex; align-items:center; justify-content:center; flex-wrap:wrap; gap:clamp(10px,2vw,16px);
   width:fit-content; max-width:100%;
-  margin-top:clamp(6px,1.2vh,10px); margin-bottom:clamp(8px,1.5vh,14px);
+  margin:clamp(6px,1.2vh,10px) auto clamp(8px,1.5vh,14px);
 }
-.hero-quote-sep{ color:var(--faint); font-size:clamp(0.88rem,1.9vw,1.05rem); line-height:1; user-select:none; margin-top:0.45em; }
-.hero-quote-fa-col{
-  display:flex; flex-direction:column; gap:clamp(4px,0.8vh,6px); width:fit-content;
-}
-.hero-quote-ru{
-  width:fit-content; max-width:100%; margin:0;
-  font-family:"Noto Sans",sans-serif; font-size:clamp(0.82rem,1.8vw,0.98rem); font-weight:300;
-  color:var(--dim); line-height:1.5;
-}
+.hero-quote-sep{ color:var(--faint); font-size:clamp(0.88rem,1.9vw,1.05rem); line-height:1; user-select:none; }
 .hero-quote-zh{
   width:fit-content; max-width:100%; margin:0;
   font-family:"Noto Sans SC",sans-serif; font-size:clamp(0.88rem,1.9vw,1.05rem); font-weight:300;
@@ -251,7 +294,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 .hero-quote-fa{
   width:fit-content; max-width:100%; margin:0;
   font-family:"Vazirmatn","Tahoma",sans-serif; font-size:clamp(0.88rem,1.9vw,1.05rem); font-weight:300;
-  color:var(--dim); line-height:1.6; direction:rtl; text-align:left;
+  color:var(--dim); line-height:1.6; direction:rtl; text-align:center;
 }
 .hero-sub{ margin-top:clamp(20px,4vh,40px); display:flex; flex-wrap:wrap; gap:26px; align-items:center; justify-content:space-between; position:relative; z-index:3 }
 .typed{ font-size:clamp(0.85rem,2.2vw,1.15rem); letter-spacing:0.06em; min-height:1.5em }
@@ -264,17 +307,15 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 .scrollcue .ln{ width:42px; height:1px; background:var(--amber) }
 
 /* --- HERO SUBJECT FILE (espionage dossier / POI target lock) --- */
-.dossier{ width:min(342px,82vw); border:1px solid var(--line); background:rgba(14,13,12,0.74);
+.dossier{
+  width:100%; max-width:342px; border:1px solid var(--line); background:rgba(14,13,12,0.74);
   backdrop-filter:blur(7px); border-radius:3px; padding:13px; font-size:0.72rem;
-  position:absolute; z-index:2; top:0; bottom:0; height:fit-content; margin-top:auto; margin-bottom:auto; }
-@media (min-width:1024px){
-  .dossier{ right:clamp(18px,4vw,56px); left:auto; margin-bottom:6vh; }
-}
-@media (min-width:1472px){
-  .dossier{ right:calc((100vw - var(--maxw)) / 2 + clamp(18px, 4vw, 56px)); }
+  position:relative; z-index:2; height:fit-content; justify-self:start;
 }
 @media (max-width:1023px){
-  .dossier{ left:auto; right:clamp(18px,4vw,56px); width:min(300px,58vw); margin-bottom:16vh; }
+  .hero-grid{ grid-template-columns:1fr; gap:clamp(28px,5vh,40px); }
+  .dossier{ max-width:min(342px,100%); justify-self:center; }
+  .hero h1{ font-size:clamp(3rem,17vw,15rem); }
 }
 .dz-top{ display:flex; justify-content:space-between; align-items:center; letter-spacing:0.14em; text-transform:uppercase;
   color:var(--dim); border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:11px }
@@ -318,7 +359,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   border-bottom:1px solid var(--line); overflow:hidden; transition:padding-left .3s var(--ease) }
 .station .ch{ font-size:0.72rem; color:var(--amber); letter-spacing:0.1em; font-variant-numeric:tabular-nums }
 .station .domain{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:lowercase;
-  font-size:clamp(1.25rem,2.8vw,2.2rem); line-height:1; white-space:nowrap }
+  font-size:clamp(1.1rem,2.4vw,1.85rem); line-height:1; white-space:nowrap }
 .station .cat{ font-size:0.78rem; letter-spacing:0.06em; color:var(--dim); margin-left:-10px; padding-right:12px; }
 .station .stat{ display:flex; align-items:center; gap:8px; font-size:0.68rem; letter-spacing:0.12em; text-transform:uppercase }
 .station .stat .d{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067 }
@@ -499,50 +540,44 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="hero" aria-label="Intro">
   <canvas id="static-canvas" aria-hidden="true"></canvas>
   <div class="hero-scrim" aria-hidden="true"></div>
-  <div class="wrap">
-    <div class="hero-kicker mono-label">
-      <span class="tag">CASE FILE // PRIMARY</span>
-      <span>MCMXCIV</span>
-    </div>
-    <p class="hero-quote">A jack of all trades is a master of none, <span class="hero-quote-nobreak">but oftentimes better than a master of one.</span></p>
-    <div class="hero-quote-intl">
-      <div class="hero-quote-fa-col">
-        <p class="hero-quote-fa" lang="fa" dir="rtl">شک کلید دانش است</p>
-        <p class="hero-quote-ru" lang="ru">Нет худа без добра</p>
+  <div class="wrap hero-grid">
+    <aside class="dossier" aria-label="Subject file: Danesh Tabrizi">
+      <div class="dz-top"><span>Subject File</span><span class="dz-track"><i></i>Tracking</span></div>
+        <div class="dz-photo">
+          <img class="dz-img" src="profile.jpg" alt="Danesh Tabrizi" width="1024" height="576">
+        <div class="dz-scan" aria-hidden="true"></div>
+        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
+        <span class="dz-match" id="dz-match">FACE MATCH · 99.7%</span>
       </div>
-      <span class="hero-quote-sep" aria-hidden="true">·</span>
-      <p class="hero-quote-zh" lang="zh">和而不同</p>
-      <span class="hero-quote-sep" aria-hidden="true">·</span>
-      <p class="hero-quote-sa" lang="sa">सत्यमेव जयते नानृतं</p>
-    </div>
-    <h1 aria-label="Danesh Tabrizi">
-      <span class="l"><span>Danesh</span></span>
-      <span class="l out"><span>Tabrizi</span></span>
-    </h1>
-    <div class="hero-sub">
-      <p class="typed" aria-live="polite"></p>
-      <a class="cta" href="#stations">Open Asset Registry →</a>
+      <div class="dz-rows">
+        <div class="dz-row"><span class="k">Subject</span><span class="v">Danesh Tabrizi</span></div>
+        <div class="dz-row"><span class="k">DOB</span><span class="v">13 Feb 1994 · <span id="dz-age">—</span> yrs</span></div>
+        <div class="dz-row"><span class="k">Class</span><span class="v">Principal Operative</span></div>
+        <div class="dz-row"><span class="k">Status</span><span class="v amber">Active</span></div>
+        <div class="dz-row"><span class="k">Last Seen</span><span class="v"><span class="redact">CLASSIFIED</span></span></div>
+        <div class="dz-row"><span class="k">Clearance</span><span class="v">LVL ███</span></div>
+      </div>
+      <div class="dz-foot"><span class="dz-id">ID//DT-0213-1994</span><span class="dz-bars" aria-hidden="true"></span></div>
+    </aside>
+    <div class="hero-main">
+      <p class="hero-quote">A jack of all trades is a master of none, <span class="hero-quote-nobreak">but oftentimes better than a master of one.</span></p>
+      <div class="hero-quote-intl">
+        <p class="hero-quote-fa" lang="fa" dir="rtl">شک کلید دانش است</p>
+        <span class="hero-quote-sep" aria-hidden="true">·</span>
+        <p class="hero-quote-zh" lang="zh">和而不同</p>
+        <span class="hero-quote-sep" aria-hidden="true">·</span>
+        <p class="hero-quote-sa" lang="sa">सत्यमेव जयते नानृतं</p>
+      </div>
+      <h1 aria-label="Danesh Tabrizi">
+        <span class="l"><span>Danesh</span></span>
+        <span class="l out"><span>Tabrizi</span></span>
+      </h1>
+      <div class="hero-sub">
+        <p class="typed" aria-live="polite"></p>
+        <a class="cta" href="#stations">Open Asset Registry →</a>
+      </div>
     </div>
   </div>
-
-  <aside class="dossier" aria-label="Subject file: Danesh Tabrizi">
-    <div class="dz-top"><span>Subject File</span><span class="dz-track"><i></i>Tracking</span></div>
-      <div class="dz-photo">
-        <img class="dz-img" src="profile.jpg" alt="Danesh Tabrizi" width="1024" height="576">
-      <div class="dz-scan" aria-hidden="true"></div>
-      <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-      <span class="dz-match" id="dz-match">FACE MATCH · 99.7%</span>
-    </div>
-    <div class="dz-rows">
-      <div class="dz-row"><span class="k">Subject</span><span class="v">Danesh Tabrizi</span></div>
-      <div class="dz-row"><span class="k">DOB</span><span class="v">13 Feb 1994 · <span id="dz-age">—</span> yrs</span></div>
-      <div class="dz-row"><span class="k">Class</span><span class="v">Principal Operative</span></div>
-      <div class="dz-row"><span class="k">Status</span><span class="v amber">Active</span></div>
-      <div class="dz-row"><span class="k">Last Seen</span><span class="v"><span class="redact">CLASSIFIED</span></span></div>
-      <div class="dz-row"><span class="k">Clearance</span><span class="v">LVL ███</span></div>
-    </div>
-    <div class="dz-foot"><span class="dz-id">ID//DT-0213-1994</span><span class="dz-bars" aria-hidden="true"></span></div>
-  </aside>
   <div class="scrollcue" aria-hidden="true"><span class="ln"></span><span>Proceed</span></div>
 </section>
 
@@ -550,7 +585,10 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="stations" id="stations" aria-label="Domains and ventures">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up">Asset Registry</h2>
+      <h2 class="up sec-head-pastel">
+        <span class="sec-head-pastel-base">Asset Registry</span>
+        <span class="sec-head-pastel-cycle pastel-color-cycle" aria-hidden="true">Asset Registry</span>
+      </h2>
       <div class="meta up">
         <p class="mono-label">Confirmed Holdings · Ventures</p>
       </div>
@@ -568,7 +606,10 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="channels" id="channels" aria-label="YouTube and comms feeds">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up">Youtube Channels</h2>
+      <h2 class="up sec-head-pastel">
+        <span class="sec-head-pastel-base">Youtube Channels</span>
+        <span class="sec-head-pastel-cycle pastel-color-cycle" aria-hidden="true">Youtube Channels</span>
+      </h2>
       <div class="meta up">
         <p class="mono-label">Comms Intel</p>
         <p class="mono-label" style="margin-top:6px;">Intercepted · Active</p>
@@ -751,21 +792,43 @@ if(!touch){
 })();
 
 /* hero reveal + type-once tagline */
-gsap.to(".hero h1 .l span",{ yPercent:0, duration:1.05, ease:"power4.out", stagger:0.12, delay:0.2 });
-gsap.from(".hero-kicker, .hero-quote, .hero-quote-intl, .hero-sub",{ opacity:0, y:16, duration:0.9, stagger:0.12, delay:0.8, ease:"power3.out" });
-(function typer(){
-  const el=document.querySelector(".typed");
-  if(reduced){ el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`; return; }
-  let i=0;
-  (function tick(){
-    el.innerHTML=`<span class="amber">▸</span> ${TAGLINE.slice(0,i)}<span class="c"></span>`;
-    if(i++<TAGLINE.length) setTimeout(tick,55);
-    else el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`; // settle, drop caret
-  })();
+(function(){
+  function initHero(){
+    document.documentElement.classList.add("fonts-ready");
+    gsap.to(".hero h1 .l span",{ yPercent:0, duration:1.05, ease:"power4.out", stagger:0.12, delay:0.2 });
+    gsap.from(".hero-quote, .hero-quote-intl, .hero-sub",{ opacity:0, y:16, duration:0.9, stagger:0.12, delay:0.8, ease:"power3.out" });
+    gsap.from(".dossier",{ opacity:0, duration:0.9, delay:1.0, ease:"power3.out" });
+    (function typer(){
+      const el=document.querySelector(".typed");
+      if(reduced){ el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`; return; }
+      let i=0;
+      (function tick(){
+        el.innerHTML=`<span class="amber">▸</span> ${TAGLINE.slice(0,i)}<span class="c"></span>`;
+        if(i++<TAGLINE.length) setTimeout(tick,55);
+        else el.innerHTML=`<span class="amber">▸</span> ${TAGLINE}`;
+      })();
+    })();
+  }
+  if(reduced){
+    initHero();
+    return;
+  }
+  const fontWait=document.fonts
+    ? Promise.race([
+        Promise.all([
+          document.fonts.load('900 1em "Big Shoulders Display"'),
+          document.fonts.load('400 1em "DM Mono"'),
+          document.fonts.load('300 1em "Vazirmatn"'),
+          document.fonts.load('300 1em "Noto Sans SC"'),
+          document.fonts.load('400 1em "Noto Sans Devanagari"')
+        ].map(p=>p.catch(()=>{}))),
+        new Promise(r=>setTimeout(r,2500))
+      ])
+    : Promise.resolve();
+  fontWait.then(initHero);
 })();
 
-/* subject file: reveal, live age, one-time scan→match */
-gsap.from(".dossier",{ opacity:0, duration:0.9, delay:1.0, ease:"power3.out" });
+/* subject file: live age, one-time scan→match */
 (function(){
   const n=new Date(); let a=n.getFullYear()-1994;
   if(n.getMonth()<1 || (n.getMonth()===1 && n.getDate()<13)) a--;   // before 13 Feb? not yet had birthday
