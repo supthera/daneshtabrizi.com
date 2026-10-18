@@ -164,7 +164,7 @@ section{position:relative}
   border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:38px; }
 .sec-head h2{ font-size:clamp(2.2rem,7vw,5.6rem) }
 #stations .sec-head h2,
-#channels .sec-head h2{ font-size:clamp(1.55rem,4vw,3rem); white-space:nowrap }
+#channels .sec-head h2{ font-size:clamp(1.35rem,3.4vw,2.5rem); white-space:nowrap }
 @keyframes pastel-color-cycle{
   0%{ color:var(--pastel-teal); }
   6.25%{ color:var(--pastel-mint); }
@@ -616,7 +616,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="channels" id="channels" aria-label="YouTube and comms feeds">
   <div class="wrap">
     <div class="sec-head">
-      <h2 class="up pastel-color-cycle">Youtube Channels</h2>
+      <h2 class="up">Youtube Channels</h2>
       <div class="meta up">
         <p class="mono-label">Documented Feeds · Broadcasting</p>
       </div>
@@ -629,8 +629,8 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="about" aria-label="About">
   <div class="wrap">
     <p class="mono-label up" style="margin-bottom:24px;">— Operational Brief</p>
-    <h3 class="lead up">One <span class="amber">operative</span>. One network. Every asset I've built — logged and accounted for.</h3>
-    <p class="body up">No third party. No handler. This is the primary file for everything under my name — the domains I hold, the ventures I run, and the comms channels I maintain. Review the registry below.</p>
+    <h3 class="lead up"><span class="amber">Danesh Tabrizi</span> is a developer, designer, and photographer.</h3>
+    <p class="body up">The list above is companies, products, and channels. Some are live. Some are not public right now.</p>
     <div class="stats">
       <div class="stat-b up"><div class="n" data-count="0" id="cnt-stations">0</div><div class="l mono-label">Assets</div></div>
       <div class="stat-b up"><div class="n" data-count="0" id="cnt-channels">0</div><div class="l mono-label">Feeds</div></div>
@@ -686,8 +686,10 @@ const ASSETS = [
   { domain:"ordinova.com",             cat:"Healthcare SaaS", type:"business", url:"https://ordinova.com" },
   { domain:"opusgrex.com",             cat:"Healthcare SaaS", type:"business", status:"offline", url:"https://opusgrex.com" },
   { domain:"medicareagencyfinder.com", cat:"Healthcare SaaS", type:"business", url:"https://medicareagencyfinder.com" },
-  { domain:"coolstaffingschool.com",   cat:"Online Course",   type:"business", status:"offline", url:"https://coolstaffingschool.com" },
+  { domain:"therapyagencyacademy.com", cat:"Online Course",   type:"business", status:"offline", url:"https://therapyagencyacademy.com" },
   { domain:"supthera.com",             cat:"Commercial Business", type:"business", url:"https://supthera.com" },
+  { domain:"dantefuego.com",           cat:"E-commerce Brand", type:"business", url:"https://dantefuego.com" },
+  { domain:"goyimearth.com",           cat:"Digital Library", type:"business", url:"https://goyimearth.com" },
   { domain:"bedborrow.com",            cat:"Commercial Business", type:"business", status:"offline", url:"https://bedborrow.com" },
   { domain:"lordbae.com",              cat:"Commercial Business", type:"business", status:"offline", url:"https://lordbae.com" },
   { domain:"mantarsultani.com",        cat:"Commercial Business", type:"business", url:"https://mantarsultani.com" },
@@ -695,15 +697,17 @@ const ASSETS = [
   { domain:"dimitrineutron.com",       cat:"Online Blog",     type:"business", status:"offline", url:"https://dimitrineutron.com" },
   { domain:"persianvegan.com",         cat:"Online Blog",     type:"business", status:"offline", url:"https://persianvegan.com" },
   { domain:"tesseracards.com",         cat:"E-commerce Brand", type:"business", status:"offline", url:"https://tesseracards.com" },
-  { domain:"dantefuego.com",           cat:"E-commerce Brand", type:"business", url:"https://dantefuego.com" },
   { domain:"tradejester.com",          cat:"Trading",         type:"business", status:"offline", url:"https://tradejester.com" },
-  { domain:"goyimearth.com",           cat:"Digital Library", type:"business", url:"https://goyimearth.com" },
+  { domain:"dexbokeh.com",             cat:"Photography",     type:"business", status:"offline", url:"https://dexbokeh.com" },
+  { domain:"crazylobby.com",           cat:"Commercial Business", type:"business", status:"offline", url:"https://crazylobby.com" },
+  { domain:"bartercrops.com",          cat:"Agriculture",     type:"business", status:"offline", url:"https://bartercrops.com" },
+  { domain:"farmerflip.com",           cat:"Agriculture",     type:"business", status:"offline", url:"https://farmerflip.com" },
 ];
 
 const FEEDS = [
   { sig:"SIG-02", name:"Primary Feed",   handle:"@yourmain",   stat:"Long-form · 128K subscribers", url:"https://YOUR_LINK_HERE" },
   { sig:"SIG-07", name:"Second", handle:"@yoursecond", stat:"Shorts · 44K subscribers",     url:"https://YOUR_LINK_HERE" },
-  { sig:"SIG-11", name:"Niche Intel",    handle:"@yourniche",  stat:"Tutorials · 12K subscribers",  url:"https://YOUR_LINK_HERE" },
+  { sig:"SIG-11", name:"Dimitri Neutron", handle:"@dimitrineutron", stat:"Active channel", url:"https://www.youtube.com/channel/UC_jTM966fM6GFbridUwrwcg" },
   { sig:"SIG-24", name:"Field Log",      handle:"@yourvlog",   stat:"Vlogs · 6K subscribers",       url:"https://YOUR_LINK_HERE" },
 ];
 
