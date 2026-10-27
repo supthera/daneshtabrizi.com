@@ -327,7 +327,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   .hero-main{ display:contents; }
   .dossier{ order:1; max-width:min(342px,100%); justify-self:center; }
   .hero-quotes{ order:2; }
-  .hero-sub{ order:3; justify-content:center; margin-top:0; }
+  .hero-sub, .cta{ display:none; }
   .hero h1{ display:none; }
 }
 .dz-top{ display:flex; justify-content:space-between; align-items:center; letter-spacing:0.14em; text-transform:uppercase;
@@ -471,9 +471,9 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 ============================================================ */
 .channels{ padding:clamp(70px,10vh,130px) 0 }
 .channels-lead{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
-.channels-note{ margin:0; display:flex; align-items:center; gap:8px; font-size:0.72rem; letter-spacing:0.08em; color:var(--rec);
-  text-shadow:0 0 8px rgba(255,67,56,.55), 0 0 18px rgba(255,67,56,.25); }
+.channels-note{ margin:0; display:flex; align-items:center; gap:8px; font-size:0.72rem; letter-spacing:0.08em; color:var(--rec); }
 .channels-note span{ font-size:1.05rem; letter-spacing:0; line-height:1; }
+.channels-note .note-text{ font-size:inherit; letter-spacing:inherit; text-shadow:0 0 8px rgba(255,67,56,.55), 0 0 18px rgba(255,67,56,.25); }
 .tvgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:clamp(18px,2vw,30px) }
 .tv{ display:block }
 .screen{ position:relative; aspect-ratio:4/3; border-radius:2px; overflow:hidden;
@@ -645,7 +645,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   <div class="wrap">
     <div class="sec-head">
       <div class="channels-lead">
-        <p class="channels-note up"><span aria-hidden="true">🚧</span> Channels Under Construction</p>
+        <p class="channels-note up"><span aria-hidden="true">🚧</span> <span class="note-text">Channels Under Construction</span></p>
         <h2 class="up">Youtube Channels</h2>
       </div>
       <div class="meta up">
