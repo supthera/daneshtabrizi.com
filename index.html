@@ -471,8 +471,9 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 ============================================================ */
 .channels{ padding:clamp(70px,10vh,130px) 0 }
 .channels-lead{ display:flex; flex-direction:column; align-items:flex-start; gap:8px; }
-.channels-note{ margin:0; font-size:0.72rem; letter-spacing:0.08em; color:var(--dim); }
-.channels-note span{ display:block; font-size:1.15rem; letter-spacing:0; margin-bottom:4px; }
+.channels-note{ margin:0; display:flex; align-items:center; gap:8px; font-size:0.72rem; letter-spacing:0.08em; color:var(--rec);
+  text-shadow:0 0 8px rgba(255,67,56,.55), 0 0 18px rgba(255,67,56,.25); }
+.channels-note span{ font-size:1.05rem; letter-spacing:0; line-height:1; }
 .tvgrid{ display:grid; grid-template-columns:repeat(auto-fit,minmax(260px,1fr)); gap:clamp(18px,2vw,30px) }
 .tv{ display:block }
 .screen{ position:relative; aspect-ratio:4/3; border-radius:2px; overflow:hidden;
@@ -713,25 +714,32 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
    FEEDS = your YouTube / comms channels
 ============================================================ */
 const ASSETS = [
-  { domain:"ordinova.com",             cat:"Healthcare SaaS", type:"business", url:"https://ordinova.com" },
-  { domain:"opusgrex.com",             cat:"Healthcare SaaS", type:"business", status:"offline", url:"https://opusgrex.com" },
-  { domain:"medicareagencyfinder.com", cat:"Healthcare SaaS", type:"business", url:"https://medicareagencyfinder.com" },
-  { domain:"therapyagencyacademy.com", cat:"Online Course",   type:"business", status:"offline", url:"https://therapyagencyacademy.com" },
-  { domain:"supthera.com",             cat:"Commercial Business", type:"business", url:"https://supthera.com" },
-  { domain:"dantefuego.com",           cat:"E-commerce Brand", type:"business", url:"https://dantefuego.com" },
-  { domain:"goyimearth.com",           cat:"Digital Library", type:"business", url:"https://goyimearth.com" },
-  { domain:"tradejester.com",          cat:"Trading",         type:"business", url:"https://tradejester.com" },
-  { domain:"dexbokeh.com",             cat:"Photography",     type:"business", status:"offline", url:"https://dexbokeh.com" },
-  { domain:"crazylobby.com",           cat:"Commercial Business", type:"business", status:"offline", url:"https://crazylobby.com" },
-  { domain:"bedborrow.com",            cat:"Commercial Business", type:"business", status:"offline", url:"https://bedborrow.com" },
-  { domain:"lordbae.com",              cat:"Commercial Business", type:"business", status:"offline", url:"https://lordbae.com" },
-  { domain:"mantarsultani.com",        cat:"Commercial Business", type:"business", url:"https://mantarsultani.com" },
-  { domain:"curiousaquarius.com",      cat:"Online Blog",     type:"business", status:"offline", url:"https://curiousaquarius.com" },
-  { domain:"dimitrineutron.com",       cat:"Online Blog",     type:"business", status:"offline", url:"https://dimitrineutron.com" },
-  { domain:"persianvegan.com",         cat:"Online Blog",     type:"business", status:"offline", url:"https://persianvegan.com" },
-  { domain:"tesseracards.com",         cat:"E-commerce Brand", type:"business", status:"offline", url:"https://tesseracards.com" },
-  { domain:"bartercrops.com",          cat:"Agriculture",     type:"business", status:"offline", url:"https://bartercrops.com" },
-  { domain:"farmerflip.com",           cat:"Agriculture",     type:"business", status:"offline", url:"https://farmerflip.com" },
+  { domain:"ordinova.com",             cat:"Healthcare SaaS", type:"holding", url:"https://ordinova.com" },
+  { domain:"opusgrex.com",             cat:"Healthcare SaaS", type:"holding", status:"offline", url:"https://opusgrex.com" },
+  { domain:"supthera.com",             cat:"Commercial Business", type:"holding", url:"https://supthera.com" },
+  { domain:"dantefuego.com",           cat:"E-commerce Brand", type:"holding", url:"https://dantefuego.com" },
+  { domain:"goyimearth.com",           cat:"Digital Library", type:"holding", url:"https://goyimearth.com" },
+  { domain:"tradejester.com",          cat:"Trading",         type:"holding", url:"https://tradejester.com" },
+  { domain:"medicareagencyfinder.com", cat:"Healthcare SaaS", type:"holding", url:"https://medicareagencyfinder.com" },
+  { domain:"medicarehospicefinder.com", cat:"Healthcare SaaS", type:"holding", status:"offline", url:"https://medicarehospicefinder.com" },
+  { domain:"therapyagencyacademy.com", cat:"Online Course",   type:"holding", status:"offline", url:"https://therapyagencyacademy.com" },
+  { domain:"zendamovement.com",        cat:"Community",       type:"holding", status:"offline", url:"https://zendamovement.com" },
+  { domain:"dexbokeh.com",             cat:"Photography",     type:"holding", status:"offline", url:"https://dexbokeh.com" },
+  { domain:"crazylobby.com",           cat:"Commercial Business", type:"holding", status:"offline", url:"https://crazylobby.com" },
+  { domain:"bedborrow.com",            cat:"Commercial Business", type:"holding", status:"offline", url:"https://bedborrow.com" },
+  { domain:"lordbae.com",              cat:"Commercial Business", type:"holding", status:"offline", url:"https://lordbae.com" },
+  { domain:"mantarsultani.com",        cat:"Commercial Business", type:"holding", url:"https://mantarsultani.com" },
+  { domain:"curiousaquarius.com",      cat:"Online Blog",     type:"holding", status:"offline", url:"https://curiousaquarius.com" },
+  { domain:"dimitrineutron.com",       cat:"Online Blog",     type:"holding", status:"offline", url:"https://dimitrineutron.com" },
+  { domain:"persianvegan.com",         cat:"Online Blog",     type:"holding", status:"offline", url:"https://persianvegan.com" },
+  { domain:"tesseracards.com",         cat:"E-commerce Brand", type:"holding", status:"offline", url:"https://tesseracards.com" },
+  { domain:"bartercrops.com",          cat:"Agriculture",     type:"holding", status:"offline", url:"https://bartercrops.com" },
+  { domain:"farmerflip.com",           cat:"Agriculture",     type:"holding", status:"offline", url:"https://farmerflip.com" },
+  { domain:"pyruzmusic.com",           cat:"Music",           type:"business", hideInAll:true, url:"https://pyruzmusic.com" },
+  { domain:"faircarehomehealth.com",   cat:"Home Health",     type:"business", status:"offline", hideInAll:true, url:"https://faircarehomehealth.com" },
+  { domain:"lavandahomehealth.com",    cat:"Home Health",     type:"business", status:"offline", hideInAll:true, url:"https://lavandahomehealth.com" },
+  { domain:"graveyardyield.com",       cat:"Cryptocurrency",  type:"business", status:"offline", hideInAll:true, url:"https://graveyardyield.com" },
+  { domain:"snow.io",                  cat:"Technology",      type:"business", status:"offline", hideInAll:true, url:"https://snow.io" },
 ];
 
 const FEEDS = [
@@ -887,6 +895,8 @@ function bindFx(scope, sel){
   const body=document.getElementById("term-body");
   const dismiss=document.getElementById("term-dismiss");
   const termCursor=document.querySelector(".term-cursor");
+  const ackSfx=new Audio("buttonbass-cowbell.wav");
+  ackSfx.preload="auto";
   let lastFocus=null;
   let typeGen=0;
 
@@ -1004,7 +1014,11 @@ function bindFx(scope, sel){
   }
 
   window.openOfflineModal=openOfflineModal;
-  dismiss.addEventListener("click",closeOfflineModal);
+  dismiss.addEventListener("click",()=>{
+    ackSfx.currentTime=0;
+    ackSfx.play().catch(()=>{});
+    closeOfflineModal();
+  });
   overlay.addEventListener("click",e=>{ if(e.target===overlay) closeOfflineModal(); });
   addEventListener("keydown",e=>{
     if(e.key==="Escape" && overlay.classList.contains("open")) closeOfflineModal();
@@ -1024,6 +1038,7 @@ function bindFx(scope, sel){
     const a=document.createElement("a");
     const live = s.status !== "offline";
     a.className="station up"; a.dataset.type=s.type;
+    if(s.hideInAll){ a.dataset.hideAll="1"; a.classList.add("hide"); }
     if(live){
       a.href=s.url; a.target="_blank"; a.rel="noopener";
       a.addEventListener("click",playAssetClick);
@@ -1054,7 +1069,7 @@ function bindFx(scope, sel){
     b.classList.add("on"); b.setAttribute("aria-selected","true");
     const f=b.dataset.f;
     document.querySelectorAll(".station").forEach(s=>{
-      const show=(f==="all"||s.dataset.type===f);
+      const show=f==="all" ? s.dataset.hideAll!=="1" : s.dataset.type===f;
       s.classList.toggle("hide",!show);
       if(show) gsap.fromTo(s,{opacity:0,y:12},{opacity:1,y:0,duration:0.45,ease:"power3.out"});
     });
