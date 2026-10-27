@@ -522,11 +522,8 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 /* ============================================================
    OPERATIONAL BRIEF (about)
 ============================================================ */
-.about{ padding:clamp(70px,11vh,150px) 0; border-top:1px solid var(--line) }
-.about .lead{ font-family:"Big Shoulders Display"; font-weight:700; text-transform:uppercase;
-  font-size:clamp(1.8rem,5vw,4rem); line-height:0.98; max-width:20ch }
-.about p.body{ margin-top:26px; max-width:60ch; color:var(--dim); font-size:0.92rem }
-.stats{ display:flex; flex-wrap:wrap; gap:clamp(26px,5vw,70px); margin-top:48px }
+.about{ padding:clamp(96px,14vh,180px) 0 clamp(36px,5vh,72px); border-top:1px solid var(--line) }
+.stats{ display:flex; flex-wrap:wrap; gap:clamp(26px,5vw,70px); margin-top:24px }
 .stat-b .n{ font-family:"Big Shoulders Display"; font-weight:900; font-size:clamp(2.4rem,6vw,4rem); line-height:1 }
 .stat-b .l{ margin-top:6px }
 
@@ -537,16 +534,17 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 .footer *, .footer *::before, .footer *::after{ cursor:none }
 @media (pointer:coarse){ .footer, .footer *{ cursor:auto } }
 .footer .bars{ margin-bottom:40px }
+.contact-row{ display:flex; align-items:center; justify-content:space-between; gap:16px; }
 .contact{ display:block; font-family:"Big Shoulders Display"; font-weight:900; text-transform:uppercase;
-  font-size:clamp(2rem,7vw,6rem); line-height:0.84; letter-spacing:-0.01em }
+  font-size:clamp(2rem,7vw,6rem); line-height:0.84; letter-spacing:-0.01em; min-width:0; flex:1 }
 .contact .o{ -webkit-text-stroke:1.4px var(--ink); color:transparent; transition:.4s var(--ease) }
 .contact:hover .o{ color:var(--amber); -webkit-text-stroke:1.4px var(--amber) }
+.contact-row .socials{ flex-shrink:0 }
 .foot-row{ display:flex; flex-wrap:wrap; align-items:center; justify-content:space-between; gap:24px; margin-top:54px }
 .socials{ display:flex; gap:10px }
 .socials a{ width:50px; height:50px; display:grid; place-items:center; border:1px solid var(--line); border-radius:3px; transition:.35s var(--ease) }
 .socials a:hover{ border-color:var(--amber) }
 .socials svg{ width:26px; height:26px; }
-.socials a[aria-label="X"] svg{ transform:scale(0.82); }
 .socials svg *{ transition:.4s var(--ease); transform-origin:center }
 .socials a:hover .m{ stroke:var(--amber); }
 .socials a:hover .f{ fill:var(--amber); }
@@ -682,8 +680,6 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <section class="about" aria-label="About">
   <div class="wrap">
     <p class="mono-label up" style="margin-bottom:24px;">— Operational Brief</p>
-    <h3 class="lead up">Developer, designer, and photographer.</h3>
-    <p class="body up">Learn, Adapt, Create and Build.</p>
     <div class="stats">
       <div class="stat-b up"><div class="n" data-count="0" id="cnt-stations">0</div><div class="l mono-label">Assets</div></div>
       <div class="stat-b up"><div class="n" data-count="0" id="cnt-channels">0</div><div class="l mono-label">Channels</div></div>
@@ -696,15 +692,13 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 <footer class="footer" id="contact" aria-label="Contact">
   <div class="wrap">
     <div class="bars" aria-hidden="true"><i class="b1"></i><i class="b2"></i><i class="b3"></i><i class="b4"></i><i class="b5"></i><i class="b6"></i><i class="b7"></i></div>
-    <a class="contact" href="mailto:hello@daneshtabrizi.com">Establish<br><span class="o">Contact</span></a>
-    <div class="foot-row">
-      <div class="socials" aria-label="Social">
-        <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="LinkedIn"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="m" x="3" y="3" width="18" height="18" rx="2.2" stroke="#ece6da" stroke-width="1.6"/><circle class="f" cx="8" cy="8" r="1.1" fill="#ece6da"/><path class="m" d="M8 10.2 V17" stroke="#ece6da" stroke-width="1.8" stroke-linecap="round"/><path class="m" d="M11.8 10.2 V17" stroke="#ece6da" stroke-width="1.8" stroke-linecap="round"/><path class="m" d="M11.8 12.6 C12.7 11.3 14 10.6 15.4 10.6 C17 10.6 18 11.7 18 13.7 V17" stroke="#ece6da" stroke-width="1.8" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
-        <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="Instagram"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="m" x="3" y="3" width="18" height="18" rx="5" stroke="#ece6da" stroke-width="1.75"/><circle class="m" cx="12" cy="12" r="4.25" stroke="#ece6da" stroke-width="1.75"/><circle class="f" cx="17.2" cy="6.8" r="1.15" fill="#ece6da"/></svg></a>
-        <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="YouTube"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="m" d="M3 7.5 A2.5 2.5 0 0 1 5.5 5 h13 A2.5 2.5 0 0 1 21 7.5 v9 A2.5 2.5 0 0 1 18.5 19 h-13 A2.5 2.5 0 0 1 3 16.5 v-9z" stroke="#ece6da" stroke-width="1.75" stroke-linejoin="round"/><path class="f" d="M10 9.2 L16.5 12 L10 14.8 Z" fill="#ece6da"/></svg></a>
-        <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="f" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#ece6da"/></svg></a>
+    <div class="contact-row">
+      <a class="contact" href="mailto:hello@daneshtabrizi.com">Establish<br><span class="o">Contact</span></a>
+      <div class="socials" aria-label="Email">
         <a href="mailto:hello@daneshtabrizi.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="m" x="3" y="6" width="18" height="13" rx="1.5" stroke="#ece6da" stroke-width="1.75"/><path class="m" d="M3 7.5 L12 13.5 L21 7.5" stroke="#ece6da" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
+    </div>
+    <div class="foot-row">
       <div class="colophon">© <span id="year"></span> DANESH TABRIZI</div>
     </div>
   </div>
@@ -781,7 +775,7 @@ gsap.registerPlugin(ScrollTrigger);
 (function brandTypewriter(){
   const el=document.getElementById("brand-type");
   if(!el) return;
-  const words=["Developer","Designer","Entrepreneur","Content Creator","Photographer"];
+  const words=["Developer","Designer","European Gigilo","Just Kidding","Entrepreneur","Content Creator","Photographer"];
   if(reduced){ el.textContent=words[0]; return; }
   let wi=0, ci=0, del=false, pause=false;
   (function tick(){
