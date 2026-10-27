@@ -167,8 +167,7 @@ section{position:relative}
 .sec-head{ display:flex; align-items:flex-end; justify-content:space-between; gap:24px; flex-wrap:wrap;
   border-bottom:1px solid var(--line); padding-bottom:18px; margin-bottom:38px; }
 .sec-head h2{ font-size:clamp(2.2rem,7vw,5.6rem) }
-#stations .sec-head h2,
-#channels .sec-head h2{ font-size:clamp(1.35rem,3.4vw,2.5rem); white-space:nowrap }
+#stations .sec-head h2{ font-size:clamp(1.35rem,3.4vw,2.5rem); white-space:nowrap }
 @keyframes pastel-color-cycle{
   0%{ color:var(--pastel-teal); }
   6.25%{ color:var(--pastel-mint); }
@@ -326,9 +325,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   .hero-grid{ grid-template-columns:1fr; gap:clamp(16px,3vh,24px); }
   .hero-main{ display:contents; }
   .dossier{ order:1; max-width:min(342px,100%); justify-self:center; }
-  .hero-quotes{ order:2; }
-  .hero-sub, .cta{ display:none; }
-  .hero h1{ display:none; }
+  .hero-quotes, .hero-sub, .cta, .hero h1{ display:none; }
 }
 .dz-top{ display:flex; justify-content:space-between; align-items:center; letter-spacing:0.14em; text-transform:uppercase;
   color:var(--dim); border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:11px }
@@ -493,11 +490,9 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   font-family:"Big Shoulders Display"; font-weight:800; text-transform:uppercase; line-height:0.92;
   font-size:clamp(1.4rem,2.6vw,2rem); transition:transform .3s var(--ease) }
 .tv:hover .screen .title{ transform:translateY(-2px) }
-.tv-meta{ display:flex; align-items:baseline; justify-content:space-between; gap:14px; margin-top:14px; flex-wrap:wrap }
-.tv-meta .nm{ font-size:0.92rem }
-.tv-meta .hd{ font-size:0.72rem; color:var(--dim) }
-.tv-meta .st{ font-size:0.68rem; color:var(--dim); letter-spacing:0.06em; width:100% }
-.tv-meta .watch{ font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--cyan) }
+.tv-meta{ display:flex; align-items:baseline; justify-content:space-between; gap:14px; margin-top:14px; flex-wrap:nowrap }
+.tv-meta .st{ font-size:0.68rem; color:var(--dim); letter-spacing:0.06em; }
+.tv-meta .watch{ font-size:0.7rem; letter-spacing:0.14em; text-transform:uppercase; color:var(--cyan); white-space:nowrap; margin-left:auto }
 
 /* ============================================================
    OPERATIONAL BRIEF (about)
@@ -531,7 +526,6 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 .socials a:hover .m{ stroke:var(--amber); }
 .socials a:hover .f{ fill:var(--amber); }
 .colophon{ font-size:0.7rem; color:var(--faint); letter-spacing:0.06em }
-.colophon a{ color:var(--dim) }
 
 .up{ opacity:0; transform:translateY(28px) }
 @media (prefers-reduced-motion:reduce){
@@ -645,11 +639,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   <div class="wrap">
     <div class="sec-head">
       <div class="channels-lead">
-        <p class="channels-note up"><span aria-hidden="true">🚧</span> <span class="note-text">Channels Under Construction</span></p>
-        <h2 class="up">Youtube Channels</h2>
-      </div>
-      <div class="meta up">
-        <p class="mono-label">Documented Feeds · Broadcasting</p>
+        <p class="channels-note up"><span aria-hidden="true">🚧</span> <span class="note-text">YouTube Channels Under Construction</span></p>
       </div>
     </div>
     <div class="tvgrid up" id="tvgrid"></div>
@@ -664,7 +654,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
     <p class="body up">Learn, Adapt, Create and Build.</p>
     <div class="stats">
       <div class="stat-b up"><div class="n" data-count="0" id="cnt-stations">0</div><div class="l mono-label">Assets</div></div>
-      <div class="stat-b up"><div class="n" data-count="0" id="cnt-channels">0</div><div class="l mono-label">Feeds</div></div>
+      <div class="stat-b up"><div class="n" data-count="0" id="cnt-channels">0</div><div class="l mono-label">Channels</div></div>
       <div class="stat-b up"><div class="n" data-count="100">0</div><div class="l mono-label">% Controlled</div></div>
     </div>
   </div>
@@ -683,7 +673,7 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
         <a href="https://YOUR_LINK_HERE" target="_blank" rel="noopener" aria-label="X"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path class="f" d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z" fill="#ece6da"/></svg></a>
         <a href="mailto:hello@daneshtabrizi.com" aria-label="Email"><svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect class="m" x="3" y="6" width="18" height="13" rx="1.5" stroke="#ece6da" stroke-width="1.75"/><path class="m" d="M3 7.5 L12 13.5 L21 7.5" stroke="#ece6da" stroke-width="1.75" stroke-linecap="round" stroke-linejoin="round"/></svg></a>
       </div>
-      <div class="colophon">© <span id="year"></span> DANESH TABRIZI — DOCUMENT SEALED · <a href="#top">RETURN TO BRIEF ↑</a></div>
+      <div class="colophon">© <span id="year"></span> DANESH TABRIZI</div>
     </div>
   </div>
 </footer>
@@ -743,10 +733,10 @@ const ASSETS = [
 ];
 
 const FEEDS = [
-  { sig:"SIG-02", name:"Primary Feed",   handle:"@yourmain",   stat:"Long-form · 128K subscribers", url:"https://YOUR_LINK_HERE" },
-  { sig:"SIG-07", name:"Second", handle:"@yoursecond", stat:"Shorts · 44K subscribers",     url:"https://YOUR_LINK_HERE" },
-  { sig:"SIG-11", name:"Dimitri Neutron", handle:"@dimitrineutron", stat:"Active channel", url:"https://www.youtube.com/channel/UC_jTM966fM6GFbridUwrwcg" },
-  { sig:"SIG-24", name:"Field Log",      handle:"@yourvlog",   stat:"Vlogs · 6K subscribers",       url:"https://YOUR_LINK_HERE" },
+  { sig:"SIG-02", name:"Dante Fuego",   handle:"@yourmain",   stat:"Long-form · 128K subscribers", url:"https://YOUR_LINK_HERE" },
+  { sig:"SIG-07", name:"Dimitri Neutron", handle:"@yoursecond", stat:"Shorts · 44K subscribers",     url:"https://YOUR_LINK_HERE" },
+  { sig:"SIG-11", name:"Ordinova", handle:"@dimitrineutron", stat:"Active channel", url:"https://www.youtube.com/channel/UC_jTM966fM6GFbridUwrwcg" },
+  { sig:"SIG-24", name:"Zenda",      handle:"@yourvlog",   stat:"Vlogs · 6K subscribers",       url:"https://YOUR_LINK_HERE" },
 ];
 
 
@@ -1092,10 +1082,8 @@ function bindFx(scope, sel){
         <div class="title fx" data-text="${ch.name}">${ch.name}</div>
       </div>
       <div class="tv-meta">
-        <span class="nm">${ch.name}</span>
-        <span class="hd">${ch.handle}</span>
-        <span class="watch">Intercept →</span>
         <span class="st">${ch.stat}</span>
+        <span class="watch">Intercept →</span>
       </div>`;
     grid.appendChild(a);
   });
