@@ -1056,6 +1056,7 @@ function bindFx(scope, sel){
   const g=document.getElementById("guide");
   const assetClickSfx=new Audio("melee.mp3");
   assetClickSfx.preload="auto";
+  assetClickSfx.volume=0.7;
   function playAssetClick(){
     assetClickSfx.currentTime=0;
     assetClickSfx.play().catch(()=>{});
