@@ -911,8 +911,18 @@ function bindFx(scope, sel){
   const body=document.getElementById("term-body");
   const dismiss=document.getElementById("term-dismiss");
   const termCursor=document.querySelector(".term-cursor");
-  const ackSfx=new Audio("buttonbass-cowbell.wav");
-  ackSfx.preload="auto";
+  const offlineSfx=new Audio("buttonbass-cowbell.wav");
+  const dismissSfx=new Audio("computer-data-sound.mp3");
+  offlineSfx.preload="auto";
+  dismissSfx.preload="auto";
+  function playOfflineSfx(){
+    offlineSfx.currentTime=0;
+    offlineSfx.play().catch(()=>{});
+  }
+  function playDismissSfx(){
+    dismissSfx.currentTime=0;
+    dismissSfx.play().catch(()=>{});
+  }
   let lastFocus=null;
   let typeGen=0;
 
@@ -1008,6 +1018,7 @@ function bindFx(scope, sel){
   }
 
   function openOfflineModal(domain){
+    playOfflineSfx();
     lastFocus=document.activeElement;
     overlay.hidden=false;
     overlay.setAttribute("aria-hidden","false");
@@ -1031,8 +1042,7 @@ function bindFx(scope, sel){
 
   window.openOfflineModal=openOfflineModal;
   dismiss.addEventListener("click",()=>{
-    ackSfx.currentTime=0;
-    ackSfx.play().catch(()=>{});
+    playDismissSfx();
     closeOfflineModal();
   });
   overlay.addEventListener("click",e=>{ if(e.target===overlay) closeOfflineModal(); });
@@ -1062,7 +1072,6 @@ function bindFx(scope, sel){
       a.href="#"; a.classList.add("offline");
       a.addEventListener("click",e=>{
         e.preventDefault();
-        playAssetClick();
         openOfflineModal(s.domain);
       });
     }
