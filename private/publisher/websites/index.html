@@ -1,0 +1,104 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Publisher HQ — Websites</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="kicker">Publisher HQ</span><span class="name">My Websites</span></div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/publisher/">Overview</a>
+        <a href="/private/publisher/write/">Write</a>
+        <a href="/private/publisher/websites/" data-nav="/private/publisher/websites/">Websites</a>
+        <a href="/private/publisher/media/">Media</a>
+        <a href="/private/publisher/history/">History</a>
+      </nav>
+      <div class="user" id="user-slot"></div>
+    </header>
+    <main>
+      <p class="hero-line">Destinations</p>
+      <h1>My Websites</h1>
+      <p class="lede">Connect destinations via custom REST, WordPress, or Webflow connectors. Credentials stay in Worker secrets — never in browser JS.</p>
+      <div id="flash"></div>
+      <section class="panel">
+        <h3>Add website</h3>
+        <form id="add-form">
+          <div class="field"><label for="name">Name</label><input id="name" required /></div>
+          <div class="field"><label for="domain">Domain</label><input id="domain" required placeholder="example.com" /></div>
+          <div class="field">
+            <label for="connector">Connector</label>
+            <select id="connector">
+              <option value="custom_rest">Custom REST API</option>
+              <option value="wordpress">WordPress REST API</option>
+              <option value="webflow">Webflow CMS</option>
+            </select>
+          </div>
+          <div class="field"><label for="endpoint">API endpoint</label><input id="endpoint" placeholder="https://…" /></div>
+          <button class="btn" type="submit">Add Website</button>
+        </form>
+      </section>
+      <section class="panel">
+        <h3>Connected</h3>
+        <div id="list" class="muted">Loading…</div>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
+    setActiveNav();
+    const health = await requireSession();
+    document.getElementById("user-slot").textContent = health.identity?.email || "";
+    const list = document.getElementById("list");
+    const flash = document.getElementById("flash");
+
+    async function refresh() {
+      const { websites, note } = await api("/api/websites");
+      if (!websites?.length) {
+        list.textContent = note || "No websites connected yet.";
+        return;
+      }
+      list.replaceChildren(el("table", { class: "table" }, [
+        el("thead", {}, [el("tr", {}, [
+          el("th", { text: "Name" }), el("th", { text: "Domain" }),
+          el("th", { text: "Connector" }), el("th", { text: "Status" })
+        ])]),
+        el("tbody", {}, websites.map(w => el("tr", {}, [
+          el("td", { text: w.name }), el("td", { text: w.domain }),
+          el("td", { text: w.connector_type }), el("td", { text: w.connection_status || "unknown" })
+        ]))),
+      ]));
+    }
+
+    document.getElementById("add-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      try {
+        await api("/api/websites", {
+          method: "POST",
+          body: JSON.stringify({
+            name: document.getElementById("name").value,
+            domain: document.getElementById("domain").value,
+            connector_type: document.getElementById("connector").value,
+            api_endpoint: document.getElementById("endpoint").value || null,
+          }),
+        });
+        flash.replaceChildren(el("div", { class: "flash ok", text: "Website added. Store API credentials as Worker secrets, referenced by secret_ref." }));
+        e.target.reset();
+        await refresh();
+      } catch (err) {
+        flash.replaceChildren(el("div", { class: "flash err", text: err.message }));
+      }
+    });
+
+    try { await refresh(); }
+    catch (e) { list.textContent = e.message; }
+  </script>
+</body>
+</html>

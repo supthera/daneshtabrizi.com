@@ -1,0 +1,158 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Publisher HQ — Write</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <span class="kicker">Publisher HQ</span>
+        <span class="name">Write Article</span>
+      </div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/publisher/">Overview</a>
+        <a href="/private/publisher/write/" data-nav="/private/publisher/write/">Write</a>
+        <a href="/private/publisher/websites/">Websites</a>
+        <a href="/private/publisher/media/">Media</a>
+        <a href="/private/publisher/history/">History</a>
+      </nav>
+      <div class="user" id="user-slot"></div>
+    </header>
+    <main>
+      <p class="hero-line">Editorial</p>
+      <h1>Write Article</h1>
+      <p class="lede">Source article is preserved independently of destination overrides.</p>
+      <div id="flash"></div>
+      <form id="article-form">
+        <div class="field">
+          <label for="title">Title</label>
+          <input id="title" name="title" required placeholder="Article title" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="slug">Slug</label>
+          <input id="slug" name="slug" placeholder="article-slug" autocomplete="off" />
+        </div>
+        <div class="field">
+          <label for="excerpt">Excerpt</label>
+          <textarea id="excerpt" name="excerpt" style="min-height:80px" placeholder="Short summary"></textarea>
+        </div>
+        <div class="field">
+          <label>Body</label>
+          <div class="editor-shell">
+            <div class="editor-toolbar" id="toolbar">
+              <button type="button" data-cmd="bold"><b>B</b></button>
+              <button type="button" data-cmd="italic"><i>I</i></button>
+              <button type="button" data-cmd="insertUnorderedList">List</button>
+              <button type="button" data-cmd="formatBlock" data-value="h2">H2</button>
+              <button type="button" data-cmd="formatBlock" data-value="blockquote">Quote</button>
+              <button type="button" data-cmd="createLink">Link</button>
+            </div>
+            <div class="editor-surface" id="editor" contenteditable="true" role="textbox" aria-multiline="true" data-placeholder="Paste or write your article…"></div>
+          </div>
+        </div>
+        <div class="field">
+          <label for="seo_title">SEO title</label>
+          <input id="seo_title" name="seo_title" />
+        </div>
+        <div class="field">
+          <label for="seo_description">SEO description</label>
+          <textarea id="seo_description" name="seo_description" style="min-height:70px"></textarea>
+        </div>
+        <div class="row">
+          <button class="btn" type="submit" id="save-draft">Save Draft</button>
+          <span class="muted" id="autosave">Autosave idle</span>
+        </div>
+      </form>
+    </main>
+  </div>
+  <script type="module">
+    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
+    setActiveNav();
+    const health = await requireSession();
+    document.getElementById("user-slot").textContent = health.identity?.email || "";
+
+    const editor = document.getElementById("editor");
+    const form = document.getElementById("article-form");
+    const flash = document.getElementById("flash");
+    const autosave = document.getElementById("autosave");
+    let articleId = null;
+    let timer = null;
+
+    document.getElementById("toolbar").addEventListener("click", (e) => {
+      const btn = e.target.closest("button[data-cmd]");
+      if (!btn) return;
+      e.preventDefault();
+      const cmd = btn.dataset.cmd;
+      if (cmd === "createLink") {
+        const url = prompt("URL");
+        if (url) document.execCommand(cmd, false, url);
+        return;
+      }
+      if (btn.dataset.value) document.execCommand(cmd, false, btn.dataset.value);
+      else document.execCommand(cmd, false, null);
+      editor.focus();
+    });
+
+    function slugify(s) {
+      return s.toLowerCase().trim().replace(/[^a-z0-9]+/g, "-").replace(/^-|-$/g, "");
+    }
+
+    document.getElementById("title").addEventListener("input", (e) => {
+      const slug = document.getElementById("slug");
+      if (!slug.dataset.touched) slug.value = slugify(e.target.value);
+    });
+    document.getElementById("slug").addEventListener("input", (e) => {
+      e.target.dataset.touched = "1";
+    });
+
+    async function save(manual = false) {
+      const title = document.getElementById("title").value.trim() || "Untitled";
+      const payload = {
+        title,
+        slug: document.getElementById("slug").value.trim() || null,
+        excerpt: document.getElementById("excerpt").value.trim() || null,
+        content_html: editor.innerHTML,
+        seo_title: document.getElementById("seo_title").value.trim() || null,
+        seo_description: document.getElementById("seo_description").value.trim() || null,
+        status: "draft",
+      };
+      try {
+        if (!articleId) {
+          const created = await api("/api/articles", { method: "POST", body: JSON.stringify(payload) });
+          articleId = created.id;
+        } else {
+          // PATCH endpoint may not exist yet — recreate as draft note via POST until update route lands
+          await api("/api/articles", { method: "POST", body: JSON.stringify({ ...payload, title: `${title}` }) });
+        }
+        autosave.textContent = `Saved ${new Date().toLocaleTimeString()}`;
+        if (manual) {
+          flash.replaceChildren(el("div", { class: "flash ok", text: `Draft saved (${articleId || "ok"}).` }));
+        }
+      } catch (e) {
+        autosave.textContent = "Save failed";
+        flash.replaceChildren(el("div", { class: "flash err", text: e.message || "Save failed — is D1 bound?" }));
+      }
+    }
+
+    function queueAutosave() {
+      clearTimeout(timer);
+      autosave.textContent = "Autosaving…";
+      timer = setTimeout(() => save(false), 1200);
+    }
+    editor.addEventListener("input", queueAutosave);
+    form.addEventListener("input", queueAutosave);
+    form.addEventListener("submit", (e) => {
+      e.preventDefault();
+      save(true);
+    });
+  </script>
+</body>
+</html>

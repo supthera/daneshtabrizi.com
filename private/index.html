@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Personal Command Center — Danesh Tabrizi</title>
+  <meta name="theme-color" content="#0a0e16" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <span class="kicker">Personal Command Center</span>
+        <span class="name">Danesh Tabrizi</span>
+      </div>
+      <nav class="nav" aria-label="Command center">
+        <a href="/private/" data-nav="/private/">Apps</a>
+        <a href="/private/publisher/" data-nav="/private/publisher/">Publisher HQ</a>
+        <a href="/private/integrations/" data-nav="/private/integrations/">Integrations</a>
+        <a href="/private/settings/" data-nav="/private/settings/">Settings</a>
+        <a href="/private/apps/" data-nav="/private/apps/">Registry</a>
+      </nav>
+      <div class="user" id="user-slot"><span>Checking access…</span></div>
+    </header>
+
+    <main>
+      <p class="hero-line">Welcome back.</p>
+      <h1>Your private applications.</h1>
+      <p class="lede">One secure identity. Multiple tools. Extensible without rebuilding auth.</p>
+      <div id="flash"></div>
+      <div class="grid" id="app-grid" aria-live="polite"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { api, el, setActiveNav, iconGlyph, requireSession } from "/private/assets/private.js";
+
+    setActiveNav();
+    const grid = document.getElementById("app-grid");
+    const userSlot = document.getElementById("user-slot");
+    const flash = document.getElementById("flash");
+
+    try {
+      const health = await requireSession();
+      userSlot.replaceChildren(
+        el("strong", { text: health.identity?.email || "Operator" }),
+        el("span", { text: health.identity?.source === "dev-bypass" ? "Dev bypass" : "Cloudflare Access" })
+      );
+
+      const { apps } = await api("/api/apps");
+      grid.replaceChildren(
+        ...apps.map((app) => {
+          const active = app.status === "active";
+          const card = el("article", { class: `card ${app.status}` }, [
+            el("div", { class: "icon", text: iconGlyph(app.icon) }),
+            el("h2", { text: app.name }),
+            el("p", { text: app.description }),
+            el("div", { class: "meta" }, [
+              el("span", { class: `badge ${app.status}`, text: app.status }),
+              active
+                ? el("a", { class: "btn", href: app.route, text: "Open →" })
+                : el("span", { class: "btn", "aria-disabled": "true", text: "Planned" }),
+            ]),
+          ]);
+          return card;
+        })
+      );
+    } catch (e) {
+      if (e.status !== 401) {
+        flash.append(el("div", { class: "flash err", text: e.message || "Failed to load applications" }));
+      }
+    }
+  </script>
+</body>
+</html>

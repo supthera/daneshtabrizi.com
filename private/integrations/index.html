@@ -1,0 +1,54 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Integrations</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="kicker">Command Center</span><span class="name">Integrations</span></div>
+      <nav class="nav">
+        <a href="/private/">Apps</a>
+        <a href="/private/integrations/" data-nav="/private/integrations/">Integrations</a>
+        <a href="/private/settings/">Settings</a>
+      </nav>
+    </header>
+    <main>
+      <p class="hero-line">Connected services</p>
+      <h1>Integrations</h1>
+      <p class="lede">Destination CMS credentials and third-party services. Secrets belong in Worker secrets / Access — not in this UI’s source.</p>
+      <div class="grid">
+        <article class="card">
+          <div class="icon">☁</div>
+          <h2>Cloudflare Access</h2>
+          <p>Primary identity gate for /private and /api.</p>
+          <div class="meta"><span class="badge active">Required</span><a class="btn ghost" href="/private/settings/">Status</a></div>
+        </article>
+        <article class="card">
+          <div class="icon">◈</div>
+          <h2>Publisher connectors</h2>
+          <p>Custom REST, WordPress, Webflow — configured per website.</p>
+          <div class="meta"><span class="badge active">Active</span><a class="btn" href="/private/publisher/websites/">Open →</a></div>
+        </article>
+        <article class="card planned">
+          <div class="icon">▣</div>
+          <h2>R2 Media</h2>
+          <p>Object storage for the shared media library.</p>
+          <div class="meta"><span class="badge planned">Setup</span><a class="btn ghost" href="/private/publisher/media/">Details</a></div>
+        </article>
+      </div>
+    </main>
+  </div>
+  <script type="module">
+    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    setActiveNav();
+    await requireSession();
+  </script>
+</body>
+</html>

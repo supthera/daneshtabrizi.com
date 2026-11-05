@@ -1,0 +1,36 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Publisher HQ — History</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="kicker">Publisher HQ</span><span class="name">Publishing History</span></div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/publisher/">Overview</a>
+        <a href="/private/publisher/write/">Write</a>
+        <a href="/private/publisher/history/" data-nav="/private/publisher/history/">History</a>
+      </nav>
+    </header>
+    <main>
+      <p class="hero-line">Jobs & logs</p>
+      <h1>Publishing History</h1>
+      <p class="lede">Per-destination results, retries, and audit trails appear here once the publish engine is connected.</p>
+      <section class="panel"><p class="muted">No publishing jobs yet.</p></section>
+    </main>
+  </div>
+  <script type="module">
+    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    setActiveNav();
+    await requireSession();
+  </script>
+</body>
+</html>

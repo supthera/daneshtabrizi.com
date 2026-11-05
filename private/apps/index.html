@@ -1,0 +1,46 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Application Registry</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="kicker">Administration</span><span class="name">Application Registry</span></div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/apps/" data-nav="/private/apps/">Registry</a>
+        <a href="/private/settings/">Settings</a>
+      </nav>
+    </header>
+    <main>
+      <p class="hero-line">Extensibility</p>
+      <h1>Applications</h1>
+      <p class="lede">Registry-driven launcher. Add apps by inserting a row (D1) or updating the fallback registry — no launcher rewrite required.</p>
+      <div id="list" class="muted">Loading…</div>
+    </main>
+  </div>
+  <script type="module">
+    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
+    setActiveNav();
+    await requireSession();
+    const { apps } = await api("/api/apps");
+    document.getElementById("list").replaceChildren(el("table", { class: "table" }, [
+      el("thead", {}, [el("tr", {}, [
+        el("th", { text: "ID" }), el("th", { text: "Name" }), el("th", { text: "Route" }),
+        el("th", { text: "Status" }), el("th", { text: "Version" })
+      ])]),
+      el("tbody", {}, apps.map(a => el("tr", { id: a.id }, [
+        el("td", { text: a.id }), el("td", { text: a.name }), el("td", { text: a.route }),
+        el("td", { text: a.status }), el("td", { text: a.version }),
+      ]))),
+    ]));
+  </script>
+</body>
+</html>

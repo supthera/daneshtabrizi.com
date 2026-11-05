@@ -474,6 +474,95 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 @keyframes termBlink{ 0%,49%{opacity:1} 50%,100%{opacity:0} }
 
 /* ============================================================
+   PRIVATE ACCESS — macOS Terminal-style shell (discovery only)
+============================================================ */
+.priv-overlay{
+  position:fixed; inset:0; z-index:9900;
+  display:grid; place-items:center; padding:24px;
+  background:rgba(0,0,0,.42);
+  backdrop-filter:blur(12px) saturate(1.2);
+  -webkit-backdrop-filter:blur(12px) saturate(1.2);
+  opacity:0; visibility:hidden; pointer-events:none;
+  transition:opacity .22s ease, visibility .22s;
+}
+.priv-overlay.open{ opacity:1; visibility:visible; pointer-events:auto; }
+.priv-modal{
+  position:relative;
+  width:min(620px,94vw);
+  border-radius:9px;
+  overflow:hidden;
+  background:#000;
+  border:0.5px solid rgba(255,255,255,.12);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.55),
+    0 28px 80px rgba(0,0,0,.55),
+    0 8px 24px rgba(0,0,0,.35);
+  transform:translateY(8px) scale(.988);
+  opacity:0;
+  transition:transform .22s cubic-bezier(.2,.8,.2,1), opacity .22s ease;
+  font-family:"SF Mono","Menlo","Monaco",ui-monospace,monospace;
+}
+.priv-overlay.open .priv-modal{ transform:none; opacity:1; }
+.priv-chrome{
+  display:flex; align-items:center; justify-content:center;
+  height:36px; padding:0 72px;
+  background:linear-gradient(180deg,#3b3b3b 0%,#2b2b2b 100%);
+  border-bottom:0.5px solid rgba(0,0,0,.55);
+  position:relative;
+  user-select:none;
+}
+.priv-traffic{
+  position:absolute; left:11px; top:50%; transform:translateY(-50%);
+  display:flex; gap:7.5px; align-items:center;
+}
+.priv-traffic button{
+  width:12px; height:12px; border-radius:50%;
+  border:0.5px solid rgba(0,0,0,.22);
+  box-shadow:inset 0 0.5px 0 rgba(255,255,255,.28);
+  padding:0; cursor:default;
+  position:relative;
+}
+.priv-traffic .c-close{ background:#ff5f57; cursor:pointer }
+.priv-traffic .c-min{ background:#febc2e }
+.priv-traffic .c-zoom{ background:#28c840 }
+.priv-traffic .c-close:hover{ filter:brightness(1.05) }
+.priv-titlebar{
+  margin:0; font-size:12px; font-weight:510; letter-spacing:-0.01em;
+  color:rgba(255,255,255,.78);
+  font-family:-apple-system,BlinkMacSystemFont,"SF Pro Text","Helvetica Neue",sans-serif;
+  white-space:nowrap; overflow:hidden; text-overflow:ellipsis;
+  max-width:100%; text-align:center;
+}
+.priv-screen{
+  background:#000;
+  color:#fff;
+  padding:10px 12px 14px;
+  min-height:248px;
+  font-size:12px;
+  line-height:1.45;
+  letter-spacing:0;
+}
+.priv-screen .ln{
+  display:block; white-space:pre-wrap; word-break:break-word;
+  opacity:0; transform:translateY(2px);
+  transition:opacity .18s ease, transform .18s ease;
+}
+.priv-screen .ln.in{ opacity:1; transform:none }
+.priv-screen .dim{ color:#6e6e6e }
+.priv-screen .mute{ color:#444 }
+.priv-screen .ok{ color:#cfcfcf }
+.priv-caret{
+  display:inline-block; width:7px; height:1.1em; margin-left:1px;
+  background:#fff; vertical-align:-0.15em;
+  animation:termBlink 1.05s step-end infinite;
+}
+.priv-hint{
+  display:block; margin-top:12px; color:#3a3a3a; font-size:11px;
+  opacity:0; transition:opacity .3s ease .15s;
+}
+.priv-hint.in{ opacity:1 }
+
+/* ============================================================
    SIGNAL FEEDS (YouTube) — surveillance terminals
 ============================================================ */
 .channels{ padding:clamp(70px,10vh,130px) 0 }
@@ -720,6 +809,20 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   </div>
 </div>
 
+<div class="priv-overlay" id="priv-overlay" hidden aria-hidden="true">
+  <div class="priv-modal" role="dialog" aria-modal="true" aria-labelledby="priv-title" aria-describedby="priv-copy">
+    <div class="priv-chrome">
+      <div class="priv-traffic">
+        <button type="button" class="c-close" id="priv-close" aria-label="Close"></button>
+        <button type="button" class="c-min" tabindex="-1" aria-hidden="true"></button>
+        <button type="button" class="c-zoom" tabindex="-1" aria-hidden="true"></button>
+      </div>
+      <p class="priv-titlebar" id="priv-title">danesh — zsh — 80×24</p>
+    </div>
+    <div class="priv-screen" id="priv-copy" aria-live="polite"></div>
+  </div>
+</div>
+
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/gsap.min.js"></script>
 <script src="https://cdnjs.cloudflare.com/ajax/libs/gsap/3.12.5/ScrollTrigger.min.js"></script>
 <script src="https://cdn.jsdelivr.net/npm/lenis@1.1.13/dist/lenis.min.js"></script>
@@ -775,7 +878,14 @@ gsap.registerPlugin(ScrollTrigger);
 (function brandTypewriter(){
   const el=document.getElementById("brand-type");
   if(!el) return;
-  const words=["Developer","Designer","European Gigilo","Just Kidding","Entrepreneur","Content Creator","Photographer"];
+  const words=[
+    "Software Engineer",
+    "Systems Analyst",
+    "AI Consultant",
+    "Photographer",
+    "Content Creator",
+    "Entrepreneur"
+  ];
   if(reduced){ el.textContent=words[0]; return; }
   let wi=0, ci=0, del=false, pause=false;
   (function tick(){
@@ -1140,6 +1250,155 @@ document.querySelectorAll("[data-count]").forEach(el=>{
 });
 document.getElementById("year").textContent=new Date().getFullYear();
 window.addEventListener("load",()=>ScrollTrigger.refresh());
+
+/* WASD discovery → terminal log → Enter → /private/ (Access gates auth) */
+(function(){
+  const seq=["w","a","s","d"];
+  let i=0;
+  let busy=false;
+  let timers=[];
+  const overlay=document.getElementById("priv-overlay");
+  const screen=document.getElementById("priv-copy");
+  const closeBtn=document.getElementById("priv-close");
+  if(!overlay||!screen) return;
+  const enterSfx=new Audio("computer-data-sound.mp3");
+  enterSfx.volume=0.55;
+  const LS_LAST="dt.priv.lastLogin";
+  const LS_N="dt.priv.visits";
+
+  function editable(el){
+    if(!el) return false;
+    const tag=(el.tagName||"").toLowerCase();
+    if(tag==="input"||tag==="textarea"||tag==="select") return true;
+    if(el.isContentEditable) return true;
+    return !!(el.closest && el.closest("input,textarea,select,[contenteditable='true']"));
+  }
+  function clearTimers(){ timers.forEach(clearTimeout); timers=[]; }
+  function later(fn,ms){ const t=setTimeout(fn,ms); timers.push(t); return t; }
+  function fmtLogin(d){
+    const days=["Sun","Mon","Tue","Wed","Thu","Fri","Sat"];
+    const mos=["Jan","Feb","Mar","Apr","May","Jun","Jul","Aug","Sep","Oct","Nov","Dec"];
+    const pad=n=>String(n).padStart(2,"0");
+    const day=String(d.getDate()).padStart(2," ");
+    return `${days[d.getDay()]} ${mos[d.getMonth()]} ${day} ${pad(d.getHours())}:${pad(d.getMinutes())}:${pad(d.getSeconds())}`;
+  }
+  function hex(n){
+    const a=new Uint8Array(n);
+    (crypto.getRandomValues?crypto.getRandomValues(a):a.forEach((_,i)=>a[i]=Math.random()*256));
+    return [...a].map(b=>b.toString(16).padStart(2,"0")).join("");
+  }
+  function line(text, cls){
+    const el=document.createElement("span");
+    el.className="ln"+(cls?" "+cls:"");
+    el.textContent=text;
+    screen.appendChild(el);
+    requestAnimationFrame(()=>el.classList.add("in"));
+    return el;
+  }
+  function promptLine(cmd){
+    const el=document.createElement("span");
+    el.className="ln";
+    el.style.marginTop="8px";
+    el.appendChild(document.createTextNode("danesh@macbook ~ % "+(cmd||"")));
+    const caret=document.createElement("span");
+    caret.className="priv-caret";
+    caret.setAttribute("aria-hidden","true");
+    el.appendChild(caret);
+    screen.appendChild(el);
+    requestAnimationFrame(()=>el.classList.add("in"));
+    return el;
+  }
+  function buildLog(){
+    screen.innerHTML="";
+    const now=new Date();
+    const prev=localStorage.getItem(LS_LAST);
+    const visits=(parseInt(localStorage.getItem(LS_N)||"0",10)||0)+1;
+    localStorage.setItem(LS_N,String(visits));
+    localStorage.setItem(LS_LAST,now.toISOString());
+    const tty="ttys"+String(Math.floor(Math.random()*8)+1).padStart(3,"0");
+    const lastTxt=prev?fmtLogin(new Date(prev)):fmtLogin(new Date(now.getTime()-1000*60*(12+Math.floor(Math.random()*40))));
+    const sid="dt-"+hex(3);
+    const route=btoa("/private/").replace(/=+$/,"");
+    const script=[
+      { delay:0,    fn:()=>line("Last login: "+lastTxt+" on "+tty,"dim") },
+      { delay:120,  fn:()=>line("danesh@macbook ~ % ssh vault://gate") },
+      { delay:380,  fn:()=>line("resolving sealed channel…","dim") },
+      { delay:620,  fn:()=>line("identity: unverified","dim") },
+      { delay:820,  fn:()=>line("clearance: LVL ██","dim") },
+      { delay:980,  fn:()=>line("session "+sid+" · visit "+visits,"dim") },
+      { delay:1180, fn:()=>line("route "+route,"mute") },
+      { delay:1380, fn:()=>promptLine("unlock") },
+      { delay:1500, fn:()=>{
+        const hint=document.createElement("span");
+        hint.className="priv-hint";
+        hint.textContent="↵ proceed · ^C abort";
+        screen.appendChild(hint);
+        requestAnimationFrame(()=>hint.classList.add("in"));
+        busy=false;
+      }}
+    ];
+    busy=true;
+    script.forEach(step=>later(step.fn,step.delay));
+  }
+  function openPriv(){
+    clearTimers();
+    busy=false;
+    buildLog();
+    overlay.hidden=false;
+    overlay.setAttribute("aria-hidden","false");
+    requestAnimationFrame(()=>overlay.classList.add("open"));
+    document.body.style.overflow="hidden";
+    closeBtn && closeBtn.focus();
+  }
+  function closePriv(){
+    clearTimers();
+    busy=false;
+    overlay.classList.remove("open");
+    overlay.setAttribute("aria-hidden","true");
+    document.body.style.overflow="";
+    setTimeout(()=>{ if(!overlay.classList.contains("open")){ overlay.hidden=true; screen.innerHTML=""; } },420);
+  }
+  function runPriv(){
+    if(busy) return;
+    busy=true;
+    clearTimers();
+    const caret=screen.querySelector(".priv-caret");
+    if(caret) caret.remove();
+    const hint=screen.querySelector(".priv-hint");
+    if(hint) hint.remove();
+    try{ enterSfx.currentTime=0; enterSfx.play().catch(()=>{}); }catch(_){}
+    line("verifying…","dim");
+    later(()=>line("handshake accepted — redirecting","ok"),220);
+    later(()=>{ location.href="/private/"; },720);
+  }
+  addEventListener("keydown",e=>{
+    if(overlay.classList.contains("open")){
+      if(e.key==="Escape"||((e.key==="c"||e.key==="C")&&e.ctrlKey)){
+        e.preventDefault();
+        closePriv();
+        return;
+      }
+      if(e.key==="Enter"){
+        e.preventDefault();
+        runPriv();
+        return;
+      }
+      return;
+    }
+    if(e.metaKey||e.ctrlKey||e.altKey) return;
+    if(editable(e.target)) return;
+    const k=(e.key||"").toLowerCase();
+    if(k.length!==1) return;
+    if(k===seq[i]){
+      i++;
+      if(i===seq.length){ i=0; openPriv(); }
+    }else{
+      i = (k===seq[0]) ? 1 : 0;
+    }
+  });
+  closeBtn && closeBtn.addEventListener("click",closePriv);
+  overlay.addEventListener("click",e=>{ if(e.target===overlay) closePriv(); });
+})();
 </script>
 </body>
 </html>

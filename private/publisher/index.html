@@ -1,0 +1,84 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Publisher HQ — Overview</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <span class="kicker">Publisher HQ</span>
+        <span class="name">Overview</span>
+      </div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/publisher/" data-nav="/private/publisher/">Overview</a>
+        <a href="/private/publisher/write/" data-nav="/private/publisher/write/">Write</a>
+        <a href="/private/publisher/websites/" data-nav="/private/publisher/websites/">Websites</a>
+        <a href="/private/publisher/media/" data-nav="/private/publisher/media/">Media</a>
+        <a href="/private/publisher/history/" data-nav="/private/publisher/history/">History</a>
+        <a href="/private/publisher/settings/" data-nav="/private/publisher/settings/">Settings</a>
+      </nav>
+      <div class="user" id="user-slot"></div>
+    </header>
+    <main>
+      <p class="hero-line">Publishing control</p>
+      <h1>Overview</h1>
+      <p class="lede">Write once. Distribute to the websites you own — with independent destination results.</p>
+      <div class="row" style="margin-bottom:18px">
+        <a class="btn" href="/private/publisher/write/">Write Article →</a>
+        <a class="btn ghost" href="/private/publisher/websites/">Manage Websites</a>
+      </div>
+      <div class="stats" id="stats">
+        <div class="stat"><div class="n" id="s-sites">—</div><div class="l">Connected sites</div></div>
+        <div class="stat"><div class="n" id="s-articles">—</div><div class="l">Articles</div></div>
+        <div class="stat"><div class="n" id="s-drafts">—</div><div class="l">Drafts</div></div>
+        <div class="stat"><div class="n" id="s-failed">0</div><div class="l">Failed pubs</div></div>
+      </div>
+      <section class="panel">
+        <h3>Recent articles</h3>
+        <div id="recent" class="muted">Loading…</div>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
+    setActiveNav();
+    const health = await requireSession();
+    document.getElementById("user-slot").textContent = health.identity?.email || "";
+
+    const [articlesRes, sitesRes] = await Promise.all([
+      api("/api/articles").catch(() => ({ articles: [] })),
+      api("/api/websites").catch(() => ({ websites: [] })),
+    ]);
+    const articles = articlesRes.articles || [];
+    const sites = sitesRes.websites || [];
+    document.getElementById("s-sites").textContent = String(sites.length);
+    document.getElementById("s-articles").textContent = String(articles.length);
+    document.getElementById("s-drafts").textContent = String(articles.filter(a => a.status === "draft").length);
+
+    const recent = document.getElementById("recent");
+    if (!articles.length) {
+      recent.textContent = "No articles yet. Create one to begin.";
+    } else {
+      const table = el("table", { class: "table" }, [
+        el("thead", {}, [el("tr", {}, [
+          el("th", { text: "Title" }), el("th", { text: "Status" }), el("th", { text: "Updated" })
+        ])]),
+        el("tbody", {}, articles.slice(0, 8).map(a => el("tr", {}, [
+          el("td", { text: a.title || "Untitled" }),
+          el("td", { text: a.status || "—" }),
+          el("td", { text: (a.updated_at || "").replace("T", " ").slice(0, 19) }),
+        ]))),
+      ]);
+      recent.replaceChildren(table);
+    }
+  </script>
+</body>
+</html>

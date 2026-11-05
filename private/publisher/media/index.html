@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Publisher HQ — Media</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="kicker">Publisher HQ</span><span class="name">Media Library</span></div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/publisher/">Overview</a>
+        <a href="/private/publisher/write/">Write</a>
+        <a href="/private/publisher/websites/">Websites</a>
+        <a href="/private/publisher/media/" data-nav="/private/publisher/media/">Media</a>
+        <a href="/private/publisher/history/">History</a>
+      </nav>
+    </header>
+    <main>
+      <p class="hero-line">R2 storage</p>
+      <h1>Media Library</h1>
+      <p class="lede">Shared media via Cloudflare R2. Upload API lands after the R2 bucket binding is configured.</p>
+      <section class="panel">
+        <h3>Status</h3>
+        <p class="muted" id="status">Checking…</p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    setActiveNav();
+    const health = await requireSession();
+    document.getElementById("status").textContent = health.bindings?.r2
+      ? "R2 binding present. Wire /api/media upload next."
+      : "R2 not bound yet. Create bucket `command-center-media` and bind as MEDIA (see docs/CLOUDFLARE_SETUP.md).";
+  </script>
+</body>
+</html>

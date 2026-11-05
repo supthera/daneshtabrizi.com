@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Publisher HQ — Settings</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="kicker">Publisher HQ</span><span class="name">Settings</span></div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/publisher/">Overview</a>
+        <a href="/private/publisher/settings/" data-nav="/private/publisher/settings/">Settings</a>
+      </nav>
+    </header>
+    <main>
+      <p class="hero-line">App settings</p>
+      <h1>Publisher Settings</h1>
+      <section class="panel">
+        <h3>Defaults</h3>
+        <p class="muted">Author defaults, canonical policy, and connector timeouts will live here. Prefer destination-specific SEO and canonicals to avoid duplicate-content issues across your domains.</p>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    setActiveNav();
+    await requireSession();
+  </script>
+</body>
+</html>

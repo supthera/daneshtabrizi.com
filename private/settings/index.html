@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Administration — Settings</title>
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand"><span class="kicker">Administration</span><span class="name">Settings</span></div>
+      <nav class="nav">
+        <a href="/private/">Command Center</a>
+        <a href="/private/settings/" data-nav="/private/settings/">Settings</a>
+        <a href="/private/integrations/">Integrations</a>
+        <a href="/private/apps/">Apps</a>
+      </nav>
+      <div class="user" id="user-slot"></div>
+    </header>
+    <main>
+      <p class="hero-line">Command Center</p>
+      <h1>Settings</h1>
+      <section class="panel">
+        <h3>Identity</h3>
+        <p class="muted" id="identity">Loading…</p>
+      </section>
+      <section class="panel">
+        <h3>Bindings</h3>
+        <pre class="muted" id="bindings" style="white-space:pre-wrap"></pre>
+      </section>
+      <section class="panel">
+        <h3>Logout</h3>
+        <p class="muted">Cloudflare Access logout clears the Access session cookie for your team domain.</p>
+        <a class="btn ghost" id="logout" href="#">Sign out via Access</a>
+      </section>
+    </main>
+  </div>
+  <script type="module">
+    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    setActiveNav();
+    const health = await requireSession();
+    document.getElementById("user-slot").textContent = health.identity?.email || "";
+    document.getElementById("identity").textContent =
+      `${health.identity?.email || "unknown"} · source: ${health.identity?.source || "n/a"}`;
+    document.getElementById("bindings").textContent = JSON.stringify(health.bindings || {}, null, 2);
+    // Access logout URL pattern: https://<team>.cloudflareaccess.com/cdn-cgi/access/logout
+    document.getElementById("logout").addEventListener("click", (e) => {
+      e.preventDefault();
+      const team = prompt("Access team domain (e.g. yourteam.cloudflareaccess.com)");
+      if (team) location.href = `https://${team.replace(/^https?:\/\//, "")}/cdn-cgi/access/logout`;
+    });
+  </script>
+</body>
+</html>

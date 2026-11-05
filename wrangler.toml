@@ -1,0 +1,22 @@
+# Cloudflare Pages + Functions + D1 + R2
+# Create resources, then replace placeholder IDs (see docs/CLOUDFLARE_SETUP.md)
+
+name = "daneshtabrizi"
+compatibility_date = "2025-10-01"
+pages_build_output_dir = "."
+
+[[d1_databases]]
+binding = "DB"
+database_name = "command-center"
+database_id = "REPLACE_WITH_D1_DATABASE_ID"
+migrations_dir = "migrations"
+
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "command-center-media"
+
+# Secrets (set via dashboard or `wrangler pages secret put`):
+# - CF_ACCESS_TEAM_DOMAIN   e.g. yourteam.cloudflareaccess.com
+# - CF_ACCESS_AUD           Access application AUD tag
+# - DEV_AUTH_BYPASS         "true" only for local preview — NEVER in production
+# - DEV_AUTH_EMAIL          authorized email for local bypass
