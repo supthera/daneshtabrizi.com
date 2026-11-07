@@ -1,22 +1,27 @@
-# Cloudflare Pages + Functions + D1 + R2
-# Create resources, then replace placeholder IDs (see docs/CLOUDFLARE_SETUP.md)
+# Cloudflare Worker + static assets (custom domains on workers.dev project)
+# Dashboard deploy command must be: npx wrangler deploy
+# Build command: exit 0
 
 name = "daneshtabrizi"
 compatibility_date = "2025-10-01"
-pages_build_output_dir = "."
 
-[[d1_databases]]
-binding = "DB"
-database_name = "command-center"
-database_id = "REPLACE_WITH_D1_DATABASE_ID"
-migrations_dir = "migrations"
+[assets]
+directory = "."
+not_found_handling = "404-page"
 
-[[r2_buckets]]
-binding = "MEDIA"
-bucket_name = "command-center-media"
+# Bind D1/R2 in the dashboard (or uncomment once real IDs exist).
+# [[d1_databases]]
+# binding = "DB"
+# database_name = "command-center"
+# database_id = "REPLACE_WITH_D1_DATABASE_ID"
+# migrations_dir = "migrations"
 
-# Secrets (set via dashboard or `wrangler pages secret put`):
-# - CF_ACCESS_TEAM_DOMAIN   e.g. yourteam.cloudflareaccess.com
-# - CF_ACCESS_AUD           Access application AUD tag
-# - DEV_AUTH_BYPASS         "true" only for local preview — NEVER in production
-# - DEV_AUTH_EMAIL          authorized email for local bypass
+# [[r2_buckets]]
+# binding = "MEDIA"
+# bucket_name = "command-center-media"
+
+# Secrets (dashboard or `wrangler secret put`):
+# - CF_ACCESS_TEAM_DOMAIN
+# - CF_ACCESS_AUD
+# - DEV_AUTH_BYPASS (local only — never production)
+# - DEV_AUTH_EMAIL

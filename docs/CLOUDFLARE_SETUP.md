@@ -1,10 +1,31 @@
 # Cloudflare setup
 
-## 1. Pages project
+## 1. Workers + static assets
 
-Repo already deploys as Cloudflare Pages with **no build**, output `/`.
+`daneshtabrizi.com` is attached to the **Workers** project `daneshtabrizi`
+(`*.workers.dev`), not a classic Pages `*.pages.dev` host.
 
-After this push, Pages will also pick up `functions/`.
+`wrangler.toml` uses `[assets] directory = "."` so `wrangler deploy` uploads the site.
+
+### Build settings (Workers & Pages → daneshtabrizi → Settings → Builds)
+
+| Setting | Value |
+|---|---|
+| Framework preset | **None** |
+| Build command | `exit 0` |
+| Deploy command | `npx wrangler deploy` |
+| Root directory | blank |
+
+Do **not** set Deploy to `exit 0` — that marks success without uploading new files (WASD never goes live).
+
+### After changing settings
+
+**Save**, then **Retry deployment** (or push a new commit). Confirm Production shows the new commit.
+
+### Note on `functions/`
+
+The `functions/` folder is Pages-style and is excluded from asset upload (see `.assetsignore`).
+API/auth routes need a Worker `main` (or a Pages project) before they go live; the public site + WASD gate do not.
 
 ## 2. D1 database
 
