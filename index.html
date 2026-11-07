@@ -314,46 +314,66 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   font-size:0.64rem; letter-spacing:0.26em; text-transform:uppercase; display:flex; align-items:center; gap:12px }
 .scrollcue .ln{ width:42px; height:1px; background:var(--amber) }
 
-/* --- HERO SUBJECT FILE (espionage dossier / POI target lock) --- */
+/* --- HERO SUBJECT FILE (quiet terminal window) --- */
 .dossier{
-  width:100%; max-width:342px; border:1px solid var(--line); background:rgba(14,13,12,0.74);
-  backdrop-filter:blur(7px); border-radius:3px; padding:13px; font-size:0.72rem;
+  width:100%; max-width:360px;
+  border-radius:9px; overflow:hidden;
+  background:#000;
+  border:0.5px solid rgba(255,255,255,.12);
+  box-shadow:
+    0 0 0 1px rgba(0,0,0,.55),
+    0 18px 48px rgba(0,0,0,.45);
+  font-family:"SF Mono","Menlo","Monaco","DM Mono",ui-monospace,monospace;
+  font-size:12px; line-height:1.45;
   position:relative; z-index:2; height:fit-content; justify-self:start;
+  color:#fff;
 }
 @media (max-width:1023px){
   .hero{ justify-content:flex-start; overflow:visible; }
   .hero-grid{ grid-template-columns:1fr; gap:clamp(16px,3vh,24px); }
   .hero-main{ display:contents; }
-  .dossier{ order:1; max-width:min(342px,100%); justify-self:center; }
+  .dossier{ order:1; max-width:min(360px,100%); justify-self:center; }
   .hero-quotes, .hero-sub, .cta, .hero h1{ display:none; }
 }
-.dz-top{ display:flex; justify-content:space-between; align-items:center; letter-spacing:0.14em; text-transform:uppercase;
-  color:var(--dim); border-bottom:1px solid var(--line); padding-bottom:9px; margin-bottom:11px }
-.dz-track{ display:inline-flex; align-items:center; gap:6px; color:var(--ink) }
-.dz-track i{ width:7px; height:7px; border-radius:50%; background:#56a067; box-shadow:0 0 8px #56a067; animation:opsPulse 2.4s ease-in-out infinite }
-.dz-photo{ position:relative; aspect-ratio:1/1; width:100%; overflow:hidden; border:1px solid var(--line); background:#0a0908; margin-bottom:12px }
-.dz-ph,.dz-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover }
-.dz-img{ object-position:58% 32%; filter:grayscale(1) contrast(1.08) }
-.dz-photo .br{ position:absolute; width:18px; height:18px; z-index:3; border:2px solid var(--ink); animation:lockin .5s var(--ease) .95s both }
-.dz-photo .tl{ top:8px; left:8px; border-right:0; border-bottom:0 }
-.dz-photo .tr{ top:8px; right:8px; border-left:0; border-bottom:0 }
-.dz-photo .bl{ bottom:8px; left:8px; border-right:0; border-top:0 }
-.dz-photo .br2{ bottom:8px; right:8px; border-left:0; border-top:0 }
-@keyframes lockin{ from{opacity:0; transform:scale(1.45)} to{opacity:1; transform:scale(1)} }
-.dz-scan{ position:absolute; left:0; top:-20%; width:100%; height:20%; z-index:2;
-  background:linear-gradient(rgba(255,174,59,0), rgba(255,174,59,0.2), rgba(255,174,59,0)); animation:scan 3.4s linear infinite }
-@keyframes scan{ 0%{top:-20%} 100%{top:120%} }
-.dz-match{ position:absolute; left:8px; bottom:8px; z-index:3; font-size:0.6rem; letter-spacing:0.08em; color:var(--amber);
-  background:rgba(0,0,0,0.55); padding:3px 7px; border-radius:1px }
-.dz-rows{ display:grid; gap:7px }
-.dz-row{ display:flex; justify-content:space-between; gap:12px }
-.dz-row .k{ color:var(--dim); letter-spacing:0.1em; text-transform:uppercase }
-.dz-row .v{ color:var(--ink); text-align:right }
-.redact{ background:var(--ink); color:transparent !important; padding:0 8px; border-radius:1px; user-select:none }
-.dz-foot{ display:flex; justify-content:space-between; align-items:center; margin-top:12px; padding-top:10px; border-top:1px solid var(--line) }
-.dz-id{ color:var(--dim); letter-spacing:0.08em }
-.dz-bars{ width:92px; height:20px; opacity:.7;
-  background:repeating-linear-gradient(90deg, var(--ink) 0 1px, transparent 1px 3px, var(--ink) 3px 4px, transparent 4px 7px) }
+.dz-body{ padding:12px 12px 14px; background:#000 }
+.dz-photo{
+  position:relative; aspect-ratio:1/1; width:100%; overflow:hidden;
+  background:#111; margin-bottom:12px;
+  border:0.5px solid rgba(255,255,255,.08);
+}
+.dz-img{ position:absolute; inset:0; width:100%; height:100%; object-fit:cover;
+  object-position:58% 32%; filter:grayscale(1) contrast(1.05); opacity:.92 }
+.dz-scan{
+  position:absolute; left:0; top:-18%; width:100%; height:18%; z-index:2; pointer-events:none;
+  background:linear-gradient(rgba(255,255,255,0), rgba(255,255,255,.14), rgba(255,255,255,0));
+  animation:dzScan 3.6s linear infinite;
+}
+@keyframes dzScan{ 0%{top:-18%} 100%{top:118%} }
+.dz-match{
+  position:absolute; left:8px; bottom:8px; z-index:3;
+  font-size:10px; letter-spacing:0.02em; color:#cfcfcf;
+  background:rgba(0,0,0,.72); padding:3px 7px;
+  border:0.5px solid rgba(255,255,255,.12);
+}
+@media (prefers-reduced-motion:reduce){
+  .dz-scan{ animation:none; opacity:.35; top:42% }
+}
+.dz-rows{ display:grid; gap:5px }
+.dz-row{ display:grid; grid-template-columns:88px 1fr; gap:10px; align-items:baseline }
+.dz-row .k{ color:#6e6e6e; letter-spacing:0; text-transform:none }
+.dz-row .v{ color:#fff; text-align:left }
+.dz-row .v.amber{ color:#fff }
+.redact{
+  display:inline-block; min-width:5.5em; height:0.95em;
+  background:#3a3a3a; color:transparent !important;
+  vertical-align:-0.05em; user-select:none; border-radius:0;
+}
+.dz-foot{
+  display:flex; justify-content:space-between; align-items:center;
+  margin-top:12px; padding-top:10px;
+  border-top:0.5px solid rgba(255,255,255,.1);
+}
+.dz-id{ color:#6e6e6e; letter-spacing:0; font-size:11px }
 
 /* ============================================================
    ASSETS (domains / businesses)
@@ -687,22 +707,22 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
   <div class="hero-scrim" aria-hidden="true"></div>
   <div class="wrap hero-grid">
     <aside class="dossier" aria-label="Subject file: Danesh Tabrizi">
-      <div class="dz-top"><span>Subject File</span><span class="dz-track"><i></i>Tracking</span></div>
+      <div class="dz-body">
         <div class="dz-photo">
           <img class="dz-img" src="profile.jpg" alt="Danesh Tabrizi" width="1024" height="576">
-        <div class="dz-scan" aria-hidden="true"></div>
-        <span class="br tl"></span><span class="br tr"></span><span class="br bl"></span><span class="br br2"></span>
-        <span class="dz-match" id="dz-match">FACE MATCH · 99.7%</span>
+          <div class="dz-scan" aria-hidden="true"></div>
+          <span class="dz-match" id="dz-match">face match · 99.7%</span>
+        </div>
+        <div class="dz-rows">
+          <div class="dz-row"><span class="k">subject</span><span class="v">Danesh Tabrizi</span></div>
+          <div class="dz-row"><span class="k">dob</span><span class="v">13 Feb 1994 · <span id="dz-age">—</span> yrs</span></div>
+          <div class="dz-row"><span class="k">class</span><span class="v">Principal Operative</span></div>
+          <div class="dz-row"><span class="k">status</span><span class="v">active</span></div>
+          <div class="dz-row"><span class="k">last seen</span><span class="v"><span class="redact" aria-label="classified">······</span></span></div>
+          <div class="dz-row"><span class="k">clearance</span><span class="v">lvl ███</span></div>
+        </div>
+        <div class="dz-foot"><span class="dz-id">id dt-0213-1994</span></div>
       </div>
-      <div class="dz-rows">
-        <div class="dz-row"><span class="k">Subject</span><span class="v">Danesh Tabrizi</span></div>
-        <div class="dz-row"><span class="k">DOB</span><span class="v">13 Feb 1994 · <span id="dz-age">—</span> yrs</span></div>
-        <div class="dz-row"><span class="k">Class</span><span class="v">Principal Operative</span></div>
-        <div class="dz-row"><span class="k">Status</span><span class="v amber">Active</span></div>
-        <div class="dz-row"><span class="k">Last Seen</span><span class="v"><span class="redact">CLASSIFIED</span></span></div>
-        <div class="dz-row"><span class="k">Clearance</span><span class="v">LVL ███</span></div>
-      </div>
-      <div class="dz-foot"><span class="dz-id">ID//DT-0213-1994</span><span class="dz-bars" aria-hidden="true"></span></div>
     </aside>
     <div class="hero-main">
       <div class="hero-quotes">
@@ -989,16 +1009,16 @@ if(!touch){
   fontWait.then(initHero);
 })();
 
-/* subject file: live age, one-time scan→match */
+/* subject file: live age + quiet face match */
 (function(){
   const n=new Date(); let a=n.getFullYear()-1994;
-  if(n.getMonth()<1 || (n.getMonth()===1 && n.getDate()<13)) a--;   // before 13 Feb? not yet had birthday
+  if(n.getMonth()<1 || (n.getMonth()===1 && n.getDate()<13)) a--;
   const el=document.getElementById("dz-age"); if(el) el.textContent=a;
 })();
 (function(){
   const m=document.getElementById("dz-match"); if(!m||reduced) return;
-  m.textContent="SCANNING…";
-  setTimeout(()=>{ m.textContent="FACE MATCH · 99.7%"; }, 1500);
+  m.textContent="scanning…";
+  setTimeout(()=>{ m.textContent="face match · 99.7%"; }, 1500);
 })();
 
 /* brief intercept glitch on hover — plays once, text stays legible */
