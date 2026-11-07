@@ -350,18 +350,26 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
 }
 @keyframes dzScan{ 0%{top:-18%} 100%{top:118%} }
 .dz-match{
-  position:absolute; left:8px; bottom:8px; z-index:3;
-  font-size:10px; letter-spacing:0.02em; color:#cfcfcf;
-  background:rgba(0,0,0,.72); padding:3px 7px;
-  border:0.5px solid rgba(255,255,255,.12);
+  position:absolute; left:22px; bottom:16px; z-index:3;
+  font-size:0.5rem; letter-spacing:0.06em; color:var(--amber);
+  background:rgba(0,0,0,.55); padding:2px 5px; border-radius:1px;
+  text-transform:uppercase; line-height:1.2;
 }
+.dz-photo .br{
+  position:absolute; width:16px; height:16px; z-index:3;
+  border:1.5px solid rgba(255,255,255,.85); pointer-events:none;
+}
+.dz-photo .tl{ top:8px; left:8px; border-right:0; border-bottom:0 }
+.dz-photo .tr{ top:8px; right:8px; border-left:0; border-bottom:0 }
+.dz-photo .bl{ bottom:8px; left:8px; border-right:0; border-top:0 }
+.dz-photo .br2{ bottom:8px; right:8px; border-left:0; border-top:0 }
 @media (prefers-reduced-motion:reduce){
   .dz-scan{ animation:none; opacity:.35; top:42% }
 }
 .dz-rows{ display:grid; gap:5px }
-.dz-row{ display:grid; grid-template-columns:88px 1fr; gap:10px; align-items:baseline }
-.dz-row .k{ color:#6e6e6e; letter-spacing:0; text-transform:none }
-.dz-row .v{ color:#fff; text-align:left }
+.dz-row{ display:flex; justify-content:space-between; gap:12px; align-items:baseline }
+.dz-row .k{ color:#6e6e6e; letter-spacing:0; text-transform:none; flex-shrink:0 }
+.dz-row .v{ color:#fff; text-align:right }
 .dz-row .v.amber{ color:#fff }
 .redact{
   display:inline-block; min-width:5.5em; height:0.95em;
@@ -711,7 +719,9 @@ body.in-hero-view .topbar *{ cursor:var(--cursor-hero); }
         <div class="dz-photo">
           <img class="dz-img" src="profile.jpg" alt="Danesh Tabrizi" width="1024" height="576">
           <div class="dz-scan" aria-hidden="true"></div>
-          <span class="dz-match" id="dz-match">face match · 99.7%</span>
+          <span class="br tl" aria-hidden="true"></span><span class="br tr" aria-hidden="true"></span>
+          <span class="br bl" aria-hidden="true"></span><span class="br br2" aria-hidden="true"></span>
+          <span class="dz-match" id="dz-match">FACE MATCH · 99.7%</span>
         </div>
         <div class="dz-rows">
           <div class="dz-row"><span class="k">subject</span><span class="v">Danesh Tabrizi</span></div>
@@ -1017,8 +1027,8 @@ if(!touch){
 })();
 (function(){
   const m=document.getElementById("dz-match"); if(!m||reduced) return;
-  m.textContent="scanning…";
-  setTimeout(()=>{ m.textContent="face match · 99.7%"; }, 1500);
+  m.textContent="SCANNING…";
+  setTimeout(()=>{ m.textContent="FACE MATCH · 99.7%"; }, 1500);
 })();
 
 /* brief intercept glitch on hover — plays once, text stays legible */
