@@ -122,13 +122,24 @@ function isProduction(request: Request): boolean {
  * - Prefer CF-Access-Jwt-Assertion
  * - Dev bypass only on localhost AND DEV_AUTH_BYPASS=true AND never on production hosts
  */
+function cookieValue(request: Request, name: string): string | null {
+  const raw = request.headers.get("Cookie") || "";
+  for (const part of raw.split(";")) {
+    const [k, ...rest] = part.trim().split("=");
+    if (k === name) return rest.join("=") || null;
+  }
+  return null;
+}
+
 export async function resolveIdentity(
   request: Request,
   env: Env
 ): Promise<AccessIdentity | null> {
   const jwt =
     request.headers.get("Cf-Access-Jwt-Assertion") ||
-    request.headers.get("CF-Access-JWT-Assertion");
+    request.headers.get("CF-Access-JWT-Assertion") ||
+    // Access session cookie — needed when /api* was not itself behind Access
+    cookieValue(request, "CF_Authorization");
 
   if (jwt && env.CF_ACCESS_TEAM_DOMAIN && env.CF_ACCESS_AUD) {
     try {

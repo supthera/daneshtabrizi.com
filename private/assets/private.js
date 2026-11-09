@@ -84,7 +84,14 @@ export function iconGlyph(name) {
 
 export async function requireSession() {
   try {
-    return await api("/api/health");
+    const health = await api("/api/health");
+    // /api/health itself is public — require a real Access identity for private UI.
+    if (!health?.identity?.email) {
+      const err = new Error("Cloudflare Access authentication required");
+      err.status = 401;
+      throw err;
+    }
+    return health;
   } catch (e) {
     if (e.status === 401) {
       document.body.innerHTML = `
