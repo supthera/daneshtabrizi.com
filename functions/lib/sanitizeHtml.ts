@@ -60,10 +60,10 @@ export function sanitizePublisherHtml(input: string): string {
       let value = match[3] ?? match[4] ?? match[5] ?? "";
       if ((name === "href" || name === "src") && /^\s*javascript:/i.test(value)) continue;
       if (name === "href" || name === "src") value = value.trim();
-      kept.push(`${name}="${value.replace(/"/g, "&quot;")}"`);
+      kept.push(name + "=" + JSON.stringify(value));
     }
-    const attrs = kept.length ? ` ${kept.join(" ")}` : "";
-    return `<${tag}${attrs}>`;
+    const attrs = kept.length ? " " + kept.join(" ") : "";
+    return "<" + tag + attrs + ">";
   });
 
   for (let i = 0; i < 4; i++) {
