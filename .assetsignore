@@ -9,8 +9,13 @@ node_modules
 .gitignore
 .assetsignore
 wrangler.toml
+worker.ts
 docs
 migrations
 functions
+scaffolds
 *.md
 .DS_Store
+tsconfig.json
+package.json
+package-lock.json

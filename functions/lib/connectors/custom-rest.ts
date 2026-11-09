@@ -1,3 +1,4 @@
+import { joinEndpoint } from "../urls";
 import type {
   ConnectionTestResult,
   PublishPayload,
@@ -29,7 +30,7 @@ export class CustomRestConnector implements PublisherConnector {
   async testConnection(): Promise<ConnectionTestResult> {
     const tested_at = new Date().toISOString();
     try {
-      const res = await fetch(new URL("/health", this.endpoint).toString(), {
+      const res = await fetch(joinEndpoint(this.endpoint, "health"), {
         headers: this.headers(),
       });
       if (!res.ok) {
@@ -43,7 +44,7 @@ export class CustomRestConnector implements PublisherConnector {
 
   async createArticle(payload: PublishPayload): Promise<PublishResult> {
     try {
-      const res = await fetch(new URL("/articles", this.endpoint).toString(), {
+      const res = await fetch(joinEndpoint(this.endpoint, "articles"), {
         method: "POST",
         headers: this.headers(),
         body: JSON.stringify(payload),
@@ -62,7 +63,6 @@ export class CustomRestConnector implements PublisherConnector {
         published_url?: string;
         stage?: PublishResult["stage"];
       };
-      // Only claim publicly_accessible when destination confirms it
       const stage = data.stage || (data.published_url ? "content_saved" : "content_received");
       return {
         ok: true,
@@ -78,7 +78,7 @@ export class CustomRestConnector implements PublisherConnector {
 
   async updateArticle(remoteId: string, payload: PublishPayload): Promise<PublishResult> {
     try {
-      const res = await fetch(new URL(`/articles/${encodeURIComponent(remoteId)}`, this.endpoint).toString(), {
+      const res = await fetch(joinEndpoint(this.endpoint, `articles/${encodeURIComponent(remoteId)}`), {
         method: "PUT",
         headers: this.headers(),
         body: JSON.stringify(payload),

@@ -8,14 +8,13 @@
   <meta name="theme-color" content="#000000" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=agenda5" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=agenda12" />
 </head>
 <body>
   <div class="wrap">
     <header class="top">
       <div class="brand">
-        <span class="kicker">Command Center</span>
-        <span class="name">Agenda</span>
+        <span class="name">Command Center</span>
       </div>
       <nav class="nav" aria-label="Command center">
         <a href="/private/">Apps</a>
@@ -29,8 +28,17 @@
     </header>
 
     <main>
-      <p class="hero-line">Projects</p>
-      <h1>Agenda</h1>
+      <div class="agenda-head">
+        <div class="agenda-menu" id="agenda-menu">
+          <button type="button" class="agenda-gear" id="agenda-gear" aria-haspopup="menu" aria-expanded="false" aria-label="Project settings" title="Settings">
+            <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
+          </button>
+          <div class="agenda-menu-panel" id="agenda-menu-panel" role="menu" hidden>
+            <button type="button" role="menuitem" id="agenda-add-project">Add Project</button>
+          </div>
+        </div>
+        <p class="hero-line">Projects</p>
+      </div>
       <div class="agenda-grid" id="agenda-grid" aria-label="Project to-do boards"></div>
     </main>
   </div>
@@ -54,49 +62,135 @@
     </div>
   </div>
 
+  <div class="agenda-overlay" id="agenda-new-overlay" hidden aria-hidden="true">
+    <div class="agenda-prompt" role="dialog" aria-modal="true" aria-labelledby="agenda-new-title">
+      <h2 id="agenda-new-title">Add Project</h2>
+      <input type="text" id="agenda-new-input" placeholder="Project name…" maxlength="80" />
+      <div class="agenda-prompt-actions">
+        <button type="button" class="agenda-prompt-cancel" id="agenda-new-cancel">Cancel</button>
+        <button type="button" class="agenda-prompt-ok" id="agenda-new-ok">Add</button>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
     import { el, setActiveNav, requireSession } from "/private/assets/private.js";
 
-    const LS_KEY = "dt.agenda.boards.v1";
+    const LS_KEY = "dt.agenda.boards.v3";
+    const LS_LEGACY = ["dt.agenda.boards.v2", "dt.agenda.boards.v1"];
     const DEFAULTS = [
-      { id: "daneshtabrizi", title: "DaneshTabrizi.com", todos: [] },
-      { id: "dantefuego", title: "DanteFuego.com", todos: [] },
+      {
+        id: "daneshtabrizi",
+        title: "DaneshTabrizi.com",
+        todos: [
+          { id: "t-publisher-hq", text: "Publisher HQ", done: false },
+          { id: "t-youtube-component", text: "Create Proper Youtube Component", done: false },
+        ],
+      },
+      {
+        id: "dantefuego",
+        title: "DanteFuego.com",
+        todos: [
+          { id: "t-etsy-reminder", text: "Etsy is Gay, friendly reminder", done: false },
+        ],
+      },
       { id: "maf", title: "MedicareAgencyFinder.com", todos: [] },
-      { id: "ordinova", title: "Ordinova.com", todos: [] },
-      { id: "tradejester", title: "Tradejester.com", todos: [] },
+      {
+        id: "ordinova",
+        title: "Ordinova.com",
+        todos: [
+          { id: "t-ordinova-perf", text: "Fix Landing Page Performance / Test with Google etc.", done: false },
+        ],
+      },
+      {
+        id: "tradejester",
+        title: "Tradejester.com",
+        todos: [
+          { id: "t-adam-aron", text: "Fuck Adam Aron", done: false },
+        ],
+      },
       { id: "zendamovement", title: "Zendamovement.com", todos: [] },
       { id: "portturret", title: "Portturret.com", todos: [] },
-      { id: "supthera", title: "Supthera.com", todos: [] },
+      {
+        id: "supthera",
+        title: "Supthera.com",
+        todos: [
+          { id: "t-supthera-launch", text: "Launch Site for Use", done: false },
+          { id: "t-supthera-creds", text: "Transfer Credentials from Ordinova Fully", done: false },
+        ],
+      },
       { id: "opusgrex", title: "Opusgrex.com", todos: [] },
       { id: "persianvegan", title: "Persianvegan.com", todos: [] },
       { id: "therapyagencyacademy", title: "Therapyagencyacademy.com", todos: [] },
       { id: "crazylobby", title: "Crazylobby.com", todos: [] },
     ];
 
-    function loadBoards() {
+    function readStored(key) {
       try {
-        const raw = localStorage.getItem(LS_KEY);
-        if (!raw) return structuredClone(DEFAULTS);
+        const raw = localStorage.getItem(key);
+        if (!raw) return null;
         const parsed = JSON.parse(raw);
-        if (!Array.isArray(parsed)) return structuredClone(DEFAULTS);
+        return Array.isArray(parsed) ? parsed : null;
+      } catch {
+        return null;
+      }
+    }
 
-        const defs = new Map(DEFAULTS.map((d) => [d.id, d]));
-        const merged = [];
-        const seen = new Set();
+    function todoCount(list) {
+      return (Array.isArray(list) ? list : []).reduce((n, b) => n + ((b && Array.isArray(b.todos)) ? b.todos.length : 0), 0);
+    }
 
-        for (const saved of parsed) {
-          if (!saved || !saved.id || !defs.has(saved.id)) continue;
+    function mergeBoards(parsed) {
+      const defs = new Map(DEFAULTS.map((d) => [d.id, d]));
+      const merged = [];
+      const seen = new Set();
+
+      for (const saved of parsed) {
+        if (!saved || !saved.id) continue;
+        const savedTodos = Array.isArray(saved.todos) ? saved.todos : [];
+        if (defs.has(saved.id)) {
           const def = defs.get(saved.id);
+          // Prefer saved todos when present; otherwise keep seeded defaults.
+          const todos = savedTodos.length ? savedTodos : structuredClone(def.todos || []);
           merged.push({
             ...def,
-            todos: Array.isArray(saved.todos) ? saved.todos : [],
+            title: typeof saved.title === "string" && saved.title.trim() ? saved.title.trim() : def.title,
+            todos,
           });
-          seen.add(saved.id);
+        } else {
+          merged.push({
+            id: saved.id,
+            title: typeof saved.title === "string" && saved.title.trim() ? saved.title.trim() : "Project",
+            todos: savedTodos,
+            custom: true,
+          });
         }
-        for (const def of DEFAULTS) {
-          if (!seen.has(def.id)) merged.push(structuredClone(def));
+        seen.add(saved.id);
+      }
+      for (const def of DEFAULTS) {
+        if (!seen.has(def.id)) merged.push(structuredClone(def));
+      }
+      return merged;
+    }
+
+    function loadBoards() {
+      try {
+        const current = readStored(LS_KEY);
+        if (current) return mergeBoards(current);
+
+        let best = null;
+        let bestScore = -1;
+        for (const key of LS_LEGACY) {
+          const legacy = readStored(key);
+          if (!legacy) continue;
+          const score = todoCount(legacy);
+          if (score > bestScore) {
+            best = legacy;
+            bestScore = score;
+          }
         }
-        return merged;
+        if (best && bestScore > 0) return mergeBoards(best);
+        return structuredClone(DEFAULTS);
       } catch {
         return structuredClone(DEFAULTS);
       }
@@ -116,6 +210,7 @@
     let purgeClock = null;
 
     let boards = loadBoards();
+    saveBoards();
     let activeId = null;
     let suppressClickUntil = 0;
     const grid = document.getElementById("agenda-grid");
@@ -126,9 +221,61 @@
     const modalInput = document.getElementById("agenda-modal-input");
     const modalAdd = document.getElementById("agenda-modal-add");
     const modalClose = document.getElementById("agenda-modal-close");
+    const gearBtn = document.getElementById("agenda-gear");
+    const menuPanel = document.getElementById("agenda-menu-panel");
+    const addProjectBtn = document.getElementById("agenda-add-project");
+    const newOverlay = document.getElementById("agenda-new-overlay");
+    const newInput = document.getElementById("agenda-new-input");
+    const newCancel = document.getElementById("agenda-new-cancel");
+    const newOk = document.getElementById("agenda-new-ok");
 
     function boardById(id) {
       return boards.find((b) => b.id === id);
+    }
+
+    function slugId(title) {
+      const base = title
+        .toLowerCase()
+        .replace(/[^a-z0-9]+/g, "-")
+        .replace(/^-+|-+$/g, "") || "project";
+      let id = base;
+      let n = 2;
+      while (boards.some((b) => b.id === id)) id = base + "-" + (n++);
+      return id;
+    }
+
+    function setMenuOpen(open) {
+      menuPanel.hidden = !open;
+      gearBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    function openNewProject() {
+      setMenuOpen(false);
+      newOverlay.hidden = false;
+      newOverlay.setAttribute("aria-hidden", "false");
+      newInput.value = "";
+      requestAnimationFrame(() => newOverlay.classList.add("open"));
+      newInput.focus();
+    }
+
+    function closeNewProject() {
+      newOverlay.classList.remove("open");
+      newOverlay.setAttribute("aria-hidden", "true");
+      setTimeout(() => {
+        if (!newOverlay.classList.contains("open")) newOverlay.hidden = true;
+      }, 220);
+    }
+
+    function submitNewProject() {
+      const title = newInput.value.trim();
+      if (!title) {
+        newInput.focus();
+        return;
+      }
+      boards.push({ id: slugId(title), title, todos: [], custom: true });
+      saveBoards();
+      closeNewProject();
+      paint();
     }
 
     function openCount(board) {
@@ -333,12 +480,12 @@
         if (e.target.closest("li,input,button")) e.stopPropagation();
       });
 
-      card.append(
+      const head = el("div", { class: "agenda-board-head" });
+      head.append(
         el("h3", { text: board.title }),
-        el("div", { class: "count", text: open ? open + " open" : "No open tasks" }),
-        list,
-        addRow
+        el("div", { class: "count", text: String(open) })
       );
+      card.append(head, list, addRow);
 
       card.addEventListener("dblclick", (e) => {
         if (Date.now() < suppressClickUntil) return;
@@ -492,10 +639,44 @@
     overlay.addEventListener("click", (e) => {
       if (e.target === overlay) closeModal();
     });
-    addEventListener("keydown", (e) => {
-      if (e.key === "Escape" && overlay.classList.contains("open")) {
+    gearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setMenuOpen(menuPanel.hidden);
+    });
+    addProjectBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      openNewProject();
+    });
+    newCancel.addEventListener("click", closeNewProject);
+    newOk.addEventListener("click", submitNewProject);
+    newInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
         e.preventDefault();
-        closeModal();
+        submitNewProject();
+      }
+    });
+    newOverlay.addEventListener("click", (e) => {
+      if (e.target === newOverlay) closeNewProject();
+    });
+    addEventListener("pointerdown", (e) => {
+      if (!menuPanel.hidden && !e.target.closest("#agenda-menu")) setMenuOpen(false);
+    });
+    addEventListener("keydown", (e) => {
+      if (e.key === "Escape") {
+        if (newOverlay.classList.contains("open")) {
+          e.preventDefault();
+          closeNewProject();
+          return;
+        }
+        if (!menuPanel.hidden) {
+          e.preventDefault();
+          setMenuOpen(false);
+          return;
+        }
+        if (overlay.classList.contains("open")) {
+          e.preventDefault();
+          closeModal();
+        }
       }
     });
     modalAdd.addEventListener("click", () => {

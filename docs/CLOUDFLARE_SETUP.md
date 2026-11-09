@@ -29,11 +29,13 @@ API/auth routes need a Worker `main` (or a Pages project) before they go live; t
 
 ## 2. D1 database
 
+Prefer the click-path in **`docs/ADMIN_CHECKLIST.md`**, or CLI:
+
 ```bash
 npx wrangler d1 create command-center
 ```
 
-Copy the database id into `wrangler.toml` → `database_id`.
+Copy the database id into `wrangler.toml` → `database_id` and uncomment `[[d1_databases]]`.
 
 Apply migrations (production):
 
@@ -47,7 +49,7 @@ Local:
 npx wrangler d1 migrations apply command-center --local
 ```
 
-Bind `DB` in the Pages project settings (or via wrangler.toml for `pages deploy`).
+Bind `DB` on the Worker: **Workers & Pages** → **daneshtabrizi** → **Bindings** → D1 (`DB`).
 
 ## 3. R2 bucket
 

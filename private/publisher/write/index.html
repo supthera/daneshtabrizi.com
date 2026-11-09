@@ -7,7 +7,7 @@
   <title>Publisher HQ — Write</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=pub1" />
 </head>
 <body>
   <div class="wrap">
@@ -19,17 +19,12 @@
       <nav class="nav">
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/">Overview</a>
-        <a href="/private/publisher/write/" data-nav="/private/publisher/write/">Write</a>
-        <a href="/private/publisher/websites/">Websites</a>
         <a href="/private/publisher/media/">Media</a>
-        <a href="/private/publisher/history/">History</a>
       </nav>
       <div class="user" id="user-slot"></div>
     </header>
     <main>
       <p class="hero-line">Editorial</p>
-      <h1>Write Article</h1>
-      <p class="lede">Source article is preserved independently of destination overrides.</p>
       <div id="flash"></div>
       <form id="article-form">
         <div class="field">
@@ -66,8 +61,13 @@
           <label for="seo_description">SEO description</label>
           <textarea id="seo_description" name="seo_description" style="min-height:70px"></textarea>
         </div>
+        <section class="panel">
+          <h3>Publish destinations</h3>
+          <div id="destinations" class="muted">Loading websites…</div>
+        </section>
         <div class="row">
-          <button class="btn" type="submit" id="save-draft">Save Draft</button>
+          <button class="btn ghost" type="submit" id="save-draft">Save Draft</button>
+          <button class="btn" type="button" id="publish-btn">Publish Selected →</button>
           <span class="muted" id="autosave">Autosave idle</span>
         </div>
       </form>
@@ -83,6 +83,7 @@
     const form = document.getElementById("article-form");
     const flash = document.getElementById("flash");
     const autosave = document.getElementById("autosave");
+    const destinations = document.getElementById("destinations");
     let articleId = null;
     let timer = null;
 
@@ -113,10 +114,9 @@
       e.target.dataset.touched = "1";
     });
 
-    async function save(manual = false) {
-      const title = document.getElementById("title").value.trim() || "Untitled";
-      const payload = {
-        title,
+    function payload() {
+      return {
+        title: document.getElementById("title").value.trim() || "Untitled",
         slug: document.getElementById("slug").value.trim() || null,
         excerpt: document.getElementById("excerpt").value.trim() || null,
         content_html: editor.innerHTML,
@@ -124,23 +124,89 @@
         seo_description: document.getElementById("seo_description").value.trim() || null,
         status: "draft",
       };
+    }
+
+    async function save(manual = false) {
+      const body = payload();
       try {
         if (!articleId) {
-          const created = await api("/api/articles", { method: "POST", body: JSON.stringify(payload) });
+          const created = await api("/api/articles", { method: "POST", body: JSON.stringify(body) });
           articleId = created.id;
         } else {
-          // PATCH endpoint may not exist yet — recreate as draft note via POST until update route lands
-          await api("/api/articles", { method: "POST", body: JSON.stringify({ ...payload, title: `${title}` }) });
+          await api("/api/articles/" + articleId, { method: "PATCH", body: JSON.stringify(body) });
         }
         autosave.textContent = `Saved ${new Date().toLocaleTimeString()}`;
         if (manual) {
-          flash.replaceChildren(el("div", { class: "flash ok", text: `Draft saved (${articleId || "ok"}).` }));
+          flash.replaceChildren(el("div", { class: "flash ok", text: `Draft saved (${articleId}).` }));
         }
+        return true;
       } catch (e) {
         autosave.textContent = "Save failed";
         flash.replaceChildren(el("div", { class: "flash err", text: e.message || "Save failed — is D1 bound?" }));
+        return false;
       }
     }
+
+    function selectedWebsiteIds() {
+      return [...destinations.querySelectorAll('input[type="checkbox"][data-website-id]:checked')]
+        .map((box) => box.getAttribute("data-website-id"));
+    }
+
+    async function loadWebsites() {
+      try {
+        const { websites, note } = await api("/api/websites");
+        if (!websites?.length) {
+          destinations.textContent = note || "No websites yet. Add one under Manage Websites.";
+          return;
+        }
+        destinations.replaceChildren(
+          el("div", { class: "dest-list" }, websites.map((w) => {
+            const id = "dest-" + w.id;
+            const row = el("label", { class: "dest-row", for: id });
+            const box = document.createElement("input");
+            box.type = "checkbox";
+            box.id = id;
+            box.dataset.websiteId = w.id;
+            if (String(w.domain || "").toLowerCase().includes("medicareagencyfinder")) box.checked = true;
+            row.append(
+              box,
+              el("span", { text: w.name }),
+              el("span", { class: "muted", text: w.domain + (w.secret_ref ? "" : " · needs secret_ref") })
+            );
+            return row;
+          }))
+        );
+      } catch (e) {
+        destinations.textContent = e.message;
+      }
+    }
+
+    document.getElementById("publish-btn").addEventListener("click", async () => {
+      const ids = selectedWebsiteIds();
+      if (!ids.length) {
+        flash.replaceChildren(el("div", { class: "flash err", text: "Select at least one destination." }));
+        return;
+      }
+      const ok = await save(false);
+      if (!ok || !articleId) return;
+      try {
+        const result = await api("/api/articles/" + articleId + "/publish", {
+          method: "POST",
+          body: JSON.stringify({ website_ids: ids, mode: "publish" }),
+        });
+        const lines = (result.results || []).map((r) =>
+          r.ok
+            ? `✓ ${r.website_name}${r.published_url ? " → " + r.published_url : ""}`
+            : `✗ ${r.website_name}: ${r.error || "failed"}`
+        );
+        flash.replaceChildren(el("div", {
+          class: "flash " + (result.results?.some((r) => r.ok) ? "ok" : "err"),
+          html: `<strong>Publish job ${result.job_id}</strong><br>${lines.join("<br>")}`,
+        }));
+      } catch (e) {
+        flash.replaceChildren(el("div", { class: "flash err", text: e.message || "Publish failed" }));
+      }
+    });
 
     function queueAutosave() {
       clearTimeout(timer);
@@ -153,6 +219,8 @@
       e.preventDefault();
       save(true);
     });
+
+    await loadWebsites();
   </script>
 </body>
 </html>

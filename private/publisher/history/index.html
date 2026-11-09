@@ -7,7 +7,7 @@
   <title>Publisher HQ — History</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=pub1" />
 </head>
 <body>
   <div class="wrap">
@@ -16,21 +16,65 @@
       <nav class="nav">
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/">Overview</a>
-        <a href="/private/publisher/write/">Write</a>
-        <a href="/private/publisher/history/" data-nav="/private/publisher/history/">History</a>
       </nav>
     </header>
     <main>
       <p class="hero-line">Jobs & logs</p>
-      <h1>Publishing History</h1>
-      <p class="lede">Per-destination results, retries, and audit trails appear here once the publish engine is connected.</p>
-      <section class="panel"><p class="muted">No publishing jobs yet.</p></section>
+      <section class="panel">
+        <h3>Recent jobs</h3>
+        <div id="jobs" class="muted">Loading…</div>
+      </section>
+      <section class="panel">
+        <h3>Logs</h3>
+        <div id="logs" class="muted">Loading…</div>
+      </section>
     </main>
   </div>
   <script type="module">
-    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    import { api, el, requireSession, setActiveNav } from "/private/assets/private.js";
     setActiveNav();
     await requireSession();
+
+    try {
+      const { jobs, logs, note, error } = await api("/api/jobs");
+      const jobsEl = document.getElementById("jobs");
+      const logsEl = document.getElementById("logs");
+
+      if (!jobs?.length) {
+        jobsEl.textContent = note || error || "No publishing jobs yet.";
+      } else {
+        jobsEl.replaceChildren(el("table", { class: "table" }, [
+          el("thead", {}, [el("tr", {}, [
+            el("th", { text: "When" }), el("th", { text: "Article" }),
+            el("th", { text: "Mode" }), el("th", { text: "Status" }),
+          ])]),
+          el("tbody", {}, jobs.map((j) => el("tr", {}, [
+            el("td", { text: j.created_at || "—" }),
+            el("td", { text: j.title || j.article_id }),
+            el("td", { text: j.mode }),
+            el("td", { text: j.status }),
+          ]))),
+        ]));
+      }
+
+      if (!logs?.length) {
+        logsEl.textContent = "No logs yet.";
+      } else {
+        logsEl.replaceChildren(el("table", { class: "table" }, [
+          el("thead", {}, [el("tr", {}, [
+            el("th", { text: "When" }), el("th", { text: "Level" }), el("th", { text: "Message" }),
+          ])]),
+          el("tbody", {}, logs.map((l) => el("tr", {}, [
+            el("td", { text: l.created_at || "—" }),
+            el("td", { text: l.level }),
+            el("td", { text: l.message }),
+          ]))),
+        ]));
+      }
+    } catch (e) {
+      document.getElementById("jobs").textContent = e.message;
+      document.getElementById("logs").textContent = "";
+    }
   </script>
 </body>
 </html>

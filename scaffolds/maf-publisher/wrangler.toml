@@ -1,0 +1,13 @@
+name = "maf-publisher"
+main = "worker.js"
+compatibility_date = "2025-10-01"
+
+# Bind a KV namespace in the dashboard or via:
+#   npx wrangler kv namespace create ARTICLES
+[[kv_namespaces]]
+binding = "ARTICLES"
+id = "REPLACE_WITH_KV_NAMESPACE_ID"
+
+# Secret:
+#   npx wrangler secret put PUBLISHER_TOKEN
+# Use the SAME value as daneshtabrizi Worker secret MAF_PUBLISHER_TOKEN

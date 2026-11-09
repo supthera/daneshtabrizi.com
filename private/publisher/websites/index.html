@@ -7,7 +7,7 @@
   <title>Publisher HQ — Websites</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=pub1" />
 </head>
 <body>
   <div class="wrap">
@@ -16,32 +16,35 @@
       <nav class="nav">
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/">Overview</a>
-        <a href="/private/publisher/write/">Write</a>
-        <a href="/private/publisher/websites/" data-nav="/private/publisher/websites/">Websites</a>
         <a href="/private/publisher/media/">Media</a>
-        <a href="/private/publisher/history/">History</a>
       </nav>
       <div class="user" id="user-slot"></div>
     </header>
     <main>
       <p class="hero-line">Destinations</p>
-      <h1>My Websites</h1>
-      <p class="lede">Connect destinations via custom REST, WordPress, or Webflow connectors. Credentials stay in Worker secrets — never in browser JS.</p>
       <div id="flash"></div>
       <section class="panel">
         <h3>Add website</h3>
         <form id="add-form">
-          <div class="field"><label for="name">Name</label><input id="name" required /></div>
-          <div class="field"><label for="domain">Domain</label><input id="domain" required placeholder="example.com" /></div>
+          <div class="field"><label for="name">Name</label><input id="name" required placeholder="MedicareAgencyFinder.com" /></div>
+          <div class="field"><label for="domain">Domain</label><input id="domain" required placeholder="medicareagencyfinder.com" /></div>
           <div class="field">
             <label for="connector">Connector</label>
             <select id="connector">
               <option value="custom_rest">Custom REST API</option>
-              <option value="wordpress">WordPress REST API</option>
-              <option value="webflow">Webflow CMS</option>
+              <option value="wordpress" disabled>WordPress REST API (soon)</option>
+              <option value="webflow" disabled>Webflow CMS (soon)</option>
             </select>
           </div>
-          <div class="field"><label for="endpoint">API endpoint</label><input id="endpoint" placeholder="https://…" /></div>
+          <div class="field">
+            <label for="endpoint">API endpoint</label>
+            <input id="endpoint" placeholder="https://medicareagencyfinder.com/api/publisher/" />
+          </div>
+          <div class="field">
+            <label for="secret_ref">Worker secret name</label>
+            <input id="secret_ref" placeholder="MAF_PUBLISHER_TOKEN" />
+            <p class="muted" style="margin-top:6px">Create this secret in Cloudflare (Workers → daneshtabrizi → Settings → Variables and Secrets). Do not paste the token here.</p>
+          </div>
           <button class="btn" type="submit">Add Website</button>
         </form>
       </section>
@@ -59,6 +62,19 @@
     const list = document.getElementById("list");
     const flash = document.getElementById("flash");
 
+    async function testSite(id, name) {
+      try {
+        const result = await api("/api/websites/" + id + "/test", { method: "POST", body: "{}" });
+        flash.replaceChildren(el("div", {
+          class: "flash " + (result.ok ? "ok" : "err"),
+          text: (name || id) + ": " + (result.message || (result.ok ? "ok" : "failed")),
+        }));
+        await refresh();
+      } catch (e) {
+        flash.replaceChildren(el("div", { class: "flash err", text: e.message }));
+      }
+    }
+
     async function refresh() {
       const { websites, note } = await api("/api/websites");
       if (!websites?.length) {
@@ -68,12 +84,24 @@
       list.replaceChildren(el("table", { class: "table" }, [
         el("thead", {}, [el("tr", {}, [
           el("th", { text: "Name" }), el("th", { text: "Domain" }),
-          el("th", { text: "Connector" }), el("th", { text: "Status" })
+          el("th", { text: "Endpoint" }), el("th", { text: "Secret" }),
+          el("th", { text: "Status" }), el("th", { text: "" }),
         ])]),
-        el("tbody", {}, websites.map(w => el("tr", {}, [
-          el("td", { text: w.name }), el("td", { text: w.domain }),
-          el("td", { text: w.connector_type }), el("td", { text: w.connection_status || "unknown" })
-        ]))),
+        el("tbody", {}, websites.map((w) => {
+          const testBtn = document.createElement("button");
+          testBtn.type = "button";
+          testBtn.className = "btn ghost";
+          testBtn.textContent = "Test";
+          testBtn.addEventListener("click", () => testSite(w.id, w.name));
+          return el("tr", {}, [
+            el("td", { text: w.name }),
+            el("td", { text: w.domain }),
+            el("td", { text: w.api_endpoint || "—" }),
+            el("td", { text: w.secret_ref || "—" }),
+            el("td", { text: w.connection_status || "unknown" }),
+            el("td", {}, [testBtn]),
+          ]);
+        })),
       ]));
     }
 
@@ -87,9 +115,10 @@
             domain: document.getElementById("domain").value,
             connector_type: document.getElementById("connector").value,
             api_endpoint: document.getElementById("endpoint").value || null,
+            secret_ref: document.getElementById("secret_ref").value || null,
           }),
         });
-        flash.replaceChildren(el("div", { class: "flash ok", text: "Website added. Store API credentials as Worker secrets, referenced by secret_ref." }));
+        flash.replaceChildren(el("div", { class: "flash ok", text: "Website added. Create the Worker secret in Cloudflare, then tap Test." }));
         e.target.reset();
         await refresh();
       } catch (err) {

@@ -25,13 +25,17 @@ Do not return success as publicly accessible until the destination confirms a li
 
 ## Custom REST destination API (recommended for your sites)
 
-Expose:
+Expose under your site’s base path (example: `https://medicareagencyfinder.com/api/publisher/`):
 
-- `GET /health` — auth required, 200 when ready
-- `POST /articles` — body = `PublishPayload`, returns `{ remote_id, published_url?, stage }`
-- `PUT /articles/:id` — update
+- `GET health` — auth required, 200 when ready
+- `POST articles` — body = `PublishPayload`, returns `{ remote_id, published_url?, stage }`
+- `PUT articles/:id` — update
 
-Authenticate with `Authorization: Bearer <secret>` (secret stored as a Worker secret, referenced from `website_credentials.secret_ref`).
+Authenticate with `Authorization: Bearer <secret>`.
+
+On daneshtabrizi, store the token as a **Worker secret** (e.g. `MAF_PUBLISHER_TOKEN`) and set `website_credentials.secret_ref` to that secret **name** (never the token value).
+
+Ready-made receiver for MedicareAgencyFinder: `scaffolds/maf-publisher/`.
 
 ### Static sites
 

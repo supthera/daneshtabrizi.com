@@ -7,32 +7,33 @@
   <title>Publisher HQ — Overview</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=nav4" />
 </head>
 <body>
   <div class="wrap">
     <header class="top">
       <div class="brand">
-        <span class="kicker">Publisher HQ</span>
-        <span class="name">Overview</span>
+        <span class="kicker">Command Center</span>
+        <span class="name">Publisher HQ</span>
       </div>
       <nav class="nav">
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/" data-nav="/private/publisher/">Overview</a>
-        <a href="/private/publisher/write/" data-nav="/private/publisher/write/">Write</a>
-        <a href="/private/publisher/websites/" data-nav="/private/publisher/websites/">Websites</a>
         <a href="/private/publisher/media/" data-nav="/private/publisher/media/">Media</a>
-        <a href="/private/publisher/history/" data-nav="/private/publisher/history/">History</a>
-        <a href="/private/publisher/settings/" data-nav="/private/publisher/settings/">Settings</a>
       </nav>
       <div class="user" id="user-slot"></div>
     </header>
     <main>
-      <p class="hero-line">Publishing control</p>
-      <h1>Overview</h1>
+      <div class="agenda-head">
+        <p class="hero-line">Publisher HQ</p>
+        <a class="agenda-gear" href="/private/publisher/settings/" aria-label="Publisher settings" title="Settings">
+          <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
+        </a>
+      </div>
       <div class="row" style="margin:18px 0">
         <a class="btn" href="/private/publisher/write/">Write Article →</a>
         <a class="btn ghost" href="/private/publisher/websites/">Manage Websites</a>
+        <a class="btn ghost" href="/private/publisher/history/">History</a>
       </div>
       <div class="stats" id="stats">
         <div class="stat"><div class="n" id="s-sites">—</div><div class="l">Connected sites</div></div>

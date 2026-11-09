@@ -1,27 +1,34 @@
-# Cloudflare Worker + static assets (custom domains on workers.dev project)
-# Dashboard deploy command must be: npx wrangler deploy
+# Cloudflare Worker + static assets
+# Dashboard: Workers & Pages → daneshtabrizi
 # Build command: exit 0
+# Deploy command: npx wrangler deploy
 
 name = "daneshtabrizi"
+main = "worker.ts"
 compatibility_date = "2025-10-01"
 
 [assets]
 directory = "."
+binding = "ASSETS"
 not_found_handling = "404-page"
+# Run the Worker first for API routes so publish/auth handlers execute.
+run_worker_first = ["/api/*"]
 
-# Bind D1/R2 in the dashboard (or uncomment once real IDs exist).
+# --- Admin: create D1, then paste database_id and uncomment ---
 # [[d1_databases]]
 # binding = "DB"
 # database_name = "command-center"
 # database_id = "REPLACE_WITH_D1_DATABASE_ID"
 # migrations_dir = "migrations"
 
+# --- Optional media store ---
 # [[r2_buckets]]
 # binding = "MEDIA"
 # bucket_name = "command-center-media"
 
-# Secrets (dashboard or `wrangler secret put`):
+# Secrets (Workers & Pages → daneshtabrizi → Settings → Variables and Secrets):
 # - CF_ACCESS_TEAM_DOMAIN
 # - CF_ACCESS_AUD
-# - DEV_AUTH_BYPASS (local only — never production)
-# - DEV_AUTH_EMAIL
+# - MAF_PUBLISHER_TOKEN          (Bearer token for MedicareAgencyFinder receiver)
+# - DEV_AUTH_BYPASS=true         (local only — never production)
+# - DEV_AUTH_EMAIL=you@gmail.com (local only)
