@@ -64,9 +64,9 @@ export function warnIfLocalPublisher(hostEl) {
   note.className = "flash err";
   note.setAttribute("role", "status");
   note.innerHTML =
-    "<strong>Local Publisher HQ</strong> — uploads go to this machine only. " +
-    "Published posts use <code>https://daneshtabrizi.com/media/…</code>, so featured images will 404 on the live site. " +
-    "Use <a href=\"https://daneshtabrizi.com/private/publisher/\">daneshtabrizi.com/private/publisher</a> for real publishes.";
+    "<strong>Local Publisher HQ</strong> — drafts, websites, and uploads stay on this machine’s Miniflare D1/R2, not production. " +
+    "Featured images published from here will 404 on the live site. " +
+    "Use <a href=\"https://daneshtabrizi.com/private/publisher/\">daneshtabrizi.com/private/publisher</a> for anything that should go live.";
   hostEl.prepend(note);
 }
 

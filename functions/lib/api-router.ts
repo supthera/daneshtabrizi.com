@@ -387,5 +387,73 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     return deleteMedia(env, decodeURIComponent(mediaOne[1]), identity.email);
   }
 
+  const AGENDA_SETTINGS_KEY = "agenda.boards";
+
+  if (path === "/api/agenda" && method === "GET") {
+    if (!env.DB) return json({ boards: null, note: "D1 not bound yet" });
+    try {
+      const row = await env.DB.prepare(`SELECT value_json FROM settings WHERE key = ?`)
+        .bind(AGENDA_SETTINGS_KEY)
+        .first<{ value_json: string }>();
+      if (!row?.value_json) return json({ boards: null, source: "empty" });
+      const parsed = JSON.parse(row.value_json);
+      if (!Array.isArray(parsed)) return json({ boards: null, source: "invalid" });
+      return json({ boards: parsed, source: "d1" });
+    } catch (e) {
+      return json({ boards: null, error: String(e) }, 500);
+    }
+  }
+
+  if (path === "/api/agenda" && method === "PUT") {
+    if (!env.DB) return json({ error: "D1 not bound" }, 503);
+    let body: Record<string, unknown>;
+    try {
+      body = await readJson(request);
+    } catch {
+      return json({ error: "Invalid JSON" }, 400);
+    }
+    if (!Array.isArray(body.boards)) return json({ error: "boards array required" }, 400);
+    if (body.boards.length > 80) return json({ error: "too many projects" }, 400);
+
+    const boards = body.boards.map((raw, index) => {
+      const board = (raw && typeof raw === "object" ? raw : {}) as Record<string, unknown>;
+      const id = String(board.id || `project-${index}`).slice(0, 80);
+      const title = String(board.title || "Project").trim().slice(0, 120) || "Project";
+      const todosRaw = Array.isArray(board.todos) ? board.todos.slice(0, 200) : [];
+      const todos = todosRaw.map((t, ti) => {
+        const todo = (t && typeof t === "object" ? t : {}) as Record<string, unknown>;
+        return {
+          id: String(todo.id || `t-${ti}`).slice(0, 80),
+          text: String(todo.text || "").slice(0, 500),
+          done: Boolean(todo.done),
+        };
+      }).filter((t) => t.text.trim());
+      const out: Record<string, unknown> = { id, title, todos };
+      if (board.custom) out.custom = true;
+      if (board.empty) out.empty = true;
+      return out;
+    });
+
+    try {
+      const value = JSON.stringify(boards);
+      await env.DB.prepare(
+        `INSERT INTO settings (key, value_json, updated_at)
+         VALUES (?, ?, datetime('now'))
+         ON CONFLICT(key) DO UPDATE SET value_json = excluded.value_json, updated_at = datetime('now')`,
+      )
+        .bind(AGENDA_SETTINGS_KEY, value)
+        .run();
+      await env.DB.prepare(
+        `INSERT INTO audit_logs (id, actor_email, action, resource_type, resource_id)
+         VALUES (?, ?, 'agenda.save', 'settings', ?)`,
+      )
+        .bind(uid(), identity.email, AGENDA_SETTINGS_KEY)
+        .run();
+      return json({ ok: true, boards, source: "d1" });
+    } catch (e) {
+      return json({ error: String(e) }, 500);
+    }
+  }
+
   return json({ error: "Not found" }, 404);
 }

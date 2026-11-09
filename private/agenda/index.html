@@ -8,7 +8,7 @@
   <meta name="theme-color" content="#000000" />
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav13" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=nav14" />
 </head>
 <body>
   <div class="wrap">
@@ -74,10 +74,11 @@
   </div>
 
   <script type="module">
-    import { el, setActiveNav, requireSession } from "/private/assets/private.js";
+    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
 
     const LS_KEY = "dt.agenda.boards.v3";
     const LS_LEGACY = ["dt.agenda.boards.v2", "dt.agenda.boards.v1"];
+    const SAVE_DEBOUNCE_MS = 450;
     const DEFAULTS = [
       {
         id: "daneshtabrizi",
@@ -173,7 +174,7 @@
       return merged;
     }
 
-    function loadBoards() {
+    function loadLocalBoards() {
       try {
         const current = readStored(LS_KEY);
         if (current) return mergeBoards(current);
@@ -196,8 +197,60 @@
       }
     }
 
+    let saveTimer = null;
+    let saveInFlight = null;
+
+    function cacheLocal(next) {
+      try {
+        localStorage.setItem(LS_KEY, JSON.stringify(next));
+      } catch {
+        /* ignore quota / private mode */
+      }
+    }
+
+    async function persistBoards(next) {
+      cacheLocal(next);
+      try {
+        await api("/api/agenda", {
+          method: "PUT",
+          body: JSON.stringify({ boards: next }),
+        });
+      } catch (err) {
+        console.warn("agenda save failed", err);
+      }
+    }
+
     function saveBoards() {
-      localStorage.setItem(LS_KEY, JSON.stringify(boards));
+      cacheLocal(boards);
+      if (saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => {
+        saveTimer = null;
+        saveInFlight = persistBoards(boards);
+      }, SAVE_DEBOUNCE_MS);
+    }
+
+    async function loadBoardsFromServer() {
+      try {
+        const data = await api("/api/agenda");
+        if (Array.isArray(data.boards) && data.boards.length) {
+          const merged = mergeBoards(data.boards);
+          cacheLocal(merged);
+          return merged;
+        }
+      } catch (err) {
+        console.warn("agenda load failed", err);
+      }
+
+      const local = loadLocalBoards();
+      // First live boot with empty D1: promote this browser's local copy.
+      if (todoCount(local) > 0) {
+        try {
+          await persistBoards(local);
+        } catch {
+          /* keep local */
+        }
+      }
+      return local;
     }
 
     function uid() {
@@ -209,8 +262,7 @@
     const fadingIds = new Set();
     let purgeClock = null;
 
-    let boards = loadBoards();
-    saveBoards();
+    let boards = loadLocalBoards();
     let activeId = null;
     let suppressClickUntil = 0;
     const grid = document.getElementById("agenda-grid");
@@ -706,6 +758,8 @@
         el("strong", { text: health.identity?.email || "Operator" }),
         el("span", { text: health.identity?.source === "dev-bypass" ? "Dev bypass" : "Cloudflare Access" })
       );
+      boards = await loadBoardsFromServer();
+      paint();
     } catch {
       document.getElementById("user-slot").textContent = "Access required";
     }
