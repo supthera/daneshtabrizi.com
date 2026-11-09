@@ -138,7 +138,8 @@
     </main>
   </div>
   <script type="module">
-    import { api, el, setActiveNav, requireSession, showToast } from "/private/assets/private.js";
+    import { api, el, setActiveNav, requireSession, showToast, warnIfLocalPublisher } from "/private/assets/private.js";
+    warnIfLocalPublisher(document.getElementById("flash"));
     setActiveNav();
     const health = await requireSession();
     document.getElementById("user-slot").textContent = health.identity?.email || "";

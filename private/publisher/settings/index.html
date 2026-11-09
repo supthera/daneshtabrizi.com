@@ -45,10 +45,11 @@
     </main>
   </div>
   <script type="module">
-    import { api, el, requireSession, setActiveNav, showToast } from "/private/assets/private.js";
+    import { api, el, requireSession, setActiveNav, showToast, warnIfLocalPublisher } from "/private/assets/private.js";
     setActiveNav();
     const health = await requireSession();
     document.getElementById("user-slot").textContent = health.identity?.email || "";
+    warnIfLocalPublisher(document.querySelector("main"));
 
     const mediaMeta = document.getElementById("media-meta");
     const mediaGrid = document.getElementById("media-grid");

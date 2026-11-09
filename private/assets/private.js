@@ -52,6 +52,24 @@ export function setActiveNav() {
   });
 }
 
+/** Local wrangler stores media in Miniflare — not the live R2 bucket. */
+export function isLocalPublisherHost() {
+  const host = location.hostname;
+  return host === "localhost" || host === "127.0.0.1" || host.endsWith(".localhost");
+}
+
+export function warnIfLocalPublisher(hostEl) {
+  if (!isLocalPublisherHost() || !hostEl) return;
+  const note = document.createElement("div");
+  note.className = "flash err";
+  note.setAttribute("role", "status");
+  note.innerHTML =
+    "<strong>Local Publisher HQ</strong> — uploads go to this machine only. " +
+    "Published posts use <code>https://daneshtabrizi.com/media/…</code>, so featured images will 404 on the live site. " +
+    "Use <a href=\"https://daneshtabrizi.com/private/publisher/\">daneshtabrizi.com/private/publisher</a> for real publishes.";
+  hostEl.prepend(note);
+}
+
 export function iconGlyph(name) {
   const map = {
     publish: "◈",

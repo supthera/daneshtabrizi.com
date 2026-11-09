@@ -2,46 +2,12 @@
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta http-equiv="refresh" content="0;url=/private/settings/#registry" />
   <meta name="robots" content="noindex,nofollow" />
-  <title>Application Registry</title>
-  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
-  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <title>Redirecting…</title>
+  <script>location.replace("/private/settings/#registry");</script>
 </head>
 <body>
-  <div class="wrap">
-    <header class="top">
-      <div class="brand"><span class="kicker">Administration</span><span class="name">Application Registry</span></div>
-      <nav class="nav" aria-label="Command center">
-        <a href="/private/">Apps</a>
-        <a href="/private/agenda/">Agenda</a>
-        <a href="/private/publisher/">Publisher HQ</a>
-        <a href="/private/integrations/">Integrations</a>
-        <a href="/private/settings/">Settings</a>
-        <a href="/private/apps/" data-nav="/private/apps/">Registry</a>
-      </nav>
-    </header>
-    <main>
-      <p class="hero-line">Extensibility</p>
-      <div id="list" class="muted">Loading…</div>
-    </main>
-  </div>
-  <script type="module">
-    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
-    setActiveNav();
-    await requireSession();
-    const { apps } = await api("/api/apps");
-    document.getElementById("list").replaceChildren(el("table", { class: "table" }, [
-      el("thead", {}, [el("tr", {}, [
-        el("th", { text: "ID" }), el("th", { text: "Name" }), el("th", { text: "Route" }),
-        el("th", { text: "Status" }), el("th", { text: "Version" })
-      ])]),
-      el("tbody", {}, apps.map(a => el("tr", { id: a.id }, [
-        el("td", { text: a.id }), el("td", { text: a.name }), el("td", { text: a.route }),
-        el("td", { text: a.status }), el("td", { text: a.version }),
-      ]))),
-    ]));
-  </script>
+  <p><a href="/private/settings/#registry">Registry moved to Settings</a></p>
 </body>
 </html>

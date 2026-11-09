@@ -7,32 +7,64 @@
   <title>Administration — Settings</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=nav13" />
 </head>
 <body>
   <div class="wrap">
     <header class="top">
-      <div class="brand"><span class="kicker">Administration</span><span class="name">Settings</span></div>
+      <div class="brand-row">
+        <a class="agenda-gear" href="/private/settings/" data-nav="/private/settings/" aria-label="Settings" title="Settings">
+          <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
+        </a>
+        <div class="brand"><span class="kicker">Command Center</span></div>
+      </div>
       <nav class="nav" aria-label="Command center">
         <a href="/private/">Apps</a>
-        <a href="/private/agenda/">Agenda</a>
-        <a href="/private/publisher/">Publisher HQ</a>
-        <a href="/private/integrations/">Integrations</a>
-        <a href="/private/settings/" data-nav="/private/settings/">Settings</a>
-        <a href="/private/apps/">Registry</a>
       </nav>
       <div class="user" id="user-slot"></div>
     </header>
     <main>
-      <p class="hero-line">Command Center</p>
-      <section class="panel">
+      <p class="hero-line">Administration</p>
+
+      <section class="panel" id="identity-panel">
         <h3>Identity</h3>
         <p class="muted" id="identity">Loading…</p>
       </section>
+
+      <section class="panel" id="integrations">
+        <h3>Integrations</h3>
+        <div class="grid settings-grid">
+          <article class="card">
+            <div class="icon">☁</div>
+            <h2>Cloudflare Access</h2>
+            <p>Primary identity gate for /private and /api.</p>
+            <div class="meta"><span class="badge active">Required</span><span class="btn ghost" id="access-status">Status</span></div>
+          </article>
+          <article class="card">
+            <div class="icon">◈</div>
+            <h2>Publisher connectors</h2>
+            <p>Custom REST, WordPress, Webflow — configured per website.</p>
+            <div class="meta"><span class="badge active">Active</span><a class="btn" href="/private/publisher/websites/">Open →</a></div>
+          </article>
+          <article class="card">
+            <div class="icon">▣</div>
+            <h2>R2 Media</h2>
+            <p>Object storage for the shared media library.</p>
+            <div class="meta"><span class="badge active">Active</span><a class="btn" href="/private/publisher/settings/">Open →</a></div>
+          </article>
+        </div>
+      </section>
+
+      <section class="panel" id="registry">
+        <h3>Application registry</h3>
+        <div id="list" class="muted">Loading…</div>
+      </section>
+
       <section class="panel">
         <h3>Bindings</h3>
         <pre class="muted" id="bindings" style="white-space:pre-wrap"></pre>
       </section>
+
       <section class="panel">
         <h3>Logout</h3>
         <p class="muted">Cloudflare Access logout clears the Access session cookie for your team domain.</p>
@@ -41,14 +73,27 @@
     </main>
   </div>
   <script type="module">
-    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    import { api, el, requireSession, setActiveNav } from "/private/assets/private.js";
     setActiveNav();
     const health = await requireSession();
     document.getElementById("user-slot").textContent = health.identity?.email || "";
-    document.getElementById("identity").textContent =
-      `${health.identity?.email || "unknown"} · source: ${health.identity?.source || "n/a"}`;
+    const identityLine = `${health.identity?.email || "unknown"} · source: ${health.identity?.source || "n/a"}`;
+    document.getElementById("identity").textContent = identityLine;
+    document.getElementById("access-status").textContent = health.identity?.source === "dev-bypass" ? "Dev bypass" : "Connected";
     document.getElementById("bindings").textContent = JSON.stringify(health.bindings || {}, null, 2);
-    // Access logout URL pattern: https://<team>.cloudflareaccess.com/cdn-cgi/access/logout
+
+    const { apps } = await api("/api/apps");
+    document.getElementById("list").replaceChildren(el("table", { class: "table" }, [
+      el("thead", {}, [el("tr", {}, [
+        el("th", { text: "ID" }), el("th", { text: "Name" }), el("th", { text: "Route" }),
+        el("th", { text: "Status" }), el("th", { text: "Version" }),
+      ])]),
+      el("tbody", {}, apps.map((a) => el("tr", { id: a.id }, [
+        el("td", { text: a.id }), el("td", { text: a.name }), el("td", { text: a.route }),
+        el("td", { text: a.status }), el("td", { text: a.version }),
+      ]))),
+    ]));
+
     document.getElementById("logout").addEventListener("click", (e) => {
       e.preventDefault();
       const team = prompt("Access team domain (e.g. yourteam.cloudflareaccess.com)");

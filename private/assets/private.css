@@ -51,6 +51,23 @@ button{background:none;border:none;cursor:pointer}
 .brand{display:flex; flex-direction:column; gap:2px; padding-bottom:6px}
 .brand .kicker{font-size:.62rem; letter-spacing:.22em; text-transform:uppercase; color:var(--dim)}
 .brand .name{font-family:var(--display); font-weight:800; letter-spacing:.02em; text-transform:uppercase; font-size:1.05rem; line-height:1}
+.brand-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  padding-bottom:6px;
+}
+.brand-row .brand{padding-bottom:0}
+.brand-row .agenda-gear{
+  display:grid;
+  place-items:center;
+  text-decoration:none;
+}
+.brand-row .agenda-gear.on img,
+.brand-row .agenda-gear:hover img{
+  opacity:1;
+  filter:brightness(0) saturate(100%) invert(42%) sepia(28%) saturate(920%) hue-rotate(325deg) brightness(.95);
+}
 .nav{display:flex; flex-wrap:wrap; gap:8px}
 .nav a{
   font-size:.8rem; letter-spacing:0; text-transform:none !important; color:var(--dim);
@@ -60,6 +77,7 @@ button{background:none;border:none;cursor:pointer}
 .nav a:hover,.nav a.on{color:var(--ink); border-color:var(--line)}
 .nav a.on{background:rgba(255,174,59,.08)}
 .user{font-size:.68rem; color:var(--dim); text-align:right}
+.settings-grid{margin-top:12px}
 .user strong{display:block; color:var(--ink); font-weight:500}
 main{padding:clamp(28px,6vh,56px) 0 64px}
 .hero-line{font-size:.66rem; letter-spacing:.04em; text-transform:none; color:var(--accent); margin-bottom:10px}

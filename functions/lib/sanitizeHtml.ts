@@ -24,16 +24,18 @@ const ALLOWED_TAGS = new Set([
   "pre",
   "span",
   "div",
+  "sup",
 ]);
 
 const ALLOWED_ATTRS: Record<string, Set<string>> = {
-  a: new Set(["href", "title", "rel", "target"]),
+  a: new Set(["href", "title", "rel", "target", "class"]),
   img: new Set(["src", "alt", "title", "width", "height"]),
   ol: new Set(["class"]),
   ul: new Set(["class"]),
   li: new Set(["class"]),
   p: new Set(["class"]),
   div: new Set(["class"]),
+  sup: new Set(["class"]),
 };
 
 /** Strip paste junk (inline dark colors, class soup) before publishing. */

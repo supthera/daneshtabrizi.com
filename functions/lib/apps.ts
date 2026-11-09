@@ -25,21 +25,11 @@ export const FALLBACK_APPS: AppRecord[] = [
   {
     id: "agenda",
     name: "Agenda",
-    description: "Calendar, reminders, and operational schedule.",
+    description: "Projects, tasks, and day-to-day operational schedule.",
     icon: "agenda",
     route: "/private/agenda/",
-    status: "planned",
-    version: "0.0.0",
-    sort_order: 15,
-  },
-  {
-    id: "trading-center",
-    name: "Trading Center",
-    description: "Future financial research and trading tools.",
-    icon: "trade",
-    route: "/private/apps/#trading-center",
-    status: "planned",
-    version: "0.0.0",
+    status: "active",
+    version: "0.1.0",
     sort_order: 20,
   },
   {
@@ -55,7 +45,7 @@ export const FALLBACK_APPS: AppRecord[] = [
   {
     id: "administration",
     name: "Administration",
-    description: "Private settings, accounts, integrations, and application management.",
+    description: "Identity, integrations, application registry, and account controls.",
     icon: "admin",
     route: "/private/settings/",
     status: "active",

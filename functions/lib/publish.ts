@@ -69,19 +69,54 @@ function absolutizeMediaUrls(html: string, origin: string): string {
   );
 }
 
+/**
+ * Featured image URLs always point at the public site origin (prod).
+ * Publishing from `wrangler dev --local` writes media only to the local
+ * Miniflare R2/D1 — those IDs 404 on daneshtabrizi.com. Verify the R2
+ * object exists in *this* env before stamping a public URL into MAF.
+ */
+async function resolveFeaturedImageUrl(
+  env: PublishEnv,
+  featuredImageId: string | null,
+): Promise<string | undefined> {
+  if (!featuredImageId) return undefined;
+
+  const media = await env.DB.prepare(
+    `SELECT id, r2_key, filename FROM media WHERE id = ?`,
+  )
+    .bind(featuredImageId)
+    .first<{ id: string; r2_key: string; filename: string | null }>();
+
+  if (!media) {
+    throw new Error(
+      `Featured image ${featuredImageId} is missing from the media library. Re-select or re-upload it, then publish again.`,
+    );
+  }
+
+  if (!env.MEDIA) {
+    throw new Error(
+      "R2 MEDIA binding is not configured — cannot publish a featured image.",
+    );
+  }
+
+  const obj = await env.MEDIA.head(media.r2_key);
+  if (!obj) {
+    throw new Error(
+      `Featured image “${media.filename || media.id}” is in the database but missing from object storage. ` +
+        `If you uploaded it via local wrangler (--local), it only exists on this machine — upload again on https://daneshtabrizi.com/private/publisher/ (or use remote bindings), then publish.`,
+    );
+  }
+
+  return mediaPublicUrl(siteOrigin(env), media.id);
+}
+
 async function toPayload(
   env: PublishEnv,
   article: ArticleRow,
   status: "draft" | "published",
 ): Promise<PublishPayload> {
   const origin = siteOrigin(env);
-  let featuredImage: string | undefined;
-  if (article.featured_image_id) {
-    const media = await env.DB.prepare(`SELECT id FROM media WHERE id = ?`)
-      .bind(article.featured_image_id)
-      .first<{ id: string }>();
-    if (media) featuredImage = mediaPublicUrl(origin, media.id);
-  }
+  const featuredImage = await resolveFeaturedImageUrl(env, article.featured_image_id);
 
   const authorName =
     article.author && !article.author.includes("@")
@@ -185,6 +220,14 @@ export async function runPublishJob(
   const list = (websites.results || []) as WebsiteRow[];
   if (!list.length) throw new Error("No matching websites");
 
+  // Fail before opening a job if featured media isn't in this env's R2.
+  if (!article.slug) {
+    const slug = slugify(article.title);
+    await db.prepare(`UPDATE articles SET slug = ?, updated_at = datetime('now') WHERE id = ?`).bind(slug, article.id).run();
+    article.slug = slug;
+  }
+  const payload = await toPayload(env, article, mode === "publish" ? "published" : "draft");
+
   const jobId = uid();
   await db
     .prepare(
@@ -194,14 +237,6 @@ export async function runPublishJob(
     .run();
 
   await log(db, jobId, article.id, null, "info", `Job started (${mode}) for ${list.length} destination(s)`);
-
-  if (!article.slug) {
-    const slug = slugify(article.title);
-    await db.prepare(`UPDATE articles SET slug = ?, updated_at = datetime('now') WHERE id = ?`).bind(slug, article.id).run();
-    article.slug = slug;
-  }
-
-  const payload = await toPayload(env, article, mode === "publish" ? "published" : "draft");
   const results: Array<{
     website_id: string;
     website_name: string;
