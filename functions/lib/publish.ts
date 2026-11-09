@@ -1,6 +1,7 @@
 import { CustomRestConnector } from "./connectors/custom-rest";
 import type { PublishPayload, PublishResult } from "./connectors/types";
 import { mediaPublicUrl } from "./media";
+import { sanitizePublisherHtml } from "./sanitizeHtml";
 
 export type PublishEnv = {
   DB: D1Database;
@@ -82,7 +83,10 @@ async function toPayload(
     article_id: article.id,
     title: article.title,
     slug: article.slug || undefined,
-    content: absolutizeMediaUrls(article.content_html || "", origin),
+    content: absolutizeMediaUrls(
+      sanitizePublisherHtml(article.content_html || ""),
+      origin,
+    ),
     excerpt: article.excerpt || undefined,
     featured_image: featuredImage,
     seo: {

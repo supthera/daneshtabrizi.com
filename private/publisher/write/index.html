@@ -508,6 +508,21 @@
       autosave.textContent = "Autosaving…";
       timer = setTimeout(() => save(false), 1200);
     }
+    editor.addEventListener("paste", (e) => {
+      e.preventDefault();
+      const html = e.clipboardData?.getData("text/html");
+      const text = e.clipboardData?.getData("text/plain") || "";
+      if (html) {
+        const cleaned = html
+          .replace(/<(script|style|noscript|iframe|object|embed)[\s\S]*?<\/\1>/gi, "")
+          .replace(/\s(?:style|class|id)=("[^"]*"|'[^']*')/gi, "")
+          .replace(/<\/?(?:meta|link|xml|o:p|w:[a-z]+)[^>]*>/gi, "");
+        document.execCommand("insertHTML", false, cleaned);
+      } else {
+        document.execCommand("insertText", false, text);
+      }
+      queueAutosave();
+    });
     editor.addEventListener("input", queueAutosave);
     form.addEventListener("input", queueAutosave);
     form.addEventListener("submit", (e) => {
