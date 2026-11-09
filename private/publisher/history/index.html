@@ -7,7 +7,7 @@
   <title>Publisher HQ — History</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=pub1" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=pub9" />
 </head>
 <body>
   <div class="wrap">
@@ -16,6 +16,8 @@
       <nav class="nav">
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/">Overview</a>
+        <a href="/private/publisher/write/">Write</a>
+        <a href="/private/publisher/history/" data-nav="/private/publisher/history/">History</a>
       </nav>
     </header>
     <main>
@@ -47,13 +49,24 @@
           el("thead", {}, [el("tr", {}, [
             el("th", { text: "When" }), el("th", { text: "Article" }),
             el("th", { text: "Mode" }), el("th", { text: "Status" }),
+            el("th", { text: "" }),
           ])]),
-          el("tbody", {}, jobs.map((j) => el("tr", {}, [
-            el("td", { text: j.created_at || "—" }),
-            el("td", { text: j.title || j.article_id }),
-            el("td", { text: j.mode }),
-            el("td", { text: j.status }),
-          ]))),
+          el("tbody", {}, jobs.map((j) => {
+            const edit = j.article_id
+              ? el("a", {
+                  class: "btn ghost compact",
+                  href: "/private/publisher/write/?id=" + encodeURIComponent(j.article_id),
+                  text: "Revise",
+                })
+              : el("span", { class: "muted", text: "—" });
+            return el("tr", {}, [
+              el("td", { text: j.created_at || "—" }),
+              el("td", { text: j.title || j.article_id || "—" }),
+              el("td", { text: j.mode }),
+              el("td", { text: j.status }),
+              el("td", {}, [edit]),
+            ]);
+          })),
         ]));
       }
 

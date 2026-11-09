@@ -7,7 +7,7 @@
   <title>Publisher HQ — Write</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=media5" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=media7" />
 </head>
 <body>
   <div class="wrap">
@@ -20,7 +20,7 @@
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/">Overview</a>
         <a href="/private/publisher/write/" data-nav="/private/publisher/write/">Write</a>
-        <a href="/private/publisher/media/">Media</a>
+        <a href="/private/publisher/history/">History</a>
       </nav>
       <div class="user" id="user-slot"></div>
     </header>
@@ -35,7 +35,8 @@
         <div class="panel-body">
           <div id="done-summary" class="muted"></div>
           <div class="row" style="margin-top:14px">
-            <button class="btn" type="button" id="write-another">Write another article</button>
+            <button class="btn" type="button" id="revise-article">Revise this article</button>
+            <button class="btn ghost" type="button" id="write-another">Write another</button>
             <a class="btn ghost" href="/private/publisher/history/">View history</a>
           </div>
         </div>
@@ -61,23 +62,38 @@
               <label for="excerpt">Excerpt</label>
               <textarea id="excerpt" name="excerpt" style="min-height:80px" placeholder="Short summary"></textarea>
             </div>
-            <section class="panel">
-              <h3>Featured image</h3>
-              <div class="featured-pick">
-                <div
-                  id="featured-preview"
-                  class="featured-preview is-empty"
-                  role="button"
-                  tabindex="0"
-                  aria-label="Upload featured image"
-                  title="Click or drop an image"
-                >Drop or click</div>
-                <input id="featured-file" type="file" accept="image/*" hidden />
-                <div class="featured-controls">
-                  <p class="muted" style="margin:0">Used as the blog hero / OG image when you publish.</p>
-                  <div class="row">
-                    <button class="btn ghost" type="button" id="featured-clear">Clear</button>
-                    <a class="btn" href="/private/publisher/media/">Open Media Library</a>
+            <section class="panel" id="featured-panel">
+              <div class="panel-head">
+                <h3>Featured image</h3>
+                <span class="list-meta" id="media-meta">Uploads stay in your library</span>
+              </div>
+              <div class="panel-body">
+                <p class="muted" style="margin:0 0 12px">Hero / OG image for publish. Upload here or pick from your library — no separate Media page needed.</p>
+                <div class="featured-pick">
+                  <div
+                    id="featured-preview"
+                    class="featured-preview is-empty"
+                    role="button"
+                    tabindex="0"
+                    aria-label="Upload featured image"
+                    title="Click or drop an image"
+                  >Drop or click</div>
+                  <input id="featured-file" type="file" accept="image/*" hidden />
+                  <div class="featured-controls">
+                    <div class="row">
+                      <button class="btn" type="button" id="featured-upload">Upload image</button>
+                      <button class="btn ghost" type="button" id="featured-clear">Clear</button>
+                    </div>
+                    <div class="field" style="margin:0">
+                      <label for="media-alt">Alt text (optional)</label>
+                      <input id="media-alt" name="media_alt" placeholder="Describe the image for accessibility" autocomplete="off" />
+                    </div>
+                  </div>
+                </div>
+                <div class="media-library-block">
+                  <div class="panel-head" style="margin-top:14px">
+                    <h3 style="font-size:1rem">Library</h3>
+                    <button class="btn ghost compact" type="button" id="media-refresh">Refresh</button>
                   </div>
                   <div id="featured-picker" class="media-picker muted">Loading media…</div>
                 </div>
@@ -191,13 +207,47 @@
       autosave.textContent = "Autosave idle";
       donePanel.hidden = true;
       doneSummary.replaceChildren();
+      history.replaceState({}, "", "/private/publisher/write/");
       setWriteOpen(true);
       loadWebsites();
       loadMedia();
     }
 
+    async function loadArticle(id) {
+      const data = await api("/api/articles/" + encodeURIComponent(id));
+      const a = data.article;
+      if (!a) throw new Error("Article not found");
+      articleId = a.id;
+      document.getElementById("title").value = a.title || "";
+      const slug = document.getElementById("slug");
+      slug.value = a.slug || "";
+      slug.dataset.touched = a.slug ? "1" : "";
+      document.getElementById("excerpt").value = a.excerpt || "";
+      document.getElementById("seo_title").value = a.seo_title || "";
+      document.getElementById("seo_description").value = a.seo_description || "";
+      editor.innerHTML = a.content_html || "";
+      setFeatured(a.featured_image_id || null);
+      donePanel.hidden = true;
+      setWriteOpen(true);
+      autosave.textContent = "Loaded for revise";
+      showFlash(true, `Editing “${a.title || "Untitled"}”. Update featured image / body, then Publish Selected.`);
+      history.replaceState({}, "", "/private/publisher/write/?id=" + encodeURIComponent(a.id));
+    }
+
     writeToggle.addEventListener("click", () => setWriteOpen(true));
     document.getElementById("write-another").addEventListener("click", resetComposer);
+    document.getElementById("revise-article").addEventListener("click", async () => {
+      if (!articleId) {
+        setWriteOpen(true);
+        return;
+      }
+      try {
+        await loadArticle(articleId);
+      } catch (e) {
+        showFlash(false, e.message || "Could not load article");
+        setWriteOpen(true);
+      }
+    });
 
     function mediaPath(id) {
       return `/media/${encodeURIComponent(id)}`;
@@ -221,14 +271,20 @@
       featuredPreview.replaceChildren(img);
     }
 
+    const mediaMeta = document.getElementById("media-meta");
+    const mediaAlt = document.getElementById("media-alt");
+
     async function loadMedia() {
       try {
         const data = await api("/api/media");
         mediaItems = data.media || [];
+        mediaMeta.textContent = data.r2
+          ? `${mediaItems.length} image${mediaItems.length === 1 ? "" : "s"} in library`
+          : "R2 not bound — uploads unavailable";
         if (!mediaItems.length) {
           featuredPicker.className = "media-picker muted";
           featuredPicker.textContent = data.r2
-            ? "No images yet — drop one on the preview, or open Media Library."
+            ? "No images yet — upload above or drop onto the preview."
             : "R2 not bound yet — finish Cloudflare R2 setup, then upload.";
           return;
         }
@@ -246,7 +302,9 @@
             btn.append(img);
             btn.addEventListener("click", () => {
               setFeatured(item.id);
+              if (item.alt_text) mediaAlt.value = item.alt_text;
               queueAutosave();
+              showFlash(true, `Featured image set (${item.filename || item.id}).`);
             });
             return btn;
           }),
@@ -255,6 +313,7 @@
       } catch (e) {
         featuredPicker.className = "media-picker muted";
         featuredPicker.textContent = e.message || "Could not load media";
+        mediaMeta.textContent = "Library unavailable";
       }
     }
 
@@ -271,9 +330,12 @@
       try {
         const formData = new FormData();
         formData.append("file", file);
+        const alt = mediaAlt.value.trim();
+        if (alt) formData.append("alt_text", alt);
         const created = await api("/api/media", { method: "POST", body: formData });
         setFeatured(created.id);
-        showFlash(true, `Featured image uploaded (${created.filename || created.id}).`);
+        showFlash(true, `Uploaded and set as featured (${created.filename || created.id}).`);
+        showToast("Image uploaded", "ok");
         await loadMedia();
         queueAutosave();
       } catch (e) {
@@ -289,14 +351,19 @@
       }
     }
 
-    featuredPreview.addEventListener("click", () => {
+    function openUploadPicker() {
       if (featuredUploading) return;
       featuredFile.click();
-    });
+    }
+
+    document.getElementById("featured-upload").addEventListener("click", openUploadPicker);
+    document.getElementById("media-refresh").addEventListener("click", loadMedia);
+
+    featuredPreview.addEventListener("click", openUploadPicker);
     featuredPreview.addEventListener("keydown", (e) => {
       if (e.key === "Enter" || e.key === " ") {
         e.preventDefault();
-        featuredFile.click();
+        openUploadPicker();
       }
     });
     featuredFile.addEventListener("change", () => {
@@ -341,7 +408,7 @@
       }
       if (cmd === "insertImage") {
         if (!mediaItems.length) {
-          showFlash(false, "Upload an image in Media Library first, then insert it here.");
+          showFlash(false, "Upload an image in Featured image first, then insert it here.");
           return;
         }
         const choices = mediaItems
@@ -531,6 +598,19 @@
     });
 
     await Promise.all([loadWebsites(), loadMedia()]);
+
+    const editId = new URLSearchParams(location.search).get("id");
+    if (editId) {
+      try {
+        await loadArticle(editId);
+      } catch (e) {
+        showFlash(false, e.message || "Could not load article for edit");
+      }
+    }
+
+    if (location.hash === "#featured-panel") {
+      document.getElementById("featured-panel")?.scrollIntoView({ behavior: "smooth", block: "start" });
+    }
   </script>
 </body>
 </html>

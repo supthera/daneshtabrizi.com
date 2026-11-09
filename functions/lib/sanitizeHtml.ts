@@ -29,6 +29,11 @@ const ALLOWED_TAGS = new Set([
 const ALLOWED_ATTRS: Record<string, Set<string>> = {
   a: new Set(["href", "title", "rel", "target"]),
   img: new Set(["src", "alt", "title", "width", "height"]),
+  ol: new Set(["class"]),
+  ul: new Set(["class"]),
+  li: new Set(["class"]),
+  p: new Set(["class"]),
+  div: new Set(["class"]),
 };
 
 /** Strip paste junk (inline dark colors, class soup) before publishing. */
@@ -69,6 +74,14 @@ export function sanitizePublisherHtml(input: string): string {
   for (let i = 0; i < 4; i++) {
     html = html.replace(/<(div|span)>\s*<\/\1>/gi, "");
   }
+
+  // Ordered lists already render numbers — strip pasted "1" / "1." prefixes inside <li>.
+  html = html.replace(/<ol\b[^>]*>[\s\S]*?<\/ol>/gi, (block) =>
+    block.replace(
+      /<li\b[^>]*>\s*(?:<(?:span|div)>\s*)*(?:\d+\.\s*|\d+\s*)(?:<\/(?:span|div)>\s*)*/gi,
+      (prefix) => prefix.replace(/(?:\d+\.\s*|\d+\s*)(?:<\/(?:span|div)>\s*)*$/i, ""),
+    ),
+  );
 
   return html.replace(/\n{3,}/g, "\n\n").trim();
 }

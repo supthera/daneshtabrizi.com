@@ -25,12 +25,16 @@ type ArticleRow = {
   slug: string | null;
   content_html: string;
   excerpt: string | null;
+  author: string | null;
   seo_title: string | null;
   seo_description: string | null;
   canonical_url: string | null;
   status: string;
   featured_image_id: string | null;
 };
+
+const DEFAULT_AUTHOR_NAME = "Danesh Tabrizi";
+const DEFAULT_AUTHOR_URL = "https://daneshtabrizi.com";
 
 function uid(): string {
   return crypto.randomUUID();
@@ -79,6 +83,11 @@ async function toPayload(
     if (media) featuredImage = mediaPublicUrl(origin, media.id);
   }
 
+  const authorName =
+    article.author && !article.author.includes("@")
+      ? article.author
+      : DEFAULT_AUTHOR_NAME;
+
   return {
     article_id: article.id,
     title: article.title,
@@ -89,6 +98,11 @@ async function toPayload(
     ),
     excerpt: article.excerpt || undefined,
     featured_image: featuredImage,
+    author: {
+      name: authorName,
+      url: DEFAULT_AUTHOR_URL,
+      avatar_url: `${origin}/author.jpg`,
+    },
     seo: {
       title: article.seo_title || undefined,
       description: article.seo_description || undefined,
@@ -149,7 +163,7 @@ export async function runPublishJob(
   const mode = opts.mode || "publish";
   const article = await db
     .prepare(
-      `SELECT id, title, slug, content_html, excerpt, seo_title, seo_description, canonical_url, status, featured_image_id
+      `SELECT id, title, slug, content_html, excerpt, author, seo_title, seo_description, canonical_url, status, featured_image_id
        FROM articles WHERE id = ?`
     )
     .bind(opts.articleId)

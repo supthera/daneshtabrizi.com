@@ -7,7 +7,7 @@
   <title>Publisher HQ — Overview</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav4" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=nav9" />
 </head>
 <body>
   <div class="wrap">
@@ -19,66 +19,343 @@
       <nav class="nav">
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/" data-nav="/private/publisher/">Overview</a>
-        <a href="/private/publisher/media/" data-nav="/private/publisher/media/">Media</a>
       </nav>
       <div class="user" id="user-slot"></div>
     </header>
     <main>
-      <div class="agenda-head">
-        <p class="hero-line">Publisher HQ</p>
-        <a class="agenda-gear" href="/private/publisher/settings/" aria-label="Publisher settings" title="Settings">
-          <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
-        </a>
-      </div>
-      <div class="row" style="margin:18px 0">
-        <a class="btn" href="/private/publisher/write/">Write Article →</a>
-        <a class="btn ghost" href="/private/publisher/websites/">Manage Websites</a>
-        <a class="btn ghost" href="/private/publisher/history/">History</a>
+      <div class="publisher-hero">
+        <div class="agenda-head">
+          <div class="agenda-menu" id="hq-menu">
+            <button type="button" class="agenda-gear" id="hq-gear" aria-haspopup="menu" aria-expanded="false" aria-label="Publisher menu" title="Menu">
+              <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
+            </button>
+            <div class="agenda-menu-panel" id="hq-menu-panel" role="menu" hidden>
+              <a role="menuitem" href="/private/publisher/websites/">Manage websites</a>
+              <a role="menuitem" href="/private/publisher/history/">History</a>
+              <a role="menuitem" href="/private/publisher/settings/">Settings</a>
+            </div>
+          </div>
+          <p class="hero-line">Publisher HQ</p>
+          <a class="btn publisher-write" href="/private/publisher/write/">Write Article →</a>
+        </div>
       </div>
       <div class="stats" id="stats">
-        <div class="stat"><div class="n" id="s-sites">—</div><div class="l">Connected sites</div></div>
-        <div class="stat"><div class="n" id="s-articles">—</div><div class="l">Articles</div></div>
-        <div class="stat"><div class="n" id="s-drafts">—</div><div class="l">Drafts</div></div>
-        <div class="stat"><div class="n" id="s-failed">0</div><div class="l">Failed pubs</div></div>
+        <a class="stat" href="/private/publisher/websites/">
+          <div class="n" id="s-sites">—</div>
+          <div class="l">Connected sites</div>
+        </a>
+        <button type="button" class="stat is-active" data-filter="all" id="stat-articles">
+          <div class="n" id="s-articles">—</div>
+          <div class="l">Articles</div>
+        </button>
+        <button type="button" class="stat" data-filter="draft" id="stat-drafts">
+          <div class="n" id="s-drafts">—</div>
+          <div class="l">Drafts</div>
+        </button>
+        <button type="button" class="stat" data-filter="failed" id="stat-failed">
+          <div class="n" id="s-failed">0</div>
+          <div class="l">Failed pubs</div>
+        </button>
       </div>
-      <section class="panel">
-        <h3>Recent articles</h3>
-        <div id="recent" class="muted">Loading…</div>
+      <section class="panel" id="list-panel">
+        <div class="panel-head">
+          <div class="title-row">
+            <div class="agenda-menu" id="list-menu" hidden>
+              <button type="button" class="agenda-gear" id="list-gear" aria-haspopup="menu" aria-expanded="false" aria-label="Failed publishes menu" title="Options">
+                <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
+              </button>
+              <div class="agenda-menu-panel" id="list-menu-panel" role="menu" hidden>
+                <button type="button" class="danger" role="menuitem" id="clear-failed-log">Clear Log</button>
+              </div>
+            </div>
+            <h3 id="list-title">Recent articles</h3>
+          </div>
+          <span class="list-meta" id="list-meta"></span>
+        </div>
+        <div class="panel-body">
+          <div id="recent" class="muted">Loading…</div>
+        </div>
       </section>
     </main>
   </div>
+
+  <div class="agenda-overlay" id="delete-overlay" hidden>
+    <div class="agenda-modal confirm-modal" role="dialog" aria-modal="true" aria-labelledby="delete-title">
+      <div class="agenda-modal-head">
+        <div>
+          <h2 id="delete-title">Delete article?</h2>
+          <p class="meta">This cannot be undone</p>
+        </div>
+        <button type="button" class="agenda-modal-close" id="delete-close" aria-label="Close">×</button>
+      </div>
+      <div class="agenda-modal-body">
+        <p class="confirm-copy" id="delete-copy">Are you sure you want to delete this article?</p>
+        <div class="confirm-actions">
+          <button type="button" class="btn ghost" id="delete-cancel">Cancel</button>
+          <button type="button" class="btn" id="delete-confirm">Delete</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <script type="module">
-    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
+    import { api, el, setActiveNav, requireSession, showToast } from "/private/assets/private.js";
     setActiveNav();
     const health = await requireSession();
     document.getElementById("user-slot").textContent = health.identity?.email || "";
 
-    const [articlesRes, sitesRes] = await Promise.all([
-      api("/api/articles").catch(() => ({ articles: [] })),
-      api("/api/websites").catch(() => ({ websites: [] })),
-    ]);
-    const articles = articlesRes.articles || [];
-    const sites = sitesRes.websites || [];
-    document.getElementById("s-sites").textContent = String(sites.length);
-    document.getElementById("s-articles").textContent = String(articles.length);
-    document.getElementById("s-drafts").textContent = String(articles.filter(a => a.status === "draft").length);
-
     const recent = document.getElementById("recent");
-    if (!articles.length) {
-      recent.textContent = "No articles yet. Create one to begin.";
-    } else {
-      const table = el("table", { class: "table" }, [
+    const listTitle = document.getElementById("list-title");
+    const listMeta = document.getElementById("list-meta");
+    const listMenu = document.getElementById("list-menu");
+    const listGear = document.getElementById("list-gear");
+    const listMenuPanel = document.getElementById("list-menu-panel");
+    const hqGear = document.getElementById("hq-gear");
+    const hqMenuPanel = document.getElementById("hq-menu-panel");
+    const filterButtons = [...document.querySelectorAll("button.stat[data-filter]")];
+    const overlay = document.getElementById("delete-overlay");
+    const deleteCopy = document.getElementById("delete-copy");
+    const deleteConfirm = document.getElementById("delete-confirm");
+
+    let articles = [];
+    let failedJobs = [];
+    let activeFilter = "all";
+    let pendingDelete = null;
+
+    function setHqMenuOpen(open) {
+      hqMenuPanel.hidden = !open;
+      hqGear.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    function setListMenuOpen(open) {
+      listMenuPanel.hidden = !open;
+      listGear.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    hqGear.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setListMenuOpen(false);
+      setHqMenuOpen(hqMenuPanel.hidden);
+    });
+    document.addEventListener("click", (e) => {
+      if (!hqMenuPanel.hidden && !e.target.closest("#hq-menu")) setHqMenuOpen(false);
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape") setHqMenuOpen(false);
+    });
+
+    const titles = {
+      all: "Recent articles",
+      draft: "Drafts",
+      failed: "Failed publishes",
+    };
+
+    function trashIcon() {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("aria-hidden", "true");
+      svg.innerHTML =
+        '<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 14h10l1-14"/><path d="M10 11v6M14 11v6"/>';
+      return svg;
+    }
+
+    function drafts() {
+      return articles.filter((a) => a.status === "draft");
+    }
+
+    function refreshStats() {
+      document.getElementById("s-articles").textContent = String(articles.length);
+      document.getElementById("s-drafts").textContent = String(drafts().length);
+      document.getElementById("s-failed").textContent = String(failedJobs.length);
+    }
+
+    function openDeleteModal(article) {
+      pendingDelete = article;
+      deleteCopy.replaceChildren(
+        document.createTextNode("Are you sure you want to delete "),
+        el("strong", { text: article.title || "Untitled" }),
+        document.createTextNode("? This removes it from Publisher HQ."),
+      );
+      overlay.hidden = false;
+      overlay.classList.add("open");
+      deleteConfirm.focus();
+    }
+
+    function closeDeleteModal() {
+      pendingDelete = null;
+      overlay.classList.remove("open");
+      overlay.hidden = true;
+      deleteConfirm.disabled = false;
+      deleteConfirm.textContent = "Delete";
+    }
+
+    function articleActions(a) {
+      const edit = el("a", {
+        class: "btn ghost compact",
+        href: "/private/publisher/write/?id=" + encodeURIComponent(a.id),
+        text: a.status === "draft" ? "Continue" : "Edit",
+      });
+      const del = el("button", {
+        class: "btn-icon danger",
+        type: "button",
+        title: "Delete article",
+        "aria-label": "Delete " + (a.title || "article"),
+        onclick: () => openDeleteModal(a),
+      });
+      del.append(trashIcon());
+      return el("div", { class: "table-actions" }, [edit, del]);
+    }
+
+    function renderArticles(list, emptyText) {
+      if (!list.length) {
+        recent.className = "muted";
+        recent.textContent = emptyText;
+        return;
+      }
+      recent.className = "";
+      recent.replaceChildren(el("table", { class: "table" }, [
         el("thead", {}, [el("tr", {}, [
-          el("th", { text: "Title" }), el("th", { text: "Status" }), el("th", { text: "Updated" })
+          el("th", { text: "Title" }),
+          el("th", { text: "Status" }),
+          el("th", { text: "Updated" }),
+          el("th", { text: "" }),
         ])]),
-        el("tbody", {}, articles.slice(0, 8).map(a => el("tr", {}, [
+        el("tbody", {}, list.map((a) => el("tr", {}, [
           el("td", { text: a.title || "Untitled" }),
           el("td", { text: a.status || "—" }),
-          el("td", { text: (a.updated_at || "").replace("T", " ").slice(0, 19) }),
+          el("td", { class: "cell-meta", text: (a.updated_at || "").replace("T", " ").slice(0, 19) }),
+          el("td", {}, [articleActions(a)]),
         ]))),
-      ]);
-      recent.replaceChildren(table);
+      ]));
     }
+
+    function renderFailed(list) {
+      if (!list.length) {
+        recent.className = "muted";
+        recent.textContent = "No failed publish jobs.";
+        return;
+      }
+      recent.className = "";
+      recent.replaceChildren(el("table", { class: "table" }, [
+        el("thead", {}, [el("tr", {}, [
+          el("th", { text: "When" }),
+          el("th", { text: "Article" }),
+          el("th", { text: "Status" }),
+          el("th", { text: "" }),
+        ])]),
+        el("tbody", {}, list.map((j) => el("tr", {}, [
+          el("td", { text: j.created_at || "—" }),
+          el("td", { text: j.title || j.article_id || "—" }),
+          el("td", { text: j.status || "failed" }),
+          el("td", {}, [
+            j.article_id
+              ? el("a", {
+                  class: "btn ghost compact",
+                  href: "/private/publisher/write/?id=" + encodeURIComponent(j.article_id),
+                  text: "Revise",
+                })
+              : el("span", { class: "muted", text: "—" }),
+          ]),
+        ]))),
+      ]));
+    }
+
+    function setFilter(filter, { scroll = true } = {}) {
+      activeFilter = filter;
+      filterButtons.forEach((btn) => {
+        btn.classList.toggle("is-active", btn.dataset.filter === filter);
+      });
+      listTitle.textContent = titles[filter] || "Articles";
+      listMenu.hidden = filter !== "failed";
+      setListMenuOpen(false);
+      if (filter === "draft") {
+        const list = drafts();
+        listMeta.textContent = `${list.length} draft${list.length === 1 ? "" : "s"}`;
+        renderArticles(list, "No drafts. Write Article to start one.");
+      } else if (filter === "failed") {
+        listMeta.textContent = `${failedJobs.length} failed`;
+        renderFailed(failedJobs);
+      } else {
+        listMeta.textContent = `showing ${Math.min(articles.length, 12)} of ${articles.length}`;
+        renderArticles(articles.slice(0, 12), "No articles yet. Create one to begin.");
+      }
+      if (scroll) {
+        document.getElementById("list-panel").scrollIntoView({ behavior: "smooth", block: "nearest" });
+      }
+    }
+
+    filterButtons.forEach((btn) => {
+      btn.addEventListener("click", () => setFilter(btn.dataset.filter));
+    });
+
+    listGear.addEventListener("click", (e) => {
+      e.stopPropagation();
+      setHqMenuOpen(false);
+      setListMenuOpen(listMenuPanel.hidden);
+    });
+    document.addEventListener("click", (e) => {
+      if (!listMenu.contains(e.target)) setListMenuOpen(false);
+    });
+    document.getElementById("clear-failed-log").addEventListener("click", async () => {
+      setListMenuOpen(false);
+      if (!failedJobs.length) {
+        showToast("No failed jobs to clear", "ok");
+        return;
+      }
+      if (!confirm(`Clear ${failedJobs.length} failed publish job${failedJobs.length === 1 ? "" : "s"} from the log?`)) {
+        return;
+      }
+      try {
+        const result = await api("/api/jobs/failed", { method: "DELETE" });
+        failedJobs = [];
+        refreshStats();
+        setFilter("failed", { scroll: false });
+        showToast(`Cleared ${result.cleared || 0} failed job${(result.cleared || 0) === 1 ? "" : "s"}`, "ok");
+      } catch (e) {
+        showToast(e.message || "Could not clear log", "err");
+      }
+    });
+
+    document.getElementById("delete-close").addEventListener("click", closeDeleteModal);
+    document.getElementById("delete-cancel").addEventListener("click", closeDeleteModal);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeDeleteModal();
+    });
+    document.addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.classList.contains("open")) closeDeleteModal();
+    });
+
+    deleteConfirm.addEventListener("click", async () => {
+      if (!pendingDelete) return;
+      const target = pendingDelete;
+      deleteConfirm.disabled = true;
+      deleteConfirm.textContent = "Deleting…";
+      try {
+        await api("/api/articles/" + encodeURIComponent(target.id), { method: "DELETE" });
+        articles = articles.filter((a) => a.id !== target.id);
+        refreshStats();
+        closeDeleteModal();
+        showToast(`Deleted “${target.title || "Untitled"}”`, "ok");
+        setFilter(activeFilter, { scroll: false });
+      } catch (e) {
+        deleteConfirm.disabled = false;
+        deleteConfirm.textContent = "Delete";
+        showToast(e.message || "Delete failed", "err");
+      }
+    });
+
+    const [articlesRes, sitesRes, jobsRes] = await Promise.all([
+      api("/api/articles").catch(() => ({ articles: [] })),
+      api("/api/websites").catch(() => ({ websites: [] })),
+      api("/api/jobs").catch(() => ({ jobs: [] })),
+    ]);
+    articles = articlesRes.articles || [];
+    failedJobs = (jobsRes.jobs || []).filter((j) => String(j.status || "").toLowerCase() === "failed");
+    document.getElementById("s-sites").textContent = String((sitesRes.websites || []).length);
+    refreshStats();
+
+    const start = new URLSearchParams(location.search).get("filter");
+    setFilter(start === "draft" || start === "failed" ? start : "all", { scroll: false });
   </script>
 </body>
 </html>

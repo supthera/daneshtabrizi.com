@@ -1,7 +1,7 @@
 import { json, resolveIdentity, unauthorized } from "./auth";
 import { runPublishJob, testWebsiteConnection, type PublishEnv } from "./publish";
 import { FALLBACK_APPS } from "./apps";
-import { listMedia, uploadMedia } from "./media";
+import { deleteMedia, listMedia, uploadMedia } from "./media";
 
 type Env = PublishEnv & {
   ASSETS?: Fetcher;
@@ -182,6 +182,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     const seoTitle = body.seo_title ? String(body.seo_title) : null;
     const seoDescription = body.seo_description ? String(body.seo_description) : null;
     const featuredImageId = body.featured_image_id ? String(body.featured_image_id) : null;
+    const author = body.author ? String(body.author) : "Danesh Tabrizi";
 
     try {
       await env.DB.prepare(
@@ -194,7 +195,7 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
           slug,
           content,
           excerpt,
-          identity.email,
+          author,
           status,
           seoTitle,
           seoDescription,
@@ -281,6 +282,25 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     return json({ id, ok: true });
   }
 
+  if (articleOne && method === "DELETE") {
+    if (!env.DB) return json({ error: "D1 not bound" }, 503);
+    const id = decodeURIComponent(articleOne[1]);
+    const existing = await env.DB.prepare(`SELECT id, title FROM articles WHERE id = ?`)
+      .bind(id)
+      .first<{ id: string; title: string }>();
+    if (!existing) return json({ error: "Not found" }, 404);
+
+    await env.DB.prepare(`DELETE FROM articles WHERE id = ?`).bind(id).run();
+    await env.DB.prepare(
+      `INSERT INTO audit_logs (id, actor_email, action, resource_type, resource_id)
+       VALUES (?, ?, 'article.delete', 'article', ?)`,
+    )
+      .bind(uid(), identity.email, id)
+      .run();
+
+    return json({ ok: true, id, title: existing.title });
+  }
+
   const articlePublish = path.match(/^\/api\/articles\/([^/]+)\/publish$/);
   if (articlePublish && method === "POST") {
     if (!env.DB) return json({ error: "D1 not bound" }, 503);
@@ -326,12 +346,45 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     }
   }
 
+  if (path === "/api/jobs/failed" && method === "DELETE") {
+    if (!env.DB) return json({ error: "D1 not bound" }, 503);
+    try {
+      const failed = await env.DB.prepare(
+        `SELECT id FROM publishing_jobs WHERE status = 'failed'`,
+      ).all<{ id: string }>();
+      const ids = (failed.results || []).map((row) => row.id);
+      if (ids.length) {
+        const placeholders = ids.map(() => "?").join(",");
+        await env.DB.prepare(
+          `DELETE FROM publishing_logs WHERE job_id IN (${placeholders})`,
+        )
+          .bind(...ids)
+          .run();
+        await env.DB.prepare(`DELETE FROM publishing_jobs WHERE status = 'failed'`).run();
+      }
+      await env.DB.prepare(
+        `INSERT INTO audit_logs (id, actor_email, action, resource_type, resource_id)
+         VALUES (?, ?, 'jobs.clear_failed', 'publishing_jobs', ?)`,
+      )
+        .bind(uid(), identity.email, String(ids.length))
+        .run();
+      return json({ ok: true, cleared: ids.length });
+    } catch (e) {
+      return json({ error: String(e) }, 500);
+    }
+  }
+
   if (path === "/api/media" && method === "GET") {
     return listMedia(env);
   }
 
   if (path === "/api/media" && method === "POST") {
     return uploadMedia(env, request, identity.email);
+  }
+
+  const mediaOne = path.match(/^\/api\/media\/([^/]+)$/);
+  if (mediaOne && method === "DELETE") {
+    return deleteMedia(env, decodeURIComponent(mediaOne[1]), identity.email);
   }
 
   return json({ error: "Not found" }, 404);

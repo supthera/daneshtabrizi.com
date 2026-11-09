@@ -30,23 +30,15 @@
         </div>
         <div class="panel-body" id="add-body" hidden>
           <form id="add-form">
-            <div class="field"><label for="name">Name</label><input id="name" required placeholder="MedicareAgencyFinder.com" /></div>
-            <div class="field"><label for="domain">Domain</label><input id="domain" required placeholder="medicareagencyfinder.com" /></div>
-            <div class="field">
-              <label for="connector">Connector</label>
-              <select id="connector">
-                <option value="custom_rest">Custom REST API</option>
-                <option value="wordpress" disabled>WordPress REST API (soon)</option>
-                <option value="webflow" disabled>Webflow CMS (soon)</option>
-              </select>
-            </div>
+            <div class="field"><label for="name">Name</label><input id="name" required placeholder="Site display name" autocomplete="off" /></div>
+            <div class="field"><label for="domain">Domain</label><input id="domain" required placeholder="example.com" autocomplete="off" /></div>
             <div class="field">
               <label for="endpoint">API endpoint</label>
-              <input id="endpoint" required placeholder="https://medicareagencyfinder.com/api/publisher/" value="https://medicareagencyfinder.com/api/publisher/" />
+              <input id="endpoint" required placeholder="https://example.com/api/publisher/" autocomplete="off" />
             </div>
             <div class="field">
               <label for="secret_ref">Worker secret name</label>
-              <input id="secret_ref" required placeholder="MAF_PUBLISHER_TOKEN" value="MAF_PUBLISHER_TOKEN" />
+              <input id="secret_ref" required placeholder="PUBLISHER_TOKEN" autocomplete="off" />
             </div>
             <div class="form-actions">
               <p class="muted form-hint">Create this secret in Cloudflare (Workers → daneshtabrizi → Settings → Variables and Secrets).</p>
@@ -202,15 +194,13 @@
           body: JSON.stringify({
             name: document.getElementById("name").value,
             domain: document.getElementById("domain").value,
-            connector_type: document.getElementById("connector").value,
+            connector_type: "custom_rest",
             api_endpoint: document.getElementById("endpoint").value || null,
             secret_ref: document.getElementById("secret_ref").value || null,
           }),
         });
         const savedName = document.getElementById("name").value.trim() || "Website";
         e.target.reset();
-        document.getElementById("endpoint").value = "https://medicareagencyfinder.com/api/publisher/";
-        document.getElementById("secret_ref").value = "MAF_PUBLISHER_TOKEN";
         setAddOpen(false);
         showToast(`${savedName} connected`, "ok");
         await refresh();

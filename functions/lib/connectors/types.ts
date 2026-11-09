@@ -2,6 +2,12 @@
 
 export type PublishStatus = "draft" | "published" | "scheduled";
 
+export type PublishAuthor = {
+  name: string;
+  url?: string;
+  avatar_url?: string;
+};
+
 export type PublishPayload = {
   article_id: string;
   title: string;
@@ -9,6 +15,7 @@ export type PublishPayload = {
   content: string;
   excerpt?: string;
   featured_image?: string;
+  author?: PublishAuthor;
   seo?: {
     title?: string;
     description?: string;

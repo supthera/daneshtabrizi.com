@@ -10,7 +10,7 @@
   --warn:#e6b84d;
   --bad:#ff5d6c;
   --ease:cubic-bezier(.2,.8,.2,1);
-  --maxw:1120px;
+  --maxw:1280px;
   --mono:"DM Mono",ui-monospace,monospace;
   --display:"Big Shoulders Display",system-ui,sans-serif;
   /* Ordinova toast pastel sweep */
@@ -70,6 +70,18 @@ main{padding:clamp(28px,6vh,56px) 0 64px}
   margin-bottom:10px;
 }
 .agenda-head .hero-line{margin-bottom:0}
+.publisher-hero{
+  margin-bottom:18px;
+}
+.publisher-hero .agenda-head{
+  margin-bottom:0;
+  gap:10px;
+}
+.publisher-hero .publisher-write{
+  margin-left:auto;
+  padding:8px 12px;
+  font-size:.68rem;
+}
 .agenda-menu{position:relative}
 .agenda-gear{
   width:22px; height:22px;
@@ -110,7 +122,8 @@ main{padding:clamp(28px,6vh,56px) 0 64px}
   z-index:30;
 }
 .agenda-menu-panel[hidden]{display:none}
-.agenda-menu-panel button{
+.agenda-menu-panel button,
+.agenda-menu-panel a{
   display:block;
   width:100%;
   text-align:left;
@@ -120,8 +133,11 @@ main{padding:clamp(28px,6vh,56px) 0 64px}
   color:var(--ink);
   font-size:.72rem;
   letter-spacing:.02em;
+  text-decoration:none;
+  background:transparent;
 }
-.agenda-menu-panel button:hover{background:rgba(255,174,59,.1); color:var(--accent)}
+.agenda-menu-panel button:hover,
+.agenda-menu-panel a:hover{background:rgba(255,174,59,.1); color:var(--accent)}
 .agenda-prompt{
   width:min(360px,92vw);
   background:#000;
@@ -205,6 +221,19 @@ h1{font-family:var(--display); font-weight:800; text-transform:uppercase; font-s
 .stat{border:1px solid var(--line); border-radius:3px; padding:14px}
 .stat .n{font-family:var(--display); font-weight:900; font-size:2rem; line-height:1}
 .stat .l{font-size:.62rem; letter-spacing:.16em; text-transform:uppercase; color:var(--dim); margin-top:6px}
+button.stat,a.stat{
+  display:block; width:100%; text-align:left; background:transparent; color:inherit;
+  cursor:pointer; transition:border-color .15s ease, background .15s ease;
+}
+button.stat:hover,a.stat:hover,
+button.stat.is-active,a.stat.is-active{
+  border-color:rgba(255,174,59,.55);
+  background:rgba(255,174,59,.06);
+}
+button.stat:focus-visible,a.stat:focus-visible{
+  outline:none; border-color:var(--accent);
+}
+.panel-head .list-meta{margin-left:auto; font-size:.68rem; color:var(--dim)}
 .panel{border:1px solid var(--line); border-radius:3px; background:var(--panel); padding:16px; margin-bottom:16px}
 .panel h3{font-family:var(--display); text-transform:uppercase; font-size:1.1rem; margin-bottom:10px}
 .panel-head{
@@ -215,11 +244,21 @@ h1{font-family:var(--display); font-weight:800; text-transform:uppercase; font-s
   margin-bottom:10px;
 }
 .panel-head h3{margin-bottom:0}
+.panel-head .title-row{
+  display:flex;
+  align-items:center;
+  gap:8px;
+  min-width:0;
+}
 .panel-head .agenda-menu{position:relative}
 .panel-head .agenda-menu-panel{
   left:auto;
   right:0;
   min-width:180px;
+}
+.panel-head .title-row .agenda-menu-panel{
+  left:0;
+  right:auto;
 }
 .panel.is-collapsed .panel-body{display:none}
 .panel.is-collapsed .panel-head{margin-bottom:0}
@@ -234,9 +273,9 @@ h1{font-family:var(--display); font-weight:800; text-transform:uppercase; font-s
 }
 .form-actions .form-hint{
   margin-right:auto;
-  max-width:min(520px, 55%);
   font-size:.68rem;
   line-height:1.35;
+  white-space:nowrap;
 }
 .panel.is-collapsed .panel-head{display:flex}
 .panel:not(.is-collapsed) .panel-head[hidden]{display:none}
@@ -260,9 +299,30 @@ h1{font-family:var(--display); font-weight:800; text-transform:uppercase; font-s
 }
 .field textarea{min-height:180px; resize:vertical}
 .row{display:flex; flex-wrap:wrap; gap:10px; align-items:center}
-.table{width:100%; border-collapse:collapse; font-size:.78rem}
-.table th,.table td{text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:top}
+.table{width:100%; border-collapse:collapse; font-size:.78rem; table-layout:auto}
+.table th,.table td{text-align:left; padding:10px 8px; border-bottom:1px solid var(--line); vertical-align:middle}
 .table th{font-size:.6rem; letter-spacing:.14em; text-transform:uppercase; color:var(--dim); font-weight:500}
+.table th:nth-child(n+2),
+.table td:nth-child(n+2){white-space:nowrap; width:1%}
+.table th:first-child,
+.table td:first-child{width:auto; white-space:normal}
+.table td.cell-meta{color:var(--dim)}
+.table .btn.compact{padding:7px 10px; font-size:.58rem; letter-spacing:.1em; white-space:nowrap}
+.table-actions{display:flex; gap:6px; align-items:center; justify-content:flex-end}
+.btn-icon{
+  width:32px; height:32px; padding:0;
+  display:grid; place-items:center;
+  border:1px solid var(--line); border-radius:2px;
+  color:var(--dim); background:transparent; cursor:pointer;
+}
+.btn-icon:hover{color:var(--ink); border-color:rgba(255,174,59,.45)}
+.btn-icon.danger:hover{color:var(--bad); border-color:rgba(255,93,108,.45)}
+.btn-icon svg{width:14px; height:14px; fill:none; stroke:currentColor; stroke-width:1.6}
+.confirm-modal{width:min(420px,94vw); max-height:none}
+.confirm-modal .agenda-modal-body{gap:18px}
+.confirm-modal .confirm-copy{font-size:.84rem; color:var(--dim); line-height:1.5; margin:0}
+.confirm-modal .confirm-copy strong{color:var(--ink); font-weight:500}
+.confirm-actions{display:flex; gap:8px; justify-content:flex-end; flex-wrap:wrap}
 .site-list{display:flex; flex-direction:column; gap:10px}
 .site-row{
   display:grid;
@@ -404,11 +464,14 @@ h1{font-family:var(--display); font-weight:800; text-transform:uppercase; font-s
   white-space:nowrap;
 }
 .featured-controls{display:flex; flex-direction:column; gap:8px; min-width:200px; flex:1}
+.media-library-block .panel-head{
+  margin-bottom:8px;
+}
 .media-picker{
   border:1px solid var(--line);
   border-radius:3px;
   padding:10px;
-  max-height:220px;
+  max-height:280px;
   overflow:auto;
   display:grid;
   grid-template-columns:repeat(auto-fill,minmax(88px,1fr));
@@ -435,6 +498,61 @@ h1{font-family:var(--display); font-weight:800; text-transform:uppercase; font-s
 .media-picker button.is-selected,
 .media-picker button:hover{border-color:rgba(255,174,59,.55)}
 .media-picker img{width:100%; aspect-ratio:1; object-fit:cover; display:block}
+.media-manager-toolbar{
+  display:flex;
+  flex-wrap:wrap;
+  align-items:center;
+  gap:12px;
+}
+.media-manager-grid{
+  border:1px solid var(--line);
+  border-radius:3px;
+  padding:10px;
+  display:grid;
+  grid-template-columns:repeat(auto-fill,minmax(120px,1fr));
+  gap:10px;
+  background:#000;
+  max-height:420px;
+  overflow:auto;
+}
+.media-manager-grid.is-dragover{
+  border-color:rgba(255,174,59,.55);
+  background:rgba(255,174,59,.04);
+}
+.media-card{
+  position:relative;
+  border:1px solid var(--line);
+  border-radius:2px;
+  overflow:hidden;
+  background:#050505;
+}
+.media-card img{
+  width:100%;
+  aspect-ratio:1;
+  object-fit:cover;
+  display:block;
+}
+.media-card-meta{
+  padding:6px 8px;
+  border-top:1px solid var(--line);
+}
+.media-card-name{
+  display:block;
+  font-size:.62rem;
+  color:var(--dim);
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+.media-card-del{
+  position:absolute;
+  top:6px;
+  right:6px;
+  opacity:0;
+  transition:opacity .15s ease;
+}
+.media-card:hover .media-card-del,
+.media-card:focus-within .media-card-del{opacity:1}
 .flash.ok{border-color:rgba(61,207,142,.35); color:#9ee7c2}
 .subnav{display:flex; flex-wrap:wrap; gap:6px; margin:0 0 24px; padding-bottom:12px; border-bottom:1px solid var(--line)}
 .subnav a{
@@ -565,8 +683,27 @@ h1{font-family:var(--display); font-weight:800; text-transform:uppercase; font-s
 }
 .agenda-todos input[type="checkbox"]{
   margin-top:2px;
-  accent-color:var(--accent);
   flex-shrink:0;
+  appearance:none;
+  -webkit-appearance:none;
+  width:13px;
+  height:13px;
+  border:1px solid var(--dim);
+  border-radius:2px;
+  background:transparent;
+  cursor:pointer;
+}
+.agenda-todos input[type="checkbox"]:checked{
+  background:var(--dim);
+  border-color:var(--dim);
+  background-image:url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 12 12'%3E%3Cpath fill='none' stroke='%23000' stroke-width='2' d='M2.5 6.2l2.4 2.3 4.6-5'/%3E%3C/svg%3E");
+  background-size:10px 10px;
+  background-position:center;
+  background-repeat:no-repeat;
+}
+.agenda-todos input[type="checkbox"]:focus-visible{
+  outline:1px solid var(--faint);
+  outline-offset:2px;
 }
 .agenda-add{
   display:flex;

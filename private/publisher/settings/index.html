@@ -7,7 +7,7 @@
   <title>Publisher HQ — Settings</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=settings-media1" />
 </head>
 <body>
   <div class="wrap">
@@ -17,10 +17,27 @@
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/">Overview</a>
       </nav>
+      <div class="user" id="user-slot"></div>
     </header>
     <main>
-      <p class="hero-line">App settings</p>
-      <h1>Publisher Settings</h1>
+      <p class="hero-line">Publisher Settings</p>
+
+      <section class="panel" id="media-panel">
+        <div class="panel-head">
+          <h3>Media library</h3>
+          <span class="list-meta" id="media-meta">Loading…</span>
+        </div>
+        <div class="panel-body">
+          <p class="muted" style="margin:0 0 12px">Upload images for article featured media, or remove unused ones from the library.</p>
+          <div class="media-manager-toolbar">
+            <input id="media-file" type="file" accept="image/*" hidden />
+            <button class="btn" type="button" id="media-upload">Upload image</button>
+            <span class="muted" id="media-hint">PNG, JPG, or WebP · max 8MB</span>
+          </div>
+          <div id="media-grid" class="media-picker muted" style="margin-top:12px">Loading media…</div>
+        </div>
+      </section>
+
       <section class="panel">
         <h3>Defaults</h3>
         <p class="muted">Author defaults, canonical policy, and connector timeouts will live here. Prefer destination-specific SEO and canonicals to avoid duplicate-content issues across your domains.</p>
@@ -28,9 +45,132 @@
     </main>
   </div>
   <script type="module">
-    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    import { api, el, requireSession, setActiveNav, showToast } from "/private/assets/private.js";
     setActiveNav();
-    await requireSession();
+    const health = await requireSession();
+    document.getElementById("user-slot").textContent = health.identity?.email || "";
+
+    const mediaMeta = document.getElementById("media-meta");
+    const mediaGrid = document.getElementById("media-grid");
+    const mediaFile = document.getElementById("media-file");
+    const mediaUpload = document.getElementById("media-upload");
+    let uploading = false;
+    let items = [];
+
+    function mediaPath(id) {
+      return "/media/" + encodeURIComponent(id);
+    }
+
+    function trashIcon() {
+      const svg = document.createElementNS("http://www.w3.org/2000/svg", "svg");
+      svg.setAttribute("viewBox", "0 0 24 24");
+      svg.setAttribute("aria-hidden", "true");
+      svg.innerHTML =
+        '<path d="M4 7h16"/><path d="M9 7V5h6v2"/><path d="M6 7l1 14h10l1-14"/><path d="M10 11v6M14 11v6"/>';
+      return svg;
+    }
+
+    async function loadMedia() {
+      try {
+        const data = await api("/api/media");
+        items = data.media || [];
+        mediaMeta.textContent = data.r2
+          ? `${items.length} image${items.length === 1 ? "" : "s"}`
+          : "R2 not bound";
+        if (!items.length) {
+          mediaGrid.className = "media-picker muted";
+          mediaGrid.textContent = data.r2
+            ? "No images yet — upload to start the library."
+            : "R2 not bound yet — finish Cloudflare R2 setup, then upload.";
+          return;
+        }
+        mediaGrid.className = "media-manager-grid";
+        mediaGrid.replaceChildren(
+          ...items.map((item) => {
+            const card = el("div", { class: "media-card" });
+            const img = document.createElement("img");
+            img.src = mediaPath(item.id);
+            img.alt = item.alt_text || item.title || item.filename || "";
+            img.loading = "lazy";
+            const meta = el("div", { class: "media-card-meta" }, [
+              el("span", {
+                class: "media-card-name",
+                text: item.title || item.filename || item.id.slice(0, 8),
+                title: item.filename || item.id,
+              }),
+            ]);
+            const del = el("button", {
+              type: "button",
+              class: "btn-icon danger media-card-del",
+              title: "Delete image",
+              "aria-label": "Delete " + (item.filename || "image"),
+            });
+            del.append(trashIcon());
+            del.addEventListener("click", async () => {
+              if (!confirm(`Delete ${item.filename || "this image"} from the library?`)) return;
+              try {
+                await api("/api/media/" + encodeURIComponent(item.id), { method: "DELETE" });
+                showToast("Image deleted", "ok");
+                await loadMedia();
+              } catch (e) {
+                showToast(e.message || "Delete failed", "err");
+              }
+            });
+            card.append(img, meta, del);
+            return card;
+          }),
+        );
+      } catch (e) {
+        mediaGrid.className = "media-picker muted";
+        mediaGrid.textContent = e.message || "Could not load media";
+        mediaMeta.textContent = "Unavailable";
+      }
+    }
+
+    async function uploadFile(file) {
+      if (!file || uploading) return;
+      if (!String(file.type || "").startsWith("image/")) {
+        showToast("Only image files are supported", "err");
+        return;
+      }
+      uploading = true;
+      mediaUpload.disabled = true;
+      mediaUpload.textContent = "Uploading…";
+      try {
+        const formData = new FormData();
+        formData.append("file", file);
+        const created = await api("/api/media", { method: "POST", body: formData });
+        showToast(`Uploaded ${created.filename || "image"}`, "ok");
+        await loadMedia();
+      } catch (e) {
+        showToast(e.message || "Upload failed", "err");
+      } finally {
+        uploading = false;
+        mediaUpload.disabled = false;
+        mediaUpload.textContent = "Upload image";
+        mediaFile.value = "";
+      }
+    }
+
+    mediaUpload.addEventListener("click", () => mediaFile.click());
+    mediaFile.addEventListener("change", () => {
+      const file = mediaFile.files && mediaFile.files[0];
+      if (file) uploadFile(file);
+    });
+
+    mediaGrid.addEventListener("dragover", (e) => {
+      e.preventDefault();
+      mediaGrid.classList.add("is-dragover");
+    });
+    mediaGrid.addEventListener("dragleave", () => mediaGrid.classList.remove("is-dragover"));
+    mediaGrid.addEventListener("drop", (e) => {
+      e.preventDefault();
+      mediaGrid.classList.remove("is-dragover");
+      const file = e.dataTransfer && e.dataTransfer.files && e.dataTransfer.files[0];
+      if (file) uploadFile(file);
+    });
+
+    await loadMedia();
   </script>
 </body>
 </html>

@@ -122,6 +122,39 @@ export async function uploadMedia(
   );
 }
 
+export async function deleteMedia(
+  env: MediaEnv,
+  mediaId: string,
+  actorEmail?: string,
+): Promise<Response> {
+  if (!env.DB) return json({ error: "D1 not bound" }, 503);
+  if (!env.MEDIA) return json({ error: "R2 MEDIA binding not configured" }, 503);
+
+  const row = await env.DB.prepare(
+    `SELECT id, r2_key, filename FROM media WHERE id = ?`,
+  )
+    .bind(mediaId)
+    .first<{ id: string; r2_key: string; filename: string }>();
+  if (!row) return json({ error: "Media not found" }, 404);
+
+  await env.MEDIA.delete(row.r2_key);
+  await env.DB.prepare(`UPDATE articles SET featured_image_id = NULL WHERE featured_image_id = ?`)
+    .bind(mediaId)
+    .run();
+  await env.DB.prepare(`DELETE FROM media WHERE id = ?`).bind(mediaId).run();
+
+  if (actorEmail) {
+    await env.DB.prepare(
+      `INSERT INTO audit_logs (id, actor_email, action, resource_type, resource_id)
+       VALUES (?, ?, 'media.delete', 'media', ?)`,
+    )
+      .bind(uid(), actorEmail, mediaId)
+      .run();
+  }
+
+  return json({ ok: true, id: mediaId, filename: row.filename });
+}
+
 export async function serveMediaFile(env: MediaEnv, mediaId: string): Promise<Response> {
   if (!env.DB || !env.MEDIA) {
     return new Response("Media unavailable", { status: 503 });
