@@ -1,4 +1,5 @@
 import { handleApi } from "./functions/lib/api-router";
+import { serveMediaFile } from "./functions/lib/media";
 
 export interface Env {
   ASSETS: Fetcher;
@@ -14,6 +15,12 @@ export interface Env {
 export default {
   async fetch(request: Request, env: Env): Promise<Response> {
     const url = new URL(request.url);
+
+    const mediaMatch = url.pathname.match(/^\/media\/([^/]+)\/?$/);
+    if (mediaMatch && request.method === "GET") {
+      return serveMediaFile(env, decodeURIComponent(mediaMatch[1]));
+    }
+
     if (url.pathname.startsWith("/api/")) {
       return handleApi(request, env as Env & { DB: D1Database });
     }

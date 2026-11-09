@@ -7,7 +7,7 @@
   <title>Publisher HQ — Websites</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=pub1" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=pub8" />
 </head>
 <body>
   <div class="wrap">
@@ -22,90 +22,179 @@
     </header>
     <main>
       <p class="hero-line">Destinations</p>
-      <div id="flash"></div>
-      <section class="panel">
-        <h3>Add website</h3>
-        <form id="add-form">
-          <div class="field"><label for="name">Name</label><input id="name" required placeholder="MedicareAgencyFinder.com" /></div>
-          <div class="field"><label for="domain">Domain</label><input id="domain" required placeholder="medicareagencyfinder.com" /></div>
-          <div class="field">
-            <label for="connector">Connector</label>
-            <select id="connector">
-              <option value="custom_rest">Custom REST API</option>
-              <option value="wordpress" disabled>WordPress REST API (soon)</option>
-              <option value="webflow" disabled>Webflow CMS (soon)</option>
-            </select>
-          </div>
-          <div class="field">
-            <label for="endpoint">API endpoint</label>
-            <input id="endpoint" placeholder="https://medicareagencyfinder.com/api/publisher/" />
-          </div>
-          <div class="field">
-            <label for="secret_ref">Worker secret name</label>
-            <input id="secret_ref" placeholder="MAF_PUBLISHER_TOKEN" />
-            <p class="muted" style="margin-top:6px">Create this secret in Cloudflare (Workers → daneshtabrizi → Settings → Variables and Secrets). Do not paste the token here.</p>
-          </div>
-          <button class="btn" type="submit">Add Website</button>
-        </form>
+      <section class="panel is-collapsed" id="add-panel">
+        <div class="panel-head" id="add-head">
+          <button type="button" class="btn" id="add-toggle" aria-expanded="false" aria-controls="add-form">
+            Add Website
+          </button>
+        </div>
+        <div class="panel-body" id="add-body" hidden>
+          <form id="add-form">
+            <div class="field"><label for="name">Name</label><input id="name" required placeholder="MedicareAgencyFinder.com" /></div>
+            <div class="field"><label for="domain">Domain</label><input id="domain" required placeholder="medicareagencyfinder.com" /></div>
+            <div class="field">
+              <label for="connector">Connector</label>
+              <select id="connector">
+                <option value="custom_rest">Custom REST API</option>
+                <option value="wordpress" disabled>WordPress REST API (soon)</option>
+                <option value="webflow" disabled>Webflow CMS (soon)</option>
+              </select>
+            </div>
+            <div class="field">
+              <label for="endpoint">API endpoint</label>
+              <input id="endpoint" required placeholder="https://medicareagencyfinder.com/api/publisher/" value="https://medicareagencyfinder.com/api/publisher/" />
+            </div>
+            <div class="field">
+              <label for="secret_ref">Worker secret name</label>
+              <input id="secret_ref" required placeholder="MAF_PUBLISHER_TOKEN" value="MAF_PUBLISHER_TOKEN" />
+            </div>
+            <div class="form-actions">
+              <p class="muted form-hint">Create this secret in Cloudflare (Workers → daneshtabrizi → Settings → Variables and Secrets).</p>
+              <button type="button" class="btn ghost" id="add-close">Close</button>
+              <button class="btn" type="submit">Save</button>
+            </div>
+          </form>
+        </div>
       </section>
       <section class="panel">
-        <h3>Connected</h3>
+        <div class="panel-head">
+          <h3>Connected</h3>
+          <div class="agenda-menu" id="connected-menu">
+            <button type="button" class="agenda-gear" id="connected-gear" aria-haspopup="menu" aria-expanded="false" aria-label="Connection settings" title="Settings">
+              <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
+            </button>
+            <div class="agenda-menu-panel" id="connected-menu-panel" role="menu" hidden></div>
+          </div>
+        </div>
         <div id="list" class="muted">Loading…</div>
       </section>
     </main>
   </div>
   <script type="module">
-    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
+    import { api, el, setActiveNav, requireSession, showToast } from "/private/assets/private.js?v=pub6";
     setActiveNav();
     const health = await requireSession();
     document.getElementById("user-slot").textContent = health.identity?.email || "";
     const list = document.getElementById("list");
-    const flash = document.getElementById("flash");
+    const gearBtn = document.getElementById("connected-gear");
+    const menuPanel = document.getElementById("connected-menu-panel");
+    let connectedSites = [];
+
+    function setMenuOpen(open) {
+      menuPanel.hidden = !open;
+      gearBtn.setAttribute("aria-expanded", open ? "true" : "false");
+    }
+
+    function renderSettingsMenu() {
+      if (!connectedSites.length) {
+        menuPanel.replaceChildren(
+          el("button", {
+            type: "button",
+            role: "menuitem",
+            text: "No connections",
+            disabled: "true",
+          }),
+        );
+        return;
+      }
+      menuPanel.replaceChildren(
+        ...connectedSites.map((w) =>
+          el("button", {
+            type: "button",
+            class: "danger",
+            role: "menuitem",
+            text: `Remove ${w.name}`,
+            onclick: async () => {
+              setMenuOpen(false);
+              if (!confirm(`Remove connection to ${w.name}?`)) return;
+              try {
+                await api("/api/websites/" + encodeURIComponent(w.id), { method: "DELETE" });
+                showToast(`Removed ${w.name}`, "ok");
+                await refresh();
+              } catch (e) {
+                showToast(e.message, "err");
+              }
+            },
+          }),
+        ),
+      );
+    }
+
+    gearBtn.addEventListener("click", (e) => {
+      e.stopPropagation();
+      renderSettingsMenu();
+      setMenuOpen(menuPanel.hidden);
+    });
+
+    document.addEventListener("click", (e) => {
+      if (!document.getElementById("connected-menu").contains(e.target)) {
+        setMenuOpen(false);
+      }
+    });
 
     async function testSite(id, name) {
       try {
         const result = await api("/api/websites/" + id + "/test", { method: "POST", body: "{}" });
-        flash.replaceChildren(el("div", {
-          class: "flash " + (result.ok ? "ok" : "err"),
-          text: (name || id) + ": " + (result.message || (result.ok ? "ok" : "failed")),
-        }));
+        showToast(
+          (name || id) + ": " + (result.message || (result.ok ? "ok" : "failed")),
+          result.ok ? "ok" : "err",
+        );
         await refresh();
       } catch (e) {
-        flash.replaceChildren(el("div", { class: "flash err", text: e.message }));
+        showToast(e.message, "err");
       }
     }
 
     async function refresh() {
       const { websites, note } = await api("/api/websites");
-      if (!websites?.length) {
+      connectedSites = websites || [];
+      setMenuOpen(false);
+      if (!connectedSites.length) {
         list.textContent = note || "No websites connected yet.";
         return;
       }
-      list.replaceChildren(el("table", { class: "table" }, [
-        el("thead", {}, [el("tr", {}, [
-          el("th", { text: "Name" }), el("th", { text: "Domain" }),
-          el("th", { text: "Endpoint" }), el("th", { text: "Secret" }),
-          el("th", { text: "Status" }), el("th", { text: "" }),
-        ])]),
-        el("tbody", {}, websites.map((w) => {
-          const testBtn = document.createElement("button");
-          testBtn.type = "button";
-          testBtn.className = "btn ghost";
-          testBtn.textContent = "Test";
-          testBtn.addEventListener("click", () => testSite(w.id, w.name));
-          return el("tr", {}, [
-            el("td", { text: w.name }),
-            el("td", { text: w.domain }),
-            el("td", { text: w.api_endpoint || "—" }),
-            el("td", { text: w.secret_ref || "—" }),
-            el("td", { text: w.connection_status || "unknown" }),
-            el("td", {}, [testBtn]),
-          ]);
-        })),
-      ]));
+      list.replaceChildren(el("div", { class: "site-list" }, connectedSites.map((w) => {
+        const testBtn = document.createElement("button");
+        testBtn.type = "button";
+        testBtn.className = "btn ghost compact";
+        testBtn.textContent = "Test";
+        testBtn.addEventListener("click", () => testSite(w.id, w.name));
+        const status = String(w.connection_status || "unknown");
+        return el("div", { class: "site-row" }, [
+          el("div", { class: "site-copy" }, [
+            el("div", { class: "site-title", text: w.name }),
+            el("div", { class: "site-meta", text: w.domain }),
+            el("div", { class: "site-meta", text: w.api_endpoint || "No endpoint set" }),
+            el("div", {
+              class: "site-status",
+              text: `${status} · ${w.secret_ref || "no secret"}`,
+              "data-ok": status === "ok" ? "1" : "0",
+            }),
+          ]),
+          testBtn,
+        ]);
+      })));
     }
 
-    document.getElementById("add-form").addEventListener("submit", async (e) => {
+    const addPanel = document.getElementById("add-panel");
+    const addHead = document.getElementById("add-head");
+    const addToggle = document.getElementById("add-toggle");
+    const addClose = document.getElementById("add-close");
+    const addBody = document.getElementById("add-body");
+    const addForm = document.getElementById("add-form");
+
+    function setAddOpen(open) {
+      addPanel.classList.toggle("is-collapsed", !open);
+      addBody.hidden = !open;
+      addHead.hidden = open;
+      addToggle.setAttribute("aria-expanded", open ? "true" : "false");
+      if (open) document.getElementById("name").focus();
+    }
+
+    addToggle.addEventListener("click", () => setAddOpen(true));
+    addClose.addEventListener("click", () => setAddOpen(false));
+
+    addForm.addEventListener("submit", async (e) => {
       e.preventDefault();
       try {
         await api("/api/websites", {
@@ -118,11 +207,15 @@
             secret_ref: document.getElementById("secret_ref").value || null,
           }),
         });
-        flash.replaceChildren(el("div", { class: "flash ok", text: "Website added. Create the Worker secret in Cloudflare, then tap Test." }));
+        const savedName = document.getElementById("name").value.trim() || "Website";
         e.target.reset();
+        document.getElementById("endpoint").value = "https://medicareagencyfinder.com/api/publisher/";
+        document.getElementById("secret_ref").value = "MAF_PUBLISHER_TOKEN";
+        setAddOpen(false);
+        showToast(`${savedName} connected`, "ok");
         await refresh();
       } catch (err) {
-        flash.replaceChildren(el("div", { class: "flash err", text: err.message }));
+        showToast(err.message, "err");
       }
     });
 

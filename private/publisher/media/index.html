@@ -7,7 +7,7 @@
   <title>Publisher HQ — Media</title>
   <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
   <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
-  <link rel="stylesheet" href="/private/assets/private.css?v=nav2" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=media1" />
 </head>
 <body>
   <div class="wrap">
@@ -16,26 +16,152 @@
       <nav class="nav">
         <a href="/private/">Command Center</a>
         <a href="/private/publisher/">Overview</a>
+        <a href="/private/publisher/write/">Write</a>
         <a href="/private/publisher/media/" data-nav="/private/publisher/media/">Media</a>
       </nav>
+      <div class="user" id="user-slot"></div>
     </header>
     <main>
       <p class="hero-line">R2 storage</p>
       <h1>Media Library</h1>
-      <p class="lede">Shared media via Cloudflare R2. Upload API lands after the R2 bucket binding is configured.</p>
+      <p class="lede">Upload images once, then insert them into articles or set as the featured image on Write.</p>
+      <div id="flash"></div>
+
       <section class="panel">
-        <h3>Status</h3>
-        <p class="muted" id="status">Checking…</p>
+        <h3>Upload</h3>
+        <form id="upload-form" class="media-upload">
+          <div class="field">
+            <label for="file">Image</label>
+            <input id="file" name="file" type="file" accept="image/*" required />
+          </div>
+          <div class="field">
+            <label for="title">Title (optional)</label>
+            <input id="title" name="title" autocomplete="off" placeholder="Hero — Medicare enrollment" />
+          </div>
+          <div class="field">
+            <label for="alt_text">Alt text (optional)</label>
+            <input id="alt_text" name="alt_text" autocomplete="off" placeholder="Describe the image" />
+          </div>
+          <div class="row">
+            <button class="btn" type="submit" id="upload-btn">Upload to R2</button>
+            <span class="muted" id="r2-status">Checking R2…</span>
+          </div>
+        </form>
+      </section>
+
+      <section class="panel">
+        <div class="panel-head">
+          <h3>Library</h3>
+          <button class="btn ghost compact" type="button" id="refresh-btn">Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div id="library" class="media-grid muted">Loading…</div>
+        </div>
       </section>
     </main>
   </div>
   <script type="module">
-    import { requireSession, setActiveNav } from "/private/assets/private.js";
+    import { api, el, setActiveNav, requireSession } from "/private/assets/private.js";
     setActiveNav();
     const health = await requireSession();
-    document.getElementById("status").textContent = health.bindings?.r2
-      ? "R2 binding present. Wire /api/media upload next."
-      : "R2 not bound yet. Create bucket `command-center-media` and bind as MEDIA (see docs/CLOUDFLARE_SETUP.md).";
+    document.getElementById("user-slot").textContent = health.identity?.email || "";
+
+    const flash = document.getElementById("flash");
+    const library = document.getElementById("library");
+    const r2Status = document.getElementById("r2-status");
+    const uploadBtn = document.getElementById("upload-btn");
+
+    function mediaUrl(item) {
+      return item.url || `/media/${encodeURIComponent(item.id)}`;
+    }
+
+    function showFlash(ok, text) {
+      flash.replaceChildren(el("div", { class: "flash " + (ok ? "ok" : "err"), text }));
+    }
+
+    async function loadLibrary() {
+      library.className = "media-grid muted";
+      library.textContent = "Loading…";
+      try {
+        const data = await api("/api/media");
+        r2Status.textContent = data.r2
+          ? "R2 bound — uploads ready"
+          : "R2 not bound — create bucket command-center-media (see Cloudflare steps)";
+        uploadBtn.disabled = !data.r2;
+        const items = data.media || [];
+        if (!items.length) {
+          library.textContent = data.error || "No media yet. Upload an image above.";
+          return;
+        }
+        library.className = "media-grid";
+        library.replaceChildren(
+          ...items.map((item) => {
+            const card = el("article", { class: "media-card" });
+            const img = document.createElement("img");
+            img.src = mediaUrl(item);
+            img.alt = item.alt_text || item.title || item.filename || "";
+            img.loading = "lazy";
+            const meta = el("div", { class: "media-meta" }, [
+              el("strong", { text: item.title || item.filename || item.id }),
+              el("span", {
+                class: "muted",
+                text: `${item.content_type || "image"} · ${Math.round((item.byte_size || 0) / 1024)} KB`,
+              }),
+            ]);
+            const actions = el("div", { class: "media-actions" }, [
+              el("button", {
+                class: "btn ghost compact",
+                type: "button",
+                text: "Copy URL",
+                onclick: async () => {
+                  const url = new URL(mediaUrl(item), location.origin).href;
+                  try {
+                    await navigator.clipboard.writeText(url);
+                    showFlash(true, "URL copied.");
+                  } catch {
+                    showFlash(false, url);
+                  }
+                },
+              }),
+            ]);
+            card.append(img, meta, actions);
+            return card;
+          }),
+        );
+      } catch (e) {
+        library.textContent = e.message || "Failed to load media";
+        r2Status.textContent = "Could not reach /api/media";
+      }
+    }
+
+    document.getElementById("upload-form").addEventListener("submit", async (e) => {
+      e.preventDefault();
+      const fileInput = document.getElementById("file");
+      const file = fileInput.files?.[0];
+      if (!file) return;
+      const form = new FormData();
+      form.append("file", file);
+      const title = document.getElementById("title").value.trim();
+      const alt = document.getElementById("alt_text").value.trim();
+      if (title) form.append("title", title);
+      if (alt) form.append("alt_text", alt);
+      uploadBtn.disabled = true;
+      uploadBtn.textContent = "Uploading…";
+      try {
+        const created = await api("/api/media", { method: "POST", body: form });
+        showFlash(true, `Uploaded ${created.filename || created.id}`);
+        e.target.reset();
+        await loadLibrary();
+      } catch (err) {
+        showFlash(false, err.message || "Upload failed");
+      } finally {
+        uploadBtn.disabled = false;
+        uploadBtn.textContent = "Upload to R2";
+      }
+    });
+
+    document.getElementById("refresh-btn").addEventListener("click", loadLibrary);
+    await loadLibrary();
   </script>
 </body>
 </html>

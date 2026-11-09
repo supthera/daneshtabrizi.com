@@ -1,11 +1,12 @@
 /** Shared private-shell helpers */
 
 export async function api(path, options = {}) {
+  const isForm = typeof FormData !== "undefined" && options.body instanceof FormData;
   const res = await fetch(path, {
     credentials: "same-origin",
     headers: {
       accept: "application/json",
-      ...(options.body ? { "content-type": "application/json" } : {}),
+      ...(options.body && !isForm ? { "content-type": "application/json" } : {}),
       ...(options.headers || {}),
     },
     ...options,
@@ -79,4 +80,33 @@ export async function requireSession() {
     }
     throw e;
   }
+}
+
+/** Ordinova-style floating toast (pastel perimeter). */
+export function showToast(message, tone = "ok", durationMs = 3200) {
+  let host = document.getElementById("toast-host");
+  if (!host) {
+    host = document.createElement("div");
+    host.id = "toast-host";
+    host.className = "toast-host";
+    host.setAttribute("aria-live", "polite");
+    document.body.appendChild(host);
+  }
+
+  const node = document.createElement("div");
+  node.className = `toast-dark toast-dark-${tone === "err" ? "error" : "success"}`;
+  node.setAttribute("role", "status");
+  const text = document.createElement("span");
+  text.className = "toast-dark-text";
+  text.textContent = message;
+  node.appendChild(text);
+  host.appendChild(node);
+
+  requestAnimationFrame(() => node.classList.add("is-in"));
+  window.setTimeout(() => {
+    node.classList.remove("is-in");
+    node.classList.add("is-out");
+    window.setTimeout(() => node.remove(), 220);
+  }, durationMs);
+  return node;
 }

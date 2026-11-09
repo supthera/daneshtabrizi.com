@@ -1,8 +1,10 @@
 import { CustomRestConnector } from "./connectors/custom-rest";
 import type { PublishPayload, PublishResult } from "./connectors/types";
+import { mediaPublicUrl } from "./media";
 
 export type PublishEnv = {
   DB: D1Database;
+  MEDIA?: R2Bucket;
   [key: string]: unknown;
 };
 
@@ -26,6 +28,7 @@ type ArticleRow = {
   seo_description: string | null;
   canonical_url: string | null;
   status: string;
+  featured_image_id: string | null;
 };
 
 function uid(): string {
@@ -46,16 +49,46 @@ function resolveSecret(env: PublishEnv, secretRef: string | null): string | null
   return typeof value === "string" && value.length ? value : null;
 }
 
-function toPayload(article: ArticleRow, status: "draft" | "published"): PublishPayload {
+function siteOrigin(env: PublishEnv): string {
+  const configured = env.PUBLIC_SITE_URL;
+  if (typeof configured === "string" && configured.trim()) {
+    return configured.replace(/\/$/, "");
+  }
+  return "https://daneshtabrizi.com";
+}
+
+function absolutizeMediaUrls(html: string, origin: string): string {
+  return String(html || "").replace(
+    /(src|href)=(["'])(\/media\/[^"']+)\2/gi,
+    (_m, attr: string, quote: string, path: string) => `${attr}=${quote}${origin}${path}${quote}`,
+  );
+}
+
+async function toPayload(
+  env: PublishEnv,
+  article: ArticleRow,
+  status: "draft" | "published",
+): Promise<PublishPayload> {
+  const origin = siteOrigin(env);
+  let featuredImage: string | undefined;
+  if (article.featured_image_id) {
+    const media = await env.DB.prepare(`SELECT id FROM media WHERE id = ?`)
+      .bind(article.featured_image_id)
+      .first<{ id: string }>();
+    if (media) featuredImage = mediaPublicUrl(origin, media.id);
+  }
+
   return {
     article_id: article.id,
     title: article.title,
     slug: article.slug || undefined,
-    content: article.content_html || "",
+    content: absolutizeMediaUrls(article.content_html || "", origin),
     excerpt: article.excerpt || undefined,
+    featured_image: featuredImage,
     seo: {
       title: article.seo_title || undefined,
       description: article.seo_description || undefined,
+      og_image: featuredImage,
     },
     canonical_url: article.canonical_url || undefined,
     status,
@@ -112,7 +145,7 @@ export async function runPublishJob(
   const mode = opts.mode || "publish";
   const article = await db
     .prepare(
-      `SELECT id, title, slug, content_html, excerpt, seo_title, seo_description, canonical_url, status
+      `SELECT id, title, slug, content_html, excerpt, seo_title, seo_description, canonical_url, status, featured_image_id
        FROM articles WHERE id = ?`
     )
     .bind(opts.articleId)
@@ -150,7 +183,7 @@ export async function runPublishJob(
     article.slug = slug;
   }
 
-  const payload = toPayload(article, mode === "publish" ? "published" : "draft");
+  const payload = await toPayload(env, article, mode === "publish" ? "published" : "draft");
   const results: Array<{
     website_id: string;
     website_name: string;

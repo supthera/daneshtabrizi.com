@@ -12,19 +12,17 @@ directory = "."
 binding = "ASSETS"
 not_found_handling = "404-page"
 # Run the Worker first for API routes so publish/auth handlers execute.
-run_worker_first = ["/api/*"]
+run_worker_first = ["/api/*", "/media/*"]
 
-# --- Admin: create D1, then paste database_id and uncomment ---
-# [[d1_databases]]
-# binding = "DB"
-# database_name = "command-center"
-# database_id = "REPLACE_WITH_D1_DATABASE_ID"
-# migrations_dir = "migrations"
+[[d1_databases]]
+binding = "DB"
+database_name = "command-center"
+database_id = "f47b7876-d05e-4ebf-a642-9c58bdc4a338"
+migrations_dir = "migrations"
 
-# --- Optional media store ---
-# [[r2_buckets]]
-# binding = "MEDIA"
-# bucket_name = "command-center-media"
+[[r2_buckets]]
+binding = "MEDIA"
+bucket_name = "command-center-media"
 
 # Secrets (Workers & Pages → daneshtabrizi → Settings → Variables and Secrets):
 # - CF_ACCESS_TEAM_DOMAIN

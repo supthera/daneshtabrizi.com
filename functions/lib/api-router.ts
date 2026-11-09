@@ -1,6 +1,7 @@
 import { json, resolveIdentity, unauthorized } from "./auth";
 import { runPublishJob, testWebsiteConnection, type PublishEnv } from "./publish";
 import { FALLBACK_APPS } from "./apps";
+import { listMedia, uploadMedia } from "./media";
 
 type Env = PublishEnv & {
   ASSETS?: Fetcher;
@@ -31,6 +32,10 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
       service: "command-center",
       identity: identity || null,
       db: Boolean(env.DB),
+      bindings: {
+        d1: Boolean(env.DB),
+        r2: Boolean(env.MEDIA),
+      },
     });
   }
 
@@ -112,6 +117,30 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     }
   }
 
+  const websiteIdMatch = path.match(/^\/api\/websites\/([^/]+)$/);
+  if (websiteIdMatch && method === "DELETE") {
+    if (!env.DB) return json({ error: "D1 not bound" }, 503);
+    const websiteId = decodeURIComponent(websiteIdMatch[1]);
+    try {
+      const existing = await env.DB.prepare(`SELECT id, name FROM websites WHERE id = ?`)
+        .bind(websiteId)
+        .first<{ id: string; name: string }>();
+      if (!existing) return json({ error: "Website not found" }, 404);
+
+      await env.DB.prepare(`DELETE FROM websites WHERE id = ?`).bind(websiteId).run();
+      await env.DB.prepare(
+        `INSERT INTO audit_logs (id, actor_email, action, resource_type, resource_id)
+         VALUES (?, ?, 'website.delete', 'website', ?)`
+      )
+        .bind(uid(), identity.email, websiteId)
+        .run();
+
+      return json({ ok: true, id: websiteId, name: existing.name });
+    } catch (e) {
+      return json({ error: String(e) }, 500);
+    }
+  }
+
   const websiteTest = path.match(/^\/api\/websites\/([^/]+)\/test$/);
   if (websiteTest && method === "POST") {
     if (!env.DB) return json({ error: "D1 not bound" }, 503);
@@ -152,13 +181,25 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     const status = String(body.status || "draft");
     const seoTitle = body.seo_title ? String(body.seo_title) : null;
     const seoDescription = body.seo_description ? String(body.seo_description) : null;
+    const featuredImageId = body.featured_image_id ? String(body.featured_image_id) : null;
 
     try {
       await env.DB.prepare(
-        `INSERT INTO articles (id, title, slug, content_html, excerpt, author, status, seo_title, seo_description)
-         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?)`
+        `INSERT INTO articles (id, title, slug, content_html, excerpt, author, status, seo_title, seo_description, featured_image_id)
+         VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`
       )
-        .bind(articleId, title, slug, content, excerpt, identity.email, status, seoTitle, seoDescription)
+        .bind(
+          articleId,
+          title,
+          slug,
+          content,
+          excerpt,
+          identity.email,
+          status,
+          seoTitle,
+          seoDescription,
+          featuredImageId,
+        )
         .run();
 
       await env.DB.prepare(
@@ -203,6 +244,12 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     const status = body.status != null ? String(body.status) : null;
     const seoTitle = body.seo_title != null ? String(body.seo_title) : null;
     const seoDescription = body.seo_description != null ? String(body.seo_description) : null;
+    const featuredImageId =
+      body.featured_image_id !== undefined
+        ? body.featured_image_id
+          ? String(body.featured_image_id)
+          : null
+        : undefined;
 
     await env.DB.prepare(
       `UPDATE articles SET
@@ -213,10 +260,22 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
          status = COALESCE(?, status),
          seo_title = COALESCE(?, seo_title),
          seo_description = COALESCE(?, seo_description),
+         featured_image_id = CASE WHEN ? THEN ? ELSE featured_image_id END,
          updated_at = datetime('now')
        WHERE id = ?`
     )
-      .bind(title, slug, excerpt, content, status, seoTitle, seoDescription, id)
+      .bind(
+        title,
+        slug,
+        excerpt,
+        content,
+        status,
+        seoTitle,
+        seoDescription,
+        featuredImageId !== undefined ? 1 : 0,
+        featuredImageId ?? null,
+        id,
+      )
       .run();
 
     return json({ id, ok: true });
@@ -265,6 +324,14 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
     } catch (e) {
       return json({ jobs: [], logs: [], error: String(e) }, 500);
     }
+  }
+
+  if (path === "/api/media" && method === "GET") {
+    return listMedia(env);
+  }
+
+  if (path === "/api/media" && method === "POST") {
+    return uploadMedia(env, request, identity.email);
   }
 
   return json({ error: "Not found" }, 404);
