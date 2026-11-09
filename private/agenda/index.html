@@ -1,0 +1,533 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Agenda — Command Center</title>
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=agenda5" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand">
+        <span class="kicker">Command Center</span>
+        <span class="name">Agenda</span>
+      </div>
+      <nav class="nav" aria-label="Command center">
+        <a href="/private/">Apps</a>
+        <a href="/private/agenda/" data-nav="/private/agenda/">Agenda</a>
+        <a href="/private/publisher/">Publisher HQ</a>
+        <a href="/private/integrations/">Integrations</a>
+        <a href="/private/settings/">Settings</a>
+        <a href="/private/apps/">Registry</a>
+      </nav>
+      <div class="user" id="user-slot"><span>Checking access…</span></div>
+    </header>
+
+    <main>
+      <p class="hero-line">Projects</p>
+      <h1>Agenda</h1>
+      <div class="agenda-grid" id="agenda-grid" aria-label="Project to-do boards"></div>
+    </main>
+  </div>
+
+  <div class="agenda-overlay" id="agenda-overlay" hidden aria-hidden="true">
+    <div class="agenda-modal" role="dialog" aria-modal="true" aria-labelledby="agenda-modal-title">
+      <div class="agenda-modal-head">
+        <div>
+          <h2 id="agenda-modal-title">Project</h2>
+          <p class="meta" id="agenda-modal-meta"></p>
+        </div>
+        <button type="button" class="agenda-modal-close" id="agenda-modal-close" aria-label="Close">×</button>
+      </div>
+      <div class="agenda-modal-body">
+        <ul class="agenda-todos" id="agenda-modal-list"></ul>
+        <div class="agenda-add">
+          <input type="text" id="agenda-modal-input" placeholder="Add task…" />
+          <button type="button" id="agenda-modal-add">Add</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script type="module">
+    import { el, setActiveNav, requireSession } from "/private/assets/private.js";
+
+    const LS_KEY = "dt.agenda.boards.v1";
+    const DEFAULTS = [
+      { id: "daneshtabrizi", title: "DaneshTabrizi.com", todos: [] },
+      { id: "dantefuego", title: "DanteFuego.com", todos: [] },
+      { id: "maf", title: "MedicareAgencyFinder.com", todos: [] },
+      { id: "ordinova", title: "Ordinova.com", todos: [] },
+      { id: "tradejester", title: "Tradejester.com", todos: [] },
+      { id: "zendamovement", title: "Zendamovement.com", todos: [] },
+      { id: "portturret", title: "Portturret.com", todos: [] },
+      { id: "supthera", title: "Supthera.com", todos: [] },
+      { id: "opusgrex", title: "Opusgrex.com", todos: [] },
+      { id: "persianvegan", title: "Persianvegan.com", todos: [] },
+      { id: "therapyagencyacademy", title: "Therapyagencyacademy.com", todos: [] },
+      { id: "crazylobby", title: "Crazylobby.com", todos: [] },
+    ];
+
+    function loadBoards() {
+      try {
+        const raw = localStorage.getItem(LS_KEY);
+        if (!raw) return structuredClone(DEFAULTS);
+        const parsed = JSON.parse(raw);
+        if (!Array.isArray(parsed)) return structuredClone(DEFAULTS);
+
+        const defs = new Map(DEFAULTS.map((d) => [d.id, d]));
+        const merged = [];
+        const seen = new Set();
+
+        for (const saved of parsed) {
+          if (!saved || !saved.id || !defs.has(saved.id)) continue;
+          const def = defs.get(saved.id);
+          merged.push({
+            ...def,
+            todos: Array.isArray(saved.todos) ? saved.todos : [],
+          });
+          seen.add(saved.id);
+        }
+        for (const def of DEFAULTS) {
+          if (!seen.has(def.id)) merged.push(structuredClone(def));
+        }
+        return merged;
+      } catch {
+        return structuredClone(DEFAULTS);
+      }
+    }
+
+    function saveBoards() {
+      localStorage.setItem(LS_KEY, JSON.stringify(boards));
+    }
+
+    function uid() {
+      return "t-" + Math.random().toString(36).slice(2, 9);
+    }
+
+    const PURGE_DELAY_MS = 3000;
+    const FADE_MS = 450;
+    const fadingIds = new Set();
+    let purgeClock = null;
+
+    let boards = loadBoards();
+    let activeId = null;
+    let suppressClickUntil = 0;
+    const grid = document.getElementById("agenda-grid");
+    const overlay = document.getElementById("agenda-overlay");
+    const modalTitle = document.getElementById("agenda-modal-title");
+    const modalMeta = document.getElementById("agenda-modal-meta");
+    const modalList = document.getElementById("agenda-modal-list");
+    const modalInput = document.getElementById("agenda-modal-input");
+    const modalAdd = document.getElementById("agenda-modal-add");
+    const modalClose = document.getElementById("agenda-modal-close");
+
+    function boardById(id) {
+      return boards.find((b) => b.id === id);
+    }
+
+    function openCount(board) {
+      return board.todos.filter((t) => !t.done).length;
+    }
+
+    function captureRects() {
+      const map = new Map();
+      grid.querySelectorAll(".agenda-board").forEach((node) => {
+        map.set(node.dataset.id, node.getBoundingClientRect());
+      });
+      return map;
+    }
+
+    function animateFlip(before) {
+      const nodes = [...grid.querySelectorAll(".agenda-board")];
+      nodes.forEach((node) => {
+        const prev = before.get(node.dataset.id);
+        if (!prev || node.classList.contains("is-dragging")) return;
+        const next = node.getBoundingClientRect();
+        const dx = prev.left - next.left;
+        const dy = prev.top - next.top;
+        if (Math.abs(dx) < 0.5 && Math.abs(dy) < 0.5) return;
+        node.style.transition = "none";
+        node.style.transform = `translate(${dx}px, ${dy}px)`;
+        node.getBoundingClientRect();
+        node.classList.add("is-settling");
+        node.style.transition = "";
+        node.style.transform = "";
+        const clear = () => {
+          node.classList.remove("is-settling");
+          node.removeEventListener("transitionend", clear);
+        };
+        node.addEventListener("transitionend", clear);
+      });
+    }
+
+    function moveBoard(fromIndex, toIndex) {
+      if (fromIndex === toIndex || fromIndex < 0 || toIndex < 0) return false;
+      if (toIndex >= boards.length) return false;
+      const before = captureRects();
+      const [item] = boards.splice(fromIndex, 1);
+      boards.splice(toIndex, 0, item);
+      paint({ preserveDragId: item.id });
+      animateFlip(before);
+      return true;
+    }
+
+    function fadeTodoRows(todoId) {
+      document.querySelectorAll(`[data-todo-id="${todoId}"]`).forEach((row) => {
+        row.classList.add("is-fading");
+      });
+    }
+
+    function deleteTodo(board, todoId) {
+      fadingIds.delete(todoId);
+      board.todos = board.todos.filter((t) => t.id !== todoId);
+      saveBoards();
+      paint();
+      if (activeId === board.id) renderModalBody(board);
+    }
+
+    function beginFade(board, todoId) {
+      if (fadingIds.has(todoId)) {
+        fadeTodoRows(todoId);
+        return;
+      }
+      if (!board.todos.some((t) => t.id === todoId && t.done)) return;
+      fadingIds.add(todoId);
+      fadeTodoRows(todoId);
+      setTimeout(() => {
+        const still = boards.find((b) => b.id === board.id);
+        if (!still) {
+          fadingIds.delete(todoId);
+          return;
+        }
+        deleteTodo(still, todoId);
+      }, FADE_MS);
+    }
+
+    function tickPurges() {
+      const now = Date.now();
+      let stamped = false;
+      boards.forEach((board) => {
+        board.todos.slice().forEach((todo) => {
+          if (!todo.done) {
+            if (todo.doneAt) {
+              delete todo.doneAt;
+              stamped = true;
+            }
+            fadingIds.delete(todo.id);
+            return;
+          }
+          if (!todo.doneAt) {
+            todo.doneAt = now;
+            stamped = true;
+          }
+          if (fadingIds.has(todo.id)) {
+            fadeTodoRows(todo.id);
+            return;
+          }
+          if (now - todo.doneAt >= PURGE_DELAY_MS) beginFade(board, todo.id);
+        });
+      });
+      if (stamped) saveBoards();
+    }
+
+    function startPurgeClock() {
+      if (purgeClock) return;
+      tickPurges();
+      purgeClock = setInterval(tickPurges, 250);
+    }
+
+    function renderTodoList(board, listEl, { allowDelete = false } = {}) {
+      listEl.replaceChildren();
+      board.todos.forEach((todo) => {
+        const box = document.createElement("input");
+        box.type = "checkbox";
+        box.checked = !!todo.done;
+        box.addEventListener("change", () => {
+          todo.done = box.checked;
+          if (todo.done) todo.doneAt = Date.now();
+          else {
+            delete todo.doneAt;
+            fadingIds.delete(todo.id);
+          }
+          saveBoards();
+          paint();
+          tickPurges();
+          if (activeId === board.id) renderModalBody(board);
+        });
+        const label = el("span", { text: todo.text });
+        const row = document.createElement("li");
+        row.dataset.todoId = todo.id;
+        if (todo.done) row.classList.add("done");
+        if (fadingIds.has(todo.id)) row.classList.add("is-fading");
+        row.append(box, label);
+        if (allowDelete) {
+          const del = document.createElement("button");
+          del.type = "button";
+          del.className = "agenda-del";
+          del.textContent = "Remove";
+          del.addEventListener("click", () => {
+            fadingIds.delete(todo.id);
+            deleteTodo(board, todo.id);
+          });
+          row.append(del);
+        }
+        listEl.appendChild(row);
+      });
+    }
+
+    function addTodo(board, text) {
+      const value = text.trim();
+      if (!value) return false;
+      board.todos.unshift({ id: uid(), text: value, done: false });
+      board.empty = false;
+      saveBoards();
+      return true;
+    }
+
+    function renderBoard(board, { preserveDragId } = {}) {
+      const open = openCount(board);
+      const card = el("article", {
+        class: "agenda-board" + (board.empty && !board.todos.length ? " empty" : ""),
+        "data-id": board.id,
+        title: "Drag to rearrange · Double-click to expand",
+      });
+      if (preserveDragId === board.id) card.classList.add("is-dragging");
+
+      const list = el("ul", { class: "agenda-todos" });
+      renderTodoList(board, list);
+
+      const input = document.createElement("input");
+      input.type = "text";
+      input.placeholder = "Add task…";
+      input.setAttribute("aria-label", "Add task for " + board.title);
+
+      const addBtn = document.createElement("button");
+      addBtn.type = "button";
+      addBtn.textContent = "Add";
+
+      function submit() {
+        if (!addTodo(board, input.value)) return;
+        input.value = "";
+        paint();
+        if (activeId === board.id) renderModalBody(board);
+      }
+      addBtn.addEventListener("click", (e) => { e.stopPropagation(); submit(); });
+      input.addEventListener("click", (e) => e.stopPropagation());
+      input.addEventListener("keydown", (e) => {
+        if (e.key === "Enter") {
+          e.preventDefault();
+          submit();
+        }
+      });
+
+      const addRow = el("div", { class: "agenda-add" });
+      addRow.append(input, addBtn);
+      addRow.addEventListener("click", (e) => e.stopPropagation());
+      list.addEventListener("click", (e) => {
+        if (e.target.closest("li,input,button")) e.stopPropagation();
+      });
+
+      card.append(
+        el("h3", { text: board.title }),
+        el("div", { class: "count", text: open ? open + " open" : "No open tasks" }),
+        list,
+        addRow
+      );
+
+      card.addEventListener("dblclick", (e) => {
+        if (Date.now() < suppressClickUntil) return;
+        if (e.target.closest("input,button,label,.agenda-add,.agenda-del")) return;
+        if (e.target.closest(".agenda-todos li")) return;
+        openModal(board.id);
+      });
+
+      grid.appendChild(card);
+    }
+
+    function renderModalBody(board) {
+      const open = openCount(board);
+      modalTitle.textContent = board.title;
+      modalMeta.textContent = open ? open + " open · " + board.todos.length + " total" : "No open tasks";
+      renderTodoList(board, modalList, { allowDelete: true });
+    }
+
+    function openModal(id) {
+      const board = boardById(id);
+      if (!board) return;
+      activeId = id;
+      renderModalBody(board);
+      overlay.hidden = false;
+      overlay.setAttribute("aria-hidden", "false");
+      requestAnimationFrame(() => overlay.classList.add("open"));
+      document.body.style.overflow = "hidden";
+      modalInput.value = "";
+      modalInput.focus();
+    }
+
+    function closeModal() {
+      overlay.classList.remove("open");
+      overlay.setAttribute("aria-hidden", "true");
+      document.body.style.overflow = "";
+      activeId = null;
+      setTimeout(() => {
+        if (!overlay.classList.contains("open")) overlay.hidden = true;
+      }, 220);
+    }
+
+    function paint(opts = {}) {
+      grid.replaceChildren();
+      boards.forEach((b) => renderBoard(b, opts));
+    }
+
+    function indexFromPoint(x, y, dragId) {
+      const cards = [...grid.querySelectorAll(".agenda-board")];
+      for (let i = 0; i < cards.length; i++) {
+        const r = cards[i].getBoundingClientRect();
+        if (x >= r.left && x <= r.right && y >= r.top && y <= r.bottom) {
+          return i;
+        }
+      }
+      return boards.findIndex((b) => b.id === dragId);
+    }
+
+    function liveCard(id) {
+      return grid.querySelector(`.agenda-board[data-id="${id}"]`);
+    }
+
+    function bindSort() {
+      let session = null;
+
+      function onMove(e) {
+        if (!session || e.pointerId !== session.pointerId) return;
+        const dx = e.clientX - session.startX;
+        const dy = e.clientY - session.startY;
+        const card = liveCard(session.id);
+        if (!card) return;
+
+        if (!session.moved) {
+          if (Math.hypot(dx, dy) < 7) return;
+          session.moved = true;
+          card.classList.remove("is-pressing");
+          card.classList.add("is-dragging");
+          grid.classList.add("is-sorting");
+          document.body.style.cursor = "grabbing";
+
+          const ghost = card.cloneNode(true);
+          ghost.classList.remove("is-dragging", "is-pressing");
+          ghost.classList.add("agenda-board-ghost");
+          ghost.style.width = session.width + "px";
+          ghost.style.height = session.height + "px";
+          ghost.style.left = e.clientX - session.offsetX + "px";
+          ghost.style.top = e.clientY - session.offsetY + "px";
+          document.body.appendChild(ghost);
+          session.ghost = ghost;
+        }
+
+        if (!session.ghost) return;
+        session.ghost.style.left = e.clientX - session.offsetX + "px";
+        session.ghost.style.top = e.clientY - session.offsetY + "px";
+
+        const from = boards.findIndex((b) => b.id === session.id);
+        const to = indexFromPoint(e.clientX, e.clientY, session.id);
+        if (from !== to) moveBoard(from, to);
+      }
+
+      function onEnd(e) {
+        if (!session || e.pointerId !== session.pointerId) return;
+        const moved = session.moved;
+        session.ghost?.remove();
+        const card = liveCard(session.id);
+        card?.classList.remove("is-dragging", "is-pressing");
+        grid.classList.remove("is-sorting");
+        document.body.style.cursor = "";
+        removeWindow();
+        session = null;
+        if (moved) {
+          saveBoards();
+          suppressClickUntil = Date.now() + 350;
+          paint();
+        }
+      }
+
+      function removeWindow() {
+        removeEventListener("pointermove", onMove);
+        removeEventListener("pointerup", onEnd);
+        removeEventListener("pointercancel", onEnd);
+      }
+
+      grid.addEventListener("pointerdown", (e) => {
+        if (e.button !== 0 || session) return;
+        const card = e.target.closest(".agenda-board");
+        if (!card || !grid.contains(card)) return;
+        if (e.target.closest("input,button,a,label,.agenda-add,.agenda-del")) return;
+        if (e.target.closest(".agenda-todos li")) return;
+
+        const rect = card.getBoundingClientRect();
+        session = {
+          id: card.dataset.id,
+          pointerId: e.pointerId,
+          startX: e.clientX,
+          startY: e.clientY,
+          offsetX: e.clientX - rect.left,
+          offsetY: e.clientY - rect.top,
+          width: rect.width,
+          height: rect.height,
+          moved: false,
+          ghost: null,
+        };
+        card.classList.add("is-pressing");
+        addEventListener("pointermove", onMove);
+        addEventListener("pointerup", onEnd);
+        addEventListener("pointercancel", onEnd);
+      });
+    }
+
+    modalClose.addEventListener("click", closeModal);
+    overlay.addEventListener("click", (e) => {
+      if (e.target === overlay) closeModal();
+    });
+    addEventListener("keydown", (e) => {
+      if (e.key === "Escape" && overlay.classList.contains("open")) {
+        e.preventDefault();
+        closeModal();
+      }
+    });
+    modalAdd.addEventListener("click", () => {
+      const board = boardById(activeId);
+      if (!board) return;
+      if (!addTodo(board, modalInput.value)) return;
+      modalInput.value = "";
+      paint();
+      renderModalBody(board);
+      modalInput.focus();
+    });
+    modalInput.addEventListener("keydown", (e) => {
+      if (e.key === "Enter") {
+        e.preventDefault();
+        modalAdd.click();
+      }
+    });
+
+    setActiveNav();
+    paint();
+    bindSort();
+    startPurgeClock();
+
+    try {
+      const health = await requireSession();
+      document.getElementById("user-slot").replaceChildren(
+        el("strong", { text: health.identity?.email || "Operator" }),
+        el("span", { text: health.identity?.source === "dev-bypass" ? "Dev bypass" : "Cloudflare Access" })
+      );
+    } catch {
+      document.getElementById("user-slot").textContent = "Access required";
+    }
+  </script>
+</body>
+</html>

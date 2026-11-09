@@ -54,6 +54,7 @@ export function setActiveNav() {
 export function iconGlyph(name) {
   const map = {
     publish: "◈",
+    agenda: "◷",
     trade: "↗",
     project: "▣",
     admin: "⚙",

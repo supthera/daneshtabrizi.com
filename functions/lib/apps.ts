@@ -23,6 +23,16 @@ export const FALLBACK_APPS: AppRecord[] = [
     sort_order: 10,
   },
   {
+    id: "agenda",
+    name: "Agenda",
+    description: "Calendar, reminders, and operational schedule.",
+    icon: "agenda",
+    route: "/private/agenda/",
+    status: "planned",
+    version: "0.0.0",
+    sort_order: 15,
+  },
+  {
     id: "trading-center",
     name: "Trading Center",
     description: "Future financial research and trading tools.",
