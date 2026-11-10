@@ -173,6 +173,6 @@ CREATE INDEX IF NOT EXISTS idx_audit_created ON audit_logs(created_at);
 -- Seed application registry
 INSERT OR IGNORE INTO applications (id, name, description, icon, route, status, version, sort_order) VALUES
   ('publisher-hq', 'Publisher HQ', 'Centralized multi-website publishing management.', 'publish', '/private/publisher/', 'active', '0.1.0', 10),
-  ('agenda', 'Agenda', 'Projects, tasks, and day-to-day operational schedule.', 'agenda', '/private/agenda/', 'active', '0.1.0', 20),
-  ('project-center', 'Project Center', 'Future project and operations management.', 'project', '/private/apps/#project-center', 'planned', '0.0.0', 30),
+  ('agenda', 'Dev Agenda', 'Projects, tasks, and day-to-day operational schedule.', 'agenda', '/private/agenda/', 'active', '0.1.0', 20),
+  ('music-studio', 'Music studio', 'Private music workspace for tracks, sessions, and studio tools.', 'music', '/private/music/', 'active', '0.1.0', 30),
   ('administration', 'Administration', 'Private settings, accounts, integrations, and application management.', 'admin', '/private/settings/', 'active', '0.1.0', 90);

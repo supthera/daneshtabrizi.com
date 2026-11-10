@@ -2,6 +2,7 @@ import { json, resolveIdentity, unauthorized } from "./auth";
 import { runPublishJob, testWebsiteConnection, type PublishEnv } from "./publish";
 import { FALLBACK_APPS } from "./apps";
 import { deleteMedia, listMedia, uploadMedia } from "./media";
+import { handleMusicApi } from "./music";
 
 type Env = PublishEnv & {
   ASSETS?: Fetcher;
@@ -41,6 +42,9 @@ export async function handleApi(request: Request, env: Env): Promise<Response> {
 
   const identity = await resolveIdentity(request, env);
   if (!identity) return unauthorized("Cloudflare Access authentication required");
+
+  const musicRes = await handleMusicApi(request, env, path, method, identity.email);
+  if (musicRes) return musicRes;
 
   if (path === "/api/apps" && method === "GET") {
     if (!env.DB) return json({ apps: FALLBACK_APPS, source: "fallback" });

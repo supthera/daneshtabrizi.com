@@ -1,0 +1,161 @@
+/* Music Studio — additive styles on Command Center shell */
+
+.music-toolbar{
+  display:flex; flex-wrap:wrap; gap:10px; align-items:center;
+  margin:14px 0 18px;
+}
+.music-toolbar .grow{flex:1; min-width:160px}
+.music-toolbar input[type="search"],
+.music-toolbar select,
+.music-field input,
+.music-field textarea,
+.music-field select{
+  width:100%;
+  background:#050505;
+  border:1px solid var(--line);
+  border-radius:2px;
+  padding:11px 12px;
+  min-height:44px;
+  color:var(--ink);
+}
+.music-toolbar select{width:auto; min-width:140px}
+.music-toolbar label.check{
+  display:inline-flex; align-items:center; gap:8px;
+  font-size:.72rem; color:var(--dim); min-height:44px; padding:0 4px;
+}
+.music-toolbar .btn{min-height:44px; padding:10px 14px}
+
+.music-grid{
+  display:grid;
+  grid-template-columns:repeat(auto-fill, minmax(240px, 1fr));
+  gap:12px;
+  margin-bottom:28px;
+}
+.music-card{
+  border:1px solid var(--line);
+  border-radius:3px;
+  background:var(--panel);
+  padding:14px;
+  display:flex; flex-direction:column; gap:10px;
+  cursor:grab;
+  transition:border-color .2s var(--ease), transform .2s var(--ease);
+  touch-action:manipulation;
+}
+.music-card:hover{border-color:rgba(255,174,59,.4)}
+.music-card.dragging{opacity:.55}
+.music-card.archived{opacity:.62}
+.music-card h2{
+  font-family:var(--display); font-weight:700; text-transform:uppercase;
+  font-size:1.15rem; line-height:1.05; letter-spacing:.02em;
+}
+.music-card .status{
+  font-size:.62rem; letter-spacing:.14em; text-transform:uppercase; color:var(--accent);
+}
+.music-card .counts{font-size:.72rem; color:var(--dim)}
+.music-card .row-actions{
+  display:flex; flex-wrap:wrap; gap:6px; margin-top:auto;
+}
+.music-card .row-actions .btn{min-height:44px; font-size:.62rem; padding:8px 10px}
+
+.music-empty{
+  border:1px dashed var(--line); border-radius:3px; padding:36px 18px;
+  text-align:center; color:var(--dim);
+}
+.music-empty h2{
+  font-family:var(--display); text-transform:uppercase; color:var(--ink);
+  font-size:1.4rem; margin-bottom:8px;
+}
+.music-empty .btn{margin-top:14px; min-height:44px}
+
+.music-detail{display:none}
+.music-detail.is-open{display:block}
+.music-dash.is-hidden{display:none}
+
+.music-detail-head{
+  display:flex; flex-wrap:wrap; gap:10px; align-items:flex-start;
+  margin:8px 0 16px;
+}
+.music-detail-head .title-edit{
+  flex:1; min-width:200px;
+  font-family:var(--display); font-weight:800; text-transform:uppercase;
+  font-size:clamp(1.4rem, 4vw, 2rem); letter-spacing:.02em;
+  background:transparent; border:0; border-bottom:1px solid var(--line);
+  padding:8px 0; min-height:44px; border-radius:0;
+}
+.music-detail-head .actions{display:flex; flex-wrap:wrap; gap:8px}
+.music-detail-head .actions .btn{min-height:44px}
+
+.music-fields{
+  display:grid; grid-template-columns:repeat(auto-fit, minmax(140px, 1fr));
+  gap:12px; margin-bottom:14px;
+}
+.music-field label{
+  display:block; font-size:.62rem; letter-spacing:.14em; text-transform:uppercase;
+  color:var(--dim); margin-bottom:6px;
+}
+.music-field textarea{min-height:160px; resize:vertical; line-height:1.45}
+.music-save-meta{font-size:.68rem; color:var(--dim); margin:6px 0 16px; min-height:1.2em}
+
+.music-takes{display:flex; flex-direction:column; gap:12px}
+.take{
+  border:1px solid var(--line); border-radius:3px; background:#070707; padding:12px;
+}
+.take.dragging{opacity:.5}
+.take-head{
+  display:flex; flex-wrap:wrap; gap:8px; align-items:center; margin-bottom:8px;
+}
+.take-head .handle{
+  min-width:44px; min-height:44px; display:grid; place-items:center;
+  color:var(--dim); border:1px solid var(--line); border-radius:2px; cursor:grab;
+}
+.take-head .label-input{flex:1; min-width:140px; min-height:44px}
+.take-head .btn{min-height:44px}
+.take .note-input{margin:8px 0; min-height:44px}
+.take .player{width:100%; margin-top:8px}
+.take video.player{max-height:360px; background:#000}
+.take .unplayable,.take .missing{
+  border:1px solid rgba(255,93,108,.35); color:#ffb3bb;
+  padding:10px 12px; font-size:.78rem; margin-top:8px;
+}
+.take .cues{margin-top:10px; display:flex; flex-direction:column; gap:6px}
+.take .cue{
+  display:flex; gap:8px; align-items:center; flex-wrap:wrap;
+  font-size:.75rem;
+}
+.take .cue button{
+  min-height:44px; min-width:64px; border:1px solid var(--line);
+  padding:8px 10px; color:var(--accent);
+}
+.take .cue-add{display:flex; flex-wrap:wrap; gap:8px; margin-top:8px}
+.take .cue-add input{flex:1; min-width:140px; min-height:44px}
+.take .cue-add .btn{min-height:44px}
+
+.music-backup{
+  margin-top:28px; border-top:1px solid var(--line); padding-top:18px;
+}
+.music-backup h3{font-family:var(--display); text-transform:uppercase; margin-bottom:8px}
+.music-backup p{color:var(--dim); font-size:.78rem; margin-bottom:10px; max-width:62ch}
+.music-backup .actions{display:flex; flex-wrap:wrap; gap:8px}
+.music-backup .actions .btn{min-height:44px}
+
+.music-reorder-mobile{
+  display:none; gap:8px; margin-top:8px;
+}
+@media (max-width:720px){
+  .music-card{cursor:default}
+  .music-reorder-mobile{display:flex}
+}
+
+.music-confirm{
+  position:fixed; inset:0; z-index:40;
+  background:rgba(0,0,0,.72); display:grid; place-items:center; padding:16px;
+}
+.music-confirm[hidden]{display:none}
+.music-confirm-box{
+  width:min(420px,100%); background:var(--panel); border:1px solid var(--line);
+  border-radius:3px; padding:18px;
+}
+.music-confirm-box h2{font-family:var(--display); text-transform:uppercase; margin-bottom:8px}
+.music-confirm-box p{color:var(--dim); font-size:.8rem; margin-bottom:14px}
+.music-confirm-actions{display:flex; gap:8px; justify-content:flex-end}
+.music-confirm-actions .btn{min-height:44px}

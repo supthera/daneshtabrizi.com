@@ -76,6 +76,7 @@ export function iconGlyph(name) {
     agenda: "◷",
     trade: "↗",
     project: "▣",
+    music: "♪",
     admin: "⚙",
     app: "◻",
   };

@@ -4,7 +4,7 @@ DELETE FROM applications WHERE id = 'trading-center';
 INSERT INTO applications (id, name, description, icon, route, status, version, sort_order)
 VALUES (
   'agenda',
-  'Agenda',
+  'Dev Agenda',
   'Projects, tasks, and day-to-day operational schedule.',
   'agenda',
   '/private/agenda/',

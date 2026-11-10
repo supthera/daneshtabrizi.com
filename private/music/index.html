@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <meta name="robots" content="noindex,nofollow" />
+  <title>Music Studio — Command Center</title>
+  <meta name="theme-color" content="#000000" />
+  <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Big+Shoulders+Display:wght@700;800;900&family=DM+Mono:wght@300;400;500&display=swap" />
+  <link rel="stylesheet" href="/private/assets/private.css?v=nav15a" />
+  <link rel="stylesheet" href="/private/music/css/music.css?v=1" />
+</head>
+<body>
+  <div class="wrap">
+    <header class="top">
+      <div class="brand-row">
+        <a class="agenda-gear" href="/private/settings/" data-nav="/private/settings/" aria-label="Settings" title="Settings">
+          <img src="/private/assets/ninja-star.webp" alt="" width="14" height="14" draggable="false" />
+        </a>
+        <div class="brand">
+          <span class="kicker">Command Center</span>
+        </div>
+      </div>
+      <nav class="nav" aria-label="Command center">
+        <a href="/private/">Apps</a>
+      </nav>
+      <div class="user" id="user-slot"><span>Checking access…</span></div>
+    </header>
+
+    <main>
+      <p class="hero-line">Music Studio</p>
+      <h1>Studio</h1>
+      <p class="lede">Private cards for songs and ideas — lyrics, notes, and takes in D1 + R2 behind your login.</p>
+      <div id="music-root"></div>
+    </main>
+  </div>
+
+  <script type="module">
+    import { el, setActiveNav, requireSession } from "/private/assets/private.js";
+    import { bootMusicStudio } from "/private/music/js/app.js";
+
+    setActiveNav();
+
+    try {
+      const health = await requireSession();
+      document.getElementById("user-slot").replaceChildren(
+        el("strong", { text: health.identity?.email || "Operator" }),
+        el("span", { text: health.identity?.source === "dev-bypass" ? "Dev bypass" : "Cloudflare Access" })
+      );
+      await bootMusicStudio(document.getElementById("music-root"));
+    } catch {
+      document.getElementById("user-slot").textContent = "Access required";
+    }
+  </script>
+</body>
+</html>
